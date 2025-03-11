@@ -1,0 +1,14 @@
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.csproj.AssemblyReference.cache
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.AssemblyInfoInputs.cache
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.AssemblyInfo.cs
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.csproj.CoreCompileInputs.cache
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\bin\Debug\net9.0\DataBase.deps.json
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\bin\Debug\net9.0\DataBase.runtimeconfig.json
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\bin\Debug\net9.0\DataBase.dll
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\bin\Debug\net9.0\DataBase.pdb
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.dll
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\refint\DataBase.dll
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.pdb
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\DataBase.genruntimeconfig.cache
+C:\Users\User\source\repos\PriazovBackend\PriazovBackend\obj\Debug\net9.0\ref\DataBase.dll
