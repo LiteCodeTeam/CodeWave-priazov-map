@@ -1,14 +1,12 @@
 ﻿using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
+using NLog;
 
 namespace DataBase
 {
-    internal class PriazovContext : DbContext
+    public class PriazovContext : DbContext
     {
-        readonly StreamWriter logStream = new StreamWriter("logFile.txt", true);
+        readonly Logger logStream = LogManager.GetCurrentClassLogger();
         //Создание таблиц в бд
         public DbSet<Project> Projects { get; set; }
         public DbSet<User> Users { get; set; }
@@ -16,15 +14,9 @@ namespace DataBase
         public DbSet<Industry> Industries { get; set; }
         public DbSet<UserProject> UserProjects { get; set; }
         //
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public PriazovContext(DbContextOptions<PriazovContext> options) : base(options)
         {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .Build();
-            optionsBuilder.UseNpgsql(config.GetConnectionString("DefaultConnection"));
-            optionsBuilder.LogTo(logStream.WriteLine, LogLevel.Warning);
-            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+            Database.EnsureCreated(); 
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

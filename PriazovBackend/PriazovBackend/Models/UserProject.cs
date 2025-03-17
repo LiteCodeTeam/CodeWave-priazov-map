@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataBase.Models
 {
-    class UserProject
+    public class UserProject
     {
         public Guid Id { get; set; }
         public Guid? UserId { get; set; }
