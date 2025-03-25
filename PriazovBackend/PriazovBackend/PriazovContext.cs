@@ -1,30 +1,21 @@
 ﻿using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace DataBase
 {
-    internal class PriazovContext : DbContext
+    public class PriazovContext : DbContext
     {
-        readonly StreamWriter logStream = new StreamWriter("logFile.txt", true);
+        
         //Создание таблиц в бд
-        public DbSet<Project> Projects { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Industry> Industries { get; set; }
-        public DbSet<UserProject> UserProjects { get; set; }
+
         //
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public PriazovContext(DbContextOptions<PriazovContext> options) : base(options)
         {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .Build();
-            optionsBuilder.UseNpgsql(config.GetConnectionString("DefaultConnection"));
-            optionsBuilder.LogTo(logStream.WriteLine, LogLevel.Warning);
-            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -93,6 +84,15 @@ namespace DataBase
                 new Region() { Name = "Херсонская область", Id = 5 },
                 new Region() { Name = "Запорожская область", Id = 6 }
                 );
+        }
+    }
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<PriazovContext>
+    {
+        public PriazovContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<PriazovContext>();
+            optionsBuilder.UseNpgsql("Your_Connection_String");
+            return new PriazovContext(optionsBuilder.Options);
         }
     }
 }
