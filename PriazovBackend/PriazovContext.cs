@@ -1,21 +1,22 @@
 ﻿using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
+using NLog;
 
 namespace DataBase
 {
     public class PriazovContext : DbContext
     {
-        
+        readonly Logger logStream = LogManager.GetCurrentClassLogger();
         //Создание таблиц в бд
+        public DbSet<Project> Projects { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Industry> Industries { get; set; }
-
+        public DbSet<UserProject> UserProjects { get; set; }
         //
         public PriazovContext(DbContextOptions<PriazovContext> options) : base(options)
         {
-
+            Database.EnsureCreated(); 
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -84,15 +85,6 @@ namespace DataBase
                 new Region() { Name = "Херсонская область", Id = 5 },
                 new Region() { Name = "Запорожская область", Id = 6 }
                 );
-        }
-    }
-    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<PriazovContext>
-    {
-        public PriazovContext CreateDbContext(string[] args)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<PriazovContext>();
-            optionsBuilder.UseNpgsql("Your_Connection_String");
-            return new PriazovContext(optionsBuilder.Options);
         }
     }
 }

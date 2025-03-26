@@ -1,39 +1,24 @@
-﻿using DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
+using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
 
-public interface IDbContextFactory
+namespace DataBase
 {
-    PriazovContext CreateDbContext();
-}
-
-public class DbContextFactory : IDbContextFactory
-{
-    private readonly IConfiguration _configuration;
-    private readonly string _connectionStringName;
-    private readonly Action<DbContextOptionsBuilder<PriazovContext>> _optionsAction;
-
-    public DbContextFactory(
-        IConfiguration configuration,
-        string connectionStringName,
-        Action<DbContextOptionsBuilder<PriazovContext>> optionsAction = null)
+    public interface IDbContextFactory<TContext> where TContext : DbContext
     {
-        _configuration = configuration;
-        _connectionStringName = connectionStringName;
-        _optionsAction = optionsAction;
+        DbContext Create();
     }
-
-    public PriazovContext CreateDbContext()
+    public class PriazovDbContextFactory : IDbContextFactory<PriazovContext>
     {
-        var optionsBuilder = new DbContextOptionsBuilder<PriazovContext>();
-        var connectionString = _configuration.GetConnectionString(_connectionStringName);
-        optionsBuilder.UseNpgsql(connectionString);
+        public PriazovContext CreateDbContext(string connectionString)
+        {
+            return new PriazovContext(new DbContextOptions<PriazovContext>());
+        }
 
-        // Применяем дополнительные настройки, если они были переданы
-        _optionsAction?.Invoke(optionsBuilder);
-
-        // Создаем экземпляр контекста с помощью рефлексии
-        return new PriazovContext(optionsBuilder.Options);
+        DbContext IDbContextFactory<PriazovContext>.Create()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace DataBase.Models
+using System.Runtime.InteropServices;
+
+namespace DataBase.Models
 {
-    internal class Industry
+    public class Industry
     {
         public UInt32 Id { get; set; }
         public string Name { get; set; } = null!;
