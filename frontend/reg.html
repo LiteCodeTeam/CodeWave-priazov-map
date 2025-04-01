@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="styles/reg.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-group">
+                <button class="menu-icon">
+                    <div class="menu-icon-bar"></div>
+                    <div class="menu-icon-bar"></div>
+                    <div class="menu-icon-bar"></div>
+                </button>
+                <div class="logo">Логотип</div>
+            </div>
+    </header>
+
+    <!-- Основное содержимое -->
+    <main class="main-container">
+        <div class="registration-container">
+            <div class="tabs-container">
+                <button class="tab executor-tab active">
+                    <span class="tab-text">исполнитель</span>
+                </button>
+                <button class="tab investor-tab">
+                    <span class="tab-text">инвестор</span>
+                </button>
+            </div>
+
+            <h1 class="registration-title">регистрация</h1>
+
+            <form class="registration-form">
+                <div class="form-field">
+                    <input type="text" placeholder="название организации">
+                </div>
+                <div class="form-field">
+                    <input type="text" placeholder="КРАТКОЕ название организации">
+                </div>
+                <div class="form-field">
+                    <select required>
+                        <option value="" disabled selected hidden>категория (с выбором)</option>
+                        <option value="category1">Категория 1</option>
+                        <option value="category2">Категория 2</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <input type="text" placeholder="чем занимается">
+                </div>
+                <div class="form-field">
+                    <input type="text" placeholder="электронная почта, вк/тг сайт">
+                </div>
+                <div class="form-field">
+                    <input type="text" placeholder="логин">
+                </div>
+                <div class="form-field">
+                    <input type="password" placeholder="пароль">
+                </div>
+                <div class="form-field">
+                    <input type="password" placeholder="повторите пароль">
+                </div>
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+
+    </footer>
+</body>
+</html>
