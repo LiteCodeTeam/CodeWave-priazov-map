@@ -17,10 +17,74 @@ namespace DataBase.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("DataBase.Models.Address", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Number")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Address");
+                });
+
+            modelBuilder.Entity("DataBase.Models.Company", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("AddressId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("IndustryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("IndustryId");
+
+                    b.ToTable("Companies");
+                });
 
             modelBuilder.Entity("DataBase.Models.Industry", b =>
                 {
@@ -101,84 +165,7 @@ namespace DataBase.Migrations
                         });
                 });
 
-            modelBuilder.Entity("DataBase.Models.Project", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<long>("IndustryId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("RegionId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IndustryId");
-
-                    b.HasIndex("RegionId");
-
-                    b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("DataBase.Models.Region", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Regions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Name = "Краснодарский край"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Name = "Ростовская область"
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            Name = "ЛНР"
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            Name = "ДНР"
-                        },
-                        new
-                        {
-                            Id = 5L,
-                            Name = "Херсонская область"
-                        },
-                        new
-                        {
-                            Id = 6L,
-                            Name = "Запорожская область"
-                        });
-                });
-
-            modelBuilder.Entity("DataBase.Models.User", b =>
+            modelBuilder.Entity("DataBase.Models.Manager", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -188,79 +175,53 @@ namespace DataBase.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsManager")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Email");
-
-                    b.HasAlternateKey("Phone");
-
-                    b.ToTable("Users");
+                    b.ToTable("Managers");
                 });
 
-            modelBuilder.Entity("DataBase.Models.UserProject", b =>
+            modelBuilder.Entity("DataBase.Models.Company", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.HasOne("DataBase.Models.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserProjects");
-                });
-
-            modelBuilder.Entity("DataBase.Models.Project", b =>
-                {
                     b.HasOne("DataBase.Models.Industry", "Industry")
                         .WithMany()
                         .HasForeignKey("IndustryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataBase.Models.Region", "Region")
-                        .WithMany()
-                        .HasForeignKey("RegionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsOne("JsonProperty.EFCore.JsonList<string>", "Contacts", b1 =>
+                        {
+                            b1.Property<Guid>("CompanyId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("JsonString")
+                                .HasColumnType("text");
+
+                            b1.HasKey("CompanyId");
+
+                            b1.ToTable("Companies");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CompanyId");
+                        });
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Contacts");
 
                     b.Navigation("Industry");
-
-                    b.Navigation("Region");
-                });
-
-            modelBuilder.Entity("DataBase.Models.UserProject", b =>
-                {
-                    b.HasOne("DataBase.Models.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId");
-
-                    b.HasOne("DataBase.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Project");
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
