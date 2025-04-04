@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder();
 
-// получаем строку подключения из файла конфигурации
+// ГЇГ®Г«ГіГ·Г ГҐГ¬ Г±ГІГ°Г®ГЄГі ГЇГ®Г¤ГЄГ«ГѕГ·ГҐГ­ГЁГї ГЁГ§ ГґГ Г©Г«Г  ГЄГ®Г­ГґГЁГЈГіГ°Г Г¶ГЁГЁ
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// добавляем контекст ApplicationContext в качестве сервиса в приложение
+// Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ ГЄГ®Г­ГІГҐГЄГ±ГІ ApplicationContext Гў ГЄГ Г·ГҐГ±ГІГўГҐ Г±ГҐГ°ГўГЁГ±Г  Гў ГЇГ°ГЁГ«Г®Г¦ГҐГ­ГЁГҐ
 builder.Services.AddDbContext<PriazovContext>(options => options.UseNpgsql(connection));
 builder.Services.AddControllers();
 
@@ -20,25 +20,25 @@ app.MapGet("/api/users", async (PriazovContext db) => await db.Users.ToListAsync
 
 app.MapGet("/api/users/{id:int}", async (Guid id, PriazovContext db) =>
 {
-    // получаем пользователя по id
+    // ГЇГ®Г«ГіГ·Г ГҐГ¬ ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гї ГЇГ® id
     User? user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-    // если не найден, отправляем статусный код и сообщение об ошибке
-    if (user == null) return Results.NotFound(new { message = "Пользователь не найден" });
+    // ГҐГ±Г«ГЁ Г­ГҐ Г­Г Г©Г¤ГҐГ­, Г®ГІГЇГ°Г ГўГ«ГїГҐГ¬ Г±ГІГ ГІГіГ±Г­Г»Г© ГЄГ®Г¤ ГЁ Г±Г®Г®ГЎГ№ГҐГ­ГЁГҐ Г®ГЎ Г®ГёГЁГЎГЄГҐ
+    if (user == null) return Results.NotFound(new { message = "ГЏГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гј Г­ГҐ Г­Г Г©Г¤ГҐГ­" });
 
-    // если пользователь найден, отправляем его
+    // ГҐГ±Г«ГЁ ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гј Г­Г Г©Г¤ГҐГ­, Г®ГІГЇГ°Г ГўГ«ГїГҐГ¬ ГҐГЈГ®
     return Results.Json(user);
 });
 
 app.MapDelete("/api/users/{id:int}", async (Guid id, PriazovContext db) =>
 {
-    // получаем пользователя по id
+    // ГЇГ®Г«ГіГ·Г ГҐГ¬ ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гї ГЇГ® id
     User? user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-    // если не найден, отправляем статусный код и сообщение об ошибке
-    if (user == null) return Results.NotFound(new { message = "Пользователь не найден" });
+    // ГҐГ±Г«ГЁ Г­ГҐ Г­Г Г©Г¤ГҐГ­, Г®ГІГЇГ°Г ГўГ«ГїГҐГ¬ Г±ГІГ ГІГіГ±Г­Г»Г© ГЄГ®Г¤ ГЁ Г±Г®Г®ГЎГ№ГҐГ­ГЁГҐ Г®ГЎ Г®ГёГЁГЎГЄГҐ
+    if (user == null) return Results.NotFound(new { message = "ГЏГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гј Г­ГҐ Г­Г Г©Г¤ГҐГ­" });
 
-    // если пользователь найден, удаляем его
+    // ГҐГ±Г«ГЁ ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гј Г­Г Г©Г¤ГҐГ­, ГіГ¤Г Г«ГїГҐГ¬ ГҐГЈГ®
     db.Users.Remove(user);
     await db.SaveChangesAsync();
     return Results.Json(user);
@@ -46,7 +46,7 @@ app.MapDelete("/api/users/{id:int}", async (Guid id, PriazovContext db) =>
 
 app.MapPost("/api/users", async (User user, PriazovContext db) =>
 {
-    // добавляем пользователя в массив
+    // Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гї Гў Г¬Г Г±Г±ГЁГў
     await db.Users.AddAsync(user);
     await db.SaveChangesAsync();
     return user;
@@ -54,13 +54,13 @@ app.MapPost("/api/users", async (User user, PriazovContext db) =>
 
 app.MapPut("/api/users", async (User userData, PriazovContext db) =>
 {
-    // получаем пользователя по id
+    // ГЇГ®Г«ГіГ·Г ГҐГ¬ ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гї ГЇГ® id
     var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userData.Id);
 
-    // если не найден, отправляем статусный код и сообщение об ошибке
-    if (user == null) return Results.NotFound(new { message = "Пользователь не найден" });
+    // ГҐГ±Г«ГЁ Г­ГҐ Г­Г Г©Г¤ГҐГ­, Г®ГІГЇГ°Г ГўГ«ГїГҐГ¬ Г±ГІГ ГІГіГ±Г­Г»Г© ГЄГ®Г¤ ГЁ Г±Г®Г®ГЎГ№ГҐГ­ГЁГҐ Г®ГЎ Г®ГёГЁГЎГЄГҐ
+    if (user == null) return Results.NotFound(new { message = "ГЏГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гј Г­ГҐ Г­Г Г©Г¤ГҐГ­" });
 
-    // если пользователь найден, изменяем его данные и отправляем обратно клиенту
+    // ГҐГ±Г«ГЁ ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гј Г­Г Г©Г¤ГҐГ­, ГЁГ§Г¬ГҐГ­ГїГҐГ¬ ГҐГЈГ® Г¤Г Г­Г­Г»ГҐ ГЁ Г®ГІГЇГ°Г ГўГ«ГїГҐГ¬ Г®ГЎГ°Г ГІГ­Г® ГЄГ«ГЁГҐГ­ГІГі
     user.Name = userData.Name;
     user.Email = userData.Email;
     user.Phone = userData.Phone;
