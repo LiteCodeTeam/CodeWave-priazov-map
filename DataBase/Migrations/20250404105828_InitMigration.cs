@@ -15,6 +15,23 @@ namespace DataBase.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Address",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    Region = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    Street = table.Column<string>(type: "text", nullable: false),
+                    Number = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Address", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Industries",
                 columns: table => new
                 {
@@ -28,83 +45,46 @@ namespace DataBase.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Regions",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Regions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Managers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    Phone = table.Column<string>(type: "text", nullable: false),
-                    IsManager = table.Column<bool>(type: "boolean", nullable: false)
+                    Phone = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.UniqueConstraint("AK_Users_Email", x => x.Email);
-                    table.UniqueConstraint("AK_Users_Phone", x => x.Phone);
+                    table.PrimaryKey("PK_Managers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Projects",
+                name: "Companies",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Contacts_JsonString = table.Column<string>(type: "text", nullable: true),
+                    AddressId = table.Column<long>(type: "bigint", nullable: false),
                     IndustryId = table.Column<long>(type: "bigint", nullable: false),
-                    RegionId = table.Column<long>(type: "bigint", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Phone = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Projects", x => x.Id);
+                    table.PrimaryKey("PK_Companies", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Projects_Industries_IndustryId",
+                        name: "FK_Companies_Address_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Address",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Companies_Industries_IndustryId",
                         column: x => x.IndustryId,
                         principalTable: "Industries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Projects_Regions_RegionId",
-                        column: x => x.RegionId,
-                        principalTable: "Regions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserProjects",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
-                    ProjectId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserProjects", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserProjects_Projects_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Projects",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserProjects_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -126,57 +106,31 @@ namespace DataBase.Migrations
                     { 12L, "Другое" }
                 });
 
-            migrationBuilder.InsertData(
-                table: "Regions",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { 1L, "Краснодарский край" },
-                    { 2L, "Ростовская область" },
-                    { 3L, "ЛНР" },
-                    { 4L, "ДНР" },
-                    { 5L, "Херсонская область" },
-                    { 6L, "Запорожская область" }
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_Companies_AddressId",
+                table: "Companies",
+                column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Projects_IndustryId",
-                table: "Projects",
+                name: "IX_Companies_IndustryId",
+                table: "Companies",
                 column: "IndustryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Projects_RegionId",
-                table: "Projects",
-                column: "RegionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserProjects_ProjectId",
-                table: "UserProjects",
-                column: "ProjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserProjects_UserId",
-                table: "UserProjects",
-                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "UserProjects");
+                name: "Companies");
 
             migrationBuilder.DropTable(
-                name: "Projects");
+                name: "Managers");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Address");
 
             migrationBuilder.DropTable(
                 name: "Industries");
-
-            migrationBuilder.DropTable(
-                name: "Regions");
         }
     }
 }
