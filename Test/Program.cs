@@ -9,6 +9,7 @@ string? connection = builder.Configuration.GetConnectionString("DefaultConnectio
 
 // добавляем контекст ApplicationContext в качестве сервиса в приложение
 builder.Services.AddDbContext<PriazovContext>(options => options.UseNpgsql(connection));
+builder.Services.AddControllers();
 
 var app = builder.Build();
 

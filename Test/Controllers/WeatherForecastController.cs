@@ -7,7 +7,7 @@ using System.Collections;
 namespace Test.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("/api/[controller]")]
 public class HomeController : ControllerBase
 {
     public PriazovContext Db { get; }
