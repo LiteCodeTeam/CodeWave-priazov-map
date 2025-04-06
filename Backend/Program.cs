@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder();
 
+//Swagger может понадобиться в будущем, но пока что оно нужно было лишь для теста backend,
+//Лично я использовал postman
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -18,8 +20,8 @@ builder.Services.AddDbContextFactory<PriazovContext>(options =>
 
 var app = builder.Build();
 
+//Создание фабрики и контекста бд
 var factory = new DbContextFactory(builder.Configuration, "DefaultConnection");
-
 var db = factory.CreateDbContext();
 
 app.UseDefaultFiles();

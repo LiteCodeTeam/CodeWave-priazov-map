@@ -11,9 +11,9 @@ namespace DataBase
 
     public class DbContextFactory
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connectionStringName;
-        private readonly Action<DbContextOptionsBuilder<PriazovContext>>? _optionsAction;
+        private readonly IConfiguration _configuration; //Конфигурация
+        private readonly string _connectionStringName; //Строка подключения
+        private readonly Action<DbContextOptionsBuilder<PriazovContext>>? _optionsAction; //Дополнительные настройки
 
         public DbContextFactory(
             IConfiguration configuration,

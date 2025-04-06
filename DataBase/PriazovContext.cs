@@ -15,10 +15,11 @@ namespace DataBase
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Industry> Industries { get; set; }
-        //
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            //Настройки таблиц
             modelBuilder.Entity<Industry>()
                 .Property<uint>("Id")
                 .ValueGeneratedOnAdd();
@@ -53,6 +54,8 @@ namespace DataBase
 
             //modelBuilder.Entity<Manager>().HasAlternateKey(u => u.Email);
             //modelBuilder.Entity<Company>().HasAlternateKey(u => u.Email);
+
+            //Создание элементов в таблице индустрий
             modelBuilder.Entity<Industry>().HasData(
                 new Industry() { Name = "Образовательное учреждение", Id = 1 },
                 new Industry() { Name = "Научно-исследовательский институт", Id = 2 },
