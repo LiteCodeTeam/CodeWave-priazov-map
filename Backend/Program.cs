@@ -1,7 +1,6 @@
 using DataBase;
 using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder();
