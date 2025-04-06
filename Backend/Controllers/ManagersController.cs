@@ -23,25 +23,46 @@ namespace Controllers
         [HttpGet("{id}")]
         public async Task GetManager(Guid? id)
         {
-            await GetManagerAsync(id, _response);
-        }
-
-        [NonAction]
-        async Task GetManagerAsync(Guid? id, HttpResponse response)
-        {
-            // получаем пользователя по id
             Manager? user = _db.Managers.FirstOrDefault((u) => u.Id == id);
             // если пользователь найден, отправляем его
             if (user != null)
             {
-                response.StatusCode = 200;
-                await response.WriteAsJsonAsync(user);
+                _response.StatusCode = 200;
+                await _response.WriteAsJsonAsync(user);
             }
             // если не найден, отправляем статусный код и сообщение об ошибке
             else
             {
-                response.StatusCode = 404;
-                await response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
+                _response.StatusCode = 404;
+                await _response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
+            }
+        }
+
+        [HttpPost]
+        public async Task PostManager()
+        {
+            try
+            {
+                // получаем данные пользователя
+                var user = await _request.ReadFromJsonAsync<Manager>();
+                if (user != null)
+                {
+                    // устанавливаем id для нового пользователя
+                    user.Id = Guid.NewGuid();
+                    // добавляем пользователя в список
+                    await _db.Managers.AddAsync(user);
+                    await _db.SaveChangesAsync();
+                    await _response.WriteAsJsonAsync(user);
+                }
+                else
+                {
+                    throw new Exception("Некорректные данные");
+                }
+            }
+            catch (Exception)
+            {
+                _response.StatusCode = 400;
+                await _response.WriteAsJsonAsync(new { message = "Некорректные данные" });
             }
         }
     }
