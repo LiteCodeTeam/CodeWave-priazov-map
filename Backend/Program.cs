@@ -27,7 +27,7 @@ app.UseStaticFiles();
 
 app.MapGet("/api/users", async () =>
 { 
-    await db.Managers.ToListAsync();
+    return await db.Managers.ToListAsync();
 });
 
 app.MapGet("/api/users/{id:Guid}", async (Guid id) =>

@@ -15,23 +15,6 @@ namespace DataBase.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Address",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Country = table.Column<string>(type: "text", nullable: false),
-                    Region = table.Column<string>(type: "text", nullable: false),
-                    City = table.Column<string>(type: "text", nullable: false),
-                    Street = table.Column<string>(type: "text", nullable: false),
-                    Number = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Address", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Industries",
                 columns: table => new
                 {
@@ -51,6 +34,7 @@ namespace DataBase.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -64,21 +48,16 @@ namespace DataBase.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Contacts_JsonString = table.Column<string>(type: "text", nullable: true),
-                    AddressId = table.Column<long>(type: "bigint", nullable: false),
+                    Address_JsonString = table.Column<string>(type: "text", nullable: true),
                     IndustryId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Companies", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Companies_Address_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Companies_Industries_IndustryId",
                         column: x => x.IndustryId,
@@ -107,11 +86,6 @@ namespace DataBase.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Companies_AddressId",
-                table: "Companies",
-                column: "AddressId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Companies_IndustryId",
                 table: "Companies",
                 column: "IndustryId");
@@ -125,9 +99,6 @@ namespace DataBase.Migrations
 
             migrationBuilder.DropTable(
                 name: "Managers");
-
-            migrationBuilder.DropTable(
-                name: "Address");
 
             migrationBuilder.DropTable(
                 name: "Industries");
