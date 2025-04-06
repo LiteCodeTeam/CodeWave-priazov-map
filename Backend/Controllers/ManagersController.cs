@@ -54,6 +54,48 @@ namespace Controllers
                     await _db.SaveChangesAsync();
                     await _response.WriteAsJsonAsync(user);
                 }
+                // если не найден, отправляем статусный код и сообщение об ошибке
+                else
+                {
+                    throw new Exception("Некорректные данные");
+                }
+            }
+            catch (Exception)
+            {
+                _response.StatusCode = 400;
+                await _response.WriteAsJsonAsync(new { message = "Некорректные данные" });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task PutManager(Guid? id)
+        {
+            try
+            {
+                // получаем данные пользователя
+                var userData = await _request.ReadFromJsonAsync<Manager>();
+                if (userData != null)
+                {
+                    // получаем данные пользователя из базы данных
+                    Manager? user = _db.Managers.FirstOrDefault((u) => u.Id == id);
+                    // если пользователь найден, изменяем его данные
+                    if (user != null)
+                    {
+                        _response.StatusCode = 200;
+                        user.Name = userData.Name;
+                        user.Email = userData.Email;
+                        user.Phone = userData.Phone;
+                        await _db.SaveChangesAsync();
+                        await _response.WriteAsJsonAsync(user);
+                    }
+                    // если не найден, отправляем статусный код и сообщение об ошибке
+                    else
+                    {
+                        _response.StatusCode = 404;
+                        await _response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
+                    }
+                }
+                // если не найден, отправляем статусный код и сообщение об ошибке
                 else
                 {
                     throw new Exception("Некорректные данные");
