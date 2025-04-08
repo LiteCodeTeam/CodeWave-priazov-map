@@ -21,7 +21,12 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContextFactory<PriazovContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //Создание фабрики и контекста бд
 var factory = new DbContextFactory(builder.Configuration, "DefaultConnection");
