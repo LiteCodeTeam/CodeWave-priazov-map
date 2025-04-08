@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 
+var adminRole = new Role("admin");
+var managerRole = new Role("manager");
+var companyRole = new Role("company");
+
 var builder = WebApplication.CreateBuilder();
 
 //Swagger может понадобиться в будущем, но пока что оно нужно было лишь для теста backend,
