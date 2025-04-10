@@ -8,15 +8,17 @@ namespace DataBase.Models
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
-        public string? Phone { get; set; }
-        public Role Role { get; set; } = null!;
+        public string Phone { get; set; } = null!;
+        public string RoleName { get; set; } = null!;
+        public string? PhotoIcon { get; set; }
     }
     public class Company : User
     {
-        public String? Description { get; set; }
-        public JsonList<string>? Contacts { get; set; }
-        public Industry Industry { get; set; } = null!;
+        public string IndustryName { get; set; } = null!;
         public JsonDictionary<string, object> Address { get; set; } = null!;
+        public string? Description { get; set; }
+        public JsonList<string>? Contacts { get; set; }
+        public List<Project>? Projects { get; set; }
     }
     public class Manager : User;
     public class Role

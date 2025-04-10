@@ -8,5 +8,6 @@
     //    public string City { get; set; } = null!;
     //    public string Street { get; set; } = null!;
     //    public UInt32 Number { get; set; }
+    //    public UInt Index { get; set; }
     //}
 }
