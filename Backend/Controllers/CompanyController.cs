@@ -19,11 +19,11 @@ namespace Controllers
         /// <summary>
         /// Выводит список компаний
         /// </summary>
-        //[HttpGet]
-        //public ActionResult<IEnumerable<Company>> GetCompany()
-        //{
-        //    return Ok(_db.Companies.ToListAsync());
-        //}
+        [HttpGet]
+        public ActionResult<IEnumerable<Company>> GetCompany()
+        {
+            return Ok(_db.Companies.ToList());
+        }
 
         /// <summary>
         /// Выводит компанию по её id
