@@ -1,7 +1,6 @@
 ﻿using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
