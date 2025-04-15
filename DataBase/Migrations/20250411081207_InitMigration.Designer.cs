@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataBase.Migrations
 {
     [DbContext(typeof(PriazovContext))]
-    [Migration("20250410174209_InitMigration")]
+    [Migration("20250411081207_InitMigration")]
     partial class InitMigration
     {
         /// <inheritdoc />
@@ -144,7 +144,7 @@ namespace DataBase.Migrations
                                 .HasForeignKey("CompanyId");
                         });
 
-                    b.OwnsOne("JsonProperty.EFCore.JsonDictionary<string, object>", "Address", b1 =>
+                    b.OwnsOne("JsonProperty.EFCore.JsonDictionary<string, string>", "Address", b1 =>
                         {
                             b1.Property<Guid>("CompanyId")
                                 .HasColumnType("uuid");

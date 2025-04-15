@@ -15,7 +15,7 @@ namespace DataBase.Models
     public class Company : User
     {
         public string IndustryName { get; set; } = null!;
-        public JsonDictionary<string, object> Address { get; set; } = null!;
+        public JsonDictionary<string, string> Address { get; set; } = null!;
         public string? Description { get; set; }
         public JsonList<string>? Contacts { get; set; }
         public List<Project>? Projects { get; set; }

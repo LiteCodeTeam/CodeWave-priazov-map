@@ -141,7 +141,7 @@ namespace DataBase.Migrations
                                 .HasForeignKey("CompanyId");
                         });
 
-                    b.OwnsOne("JsonProperty.EFCore.JsonDictionary<string, object>", "Address", b1 =>
+                    b.OwnsOne("JsonProperty.EFCore.JsonDictionary<string, string>", "Address", b1 =>
                         {
                             b1.Property<Guid>("CompanyId")
                                 .HasColumnType("uuid");
