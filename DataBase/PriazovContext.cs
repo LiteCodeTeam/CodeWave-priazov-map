@@ -1,7 +1,5 @@
 ﻿using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using System.Reflection.Metadata;
 
 namespace DataBase
 {
@@ -13,9 +11,9 @@ namespace DataBase
 
         }
         //Создание таблиц в бд
-        public DbSet<Manager> Managers { get; set; }
-        public DbSet<Company> Companies { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<UserSession> Sessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +33,34 @@ namespace DataBase
                 .HasForeignKey(e => e.CompanyId)
                 .IsRequired();
 
+            modelBuilder.Entity<UserSession>()
+                .Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<UserSession>()
+              .Property<Guid>("Id").IsRequired();
+            modelBuilder.Entity<UserSession>()
+                .HasKey(i => i.Id);
+
+            // Настройка наследования (TPH)
+            modelBuilder.Entity<User>()
+                .ToTable("Users")
+                .HasDiscriminator<string>("UserType")
+                .HasValue<Manager>("Manager")
+                .HasValue<Company>("Company");
+
+            // Явная настройка связи (1 к многим)
+            modelBuilder.Entity<UserSession>()
+                .HasOne(us => us.User)
+                .WithMany()
+                .HasForeignKey(us => us.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Убедимся, что не создаются лишние таблицы
+            modelBuilder.Entity<Manager>().ToTable("Users");
+            modelBuilder.Entity<Company>().ToTable("Users");
+
+
             //modelBuilder.Entity<Address>()
             //    .Property<uint>("Id")
             //    .ValueGeneratedOnAdd();
@@ -42,25 +68,6 @@ namespace DataBase
             //   .Property<uint>("Id").IsRequired();
             //modelBuilder.Entity<Address>()
             //    .HasKey(i => i.Id);
-
-            modelBuilder.Entity<Manager>()
-                .Property<Guid>("Id")
-                .ValueGeneratedOnAdd();
-            modelBuilder.Entity<Manager>()
-              .Property<Guid>("Id").IsRequired();
-            modelBuilder.Entity<Manager>()
-                .HasKey(i => i.Id);
-
-            modelBuilder.Entity<Company>()
-                .Property<Guid>("Id")
-                .ValueGeneratedOnAdd();
-            modelBuilder.Entity<Company>()
-              .Property<Guid>("Id").IsRequired();
-            modelBuilder.Entity<Company>()
-                .HasKey(i => i.Id);
-
-            //modelBuilder.Entity<Manager>().HasAlternateKey(u => u.Email);
-            //modelBuilder.Entity<Company>().HasAlternateKey(u => u.Email);
 
             //Создание элементов в таблице индустрий
             //modelBuilder.Entity<Industry>().HasData(

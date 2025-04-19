@@ -22,81 +22,6 @@ namespace DataBase.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DataBase.Models.Company", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("IndustryName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhotoIcon")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Companies");
-                });
-
-            modelBuilder.Entity("DataBase.Models.Manager", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhotoIcon")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Managers");
-                });
-
             modelBuilder.Entity("DataBase.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -123,44 +48,96 @@ namespace DataBase.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("DataBase.Models.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhotoIcon")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users", (string)null);
+
+                    b.HasDiscriminator<string>("UserType").HasValue("User");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("DataBase.Models.UserSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Sessions");
+                });
+
             modelBuilder.Entity("DataBase.Models.Company", b =>
                 {
-                    b.OwnsOne("JsonList", "Contacts", b1 =>
-                        {
-                            b1.Property<Guid>("CompanyId")
-                                .HasColumnType("uuid");
+                    b.HasBaseType("DataBase.Models.User");
 
-                            b1.Property<string>("JsonString")
-                                .HasColumnType("text");
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
-                            b1.HasKey("CompanyId");
+                    b.Property<string>("IndustryName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                            b1.ToTable("Companies");
+                    b.ToTable("Users", (string)null);
 
-                            b1.WithOwner()
-                                .HasForeignKey("CompanyId");
-                        });
+                    b.HasDiscriminator().HasValue("Company");
+                });
 
-                    b.OwnsOne("JsonProperty.EFCore.JsonDictionary<string, string>", "Address", b1 =>
-                        {
-                            b1.Property<Guid>("CompanyId")
-                                .HasColumnType("uuid");
+            modelBuilder.Entity("DataBase.Models.Manager", b =>
+                {
+                    b.HasBaseType("DataBase.Models.User");
 
-                            b1.Property<string>("JsonString")
-                                .HasColumnType("text");
+                    b.ToTable("Users", (string)null);
 
-                            b1.HasKey("CompanyId");
-
-                            b1.ToTable("Companies");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CompanyId");
-                        });
-
-                    b.Navigation("Address")
-                        .IsRequired();
-
-                    b.Navigation("Contacts");
+                    b.HasDiscriminator().HasValue("Manager");
                 });
 
             modelBuilder.Entity("DataBase.Models.Project", b =>
@@ -171,7 +148,7 @@ namespace DataBase.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("JsonProperty.EFCore.JsonList<string>", "Photos", b1 =>
+                    b.OwnsOne("JsonList", "Photos", b1 =>
                         {
                             b1.Property<Guid>("ProjectId")
                                 .HasColumnType("uuid");
@@ -190,6 +167,57 @@ namespace DataBase.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("DataBase.Models.UserSession", b =>
+                {
+                    b.HasOne("DataBase.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DataBase.Models.Company", b =>
+                {
+                    b.OwnsOne("JsonProperty.EFCore.JsonList<string>", "Contacts", b1 =>
+                        {
+                            b1.Property<Guid>("CompanyId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("JsonString")
+                                .HasColumnType("text");
+
+                            b1.HasKey("CompanyId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CompanyId");
+                        });
+
+                    b.OwnsOne("JsonProperty.EFCore.JsonDictionary<string, string>", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("CompanyId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("JsonString")
+                                .HasColumnType("text");
+
+                            b1.HasKey("CompanyId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CompanyId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+
+                    b.Navigation("Contacts");
                 });
 
             modelBuilder.Entity("DataBase.Models.Company", b =>

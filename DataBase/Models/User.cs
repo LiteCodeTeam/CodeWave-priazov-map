@@ -23,7 +23,7 @@ namespace DataBase.Models
     public class Manager : User;
     public class Role
     {
-        public String Name { get; set; } = null!;
+        public String Name { get; set; } = String.Empty;
         public Role(string name) => Name = name;
     }
 }

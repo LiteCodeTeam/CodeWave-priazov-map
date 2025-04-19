@@ -26,7 +26,7 @@ namespace Controllers
         [HttpGet]
         public async Task GetCompany()
         {
-            await _db.Companies.ToListAsync();
+            await _db.Users.OfType<Company>().ToListAsync();
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Controllers
         [HttpGet("{id}")]
         public async Task GetCompany(Guid? id)
         {
-            Company? user = _db.Companies.FirstOrDefault((u) => u.Id == id);
+            Company? user = _db.Users.OfType<Company>().FirstOrDefault((u) => u.Id == id);
             // если компания найдена, отправляем её
             if (user != null)
             {
@@ -65,7 +65,7 @@ namespace Controllers
                     // устанавливаем id для новой компании
                     user.Id = Guid.NewGuid();
                     // добавляем компанию в список
-                    await _db.Companies.AddAsync(user);
+                    await _db.Users.AddAsync(user);
                     await _db.SaveChangesAsync();
                     await _response.WriteAsJsonAsync(user);
                 }
@@ -95,7 +95,7 @@ namespace Controllers
                 if (userData != null)
                 {
                     // получаем данные компании из базы данных
-                    Company? user = _db.Companies.FirstOrDefault((u) => u.Id == id);
+                    Company? user = _db.Users.OfType<Company>().FirstOrDefault((u) => u.Id == id);
                     // если компания найдена, изменяем его данные
                     if (user != null)
                     {

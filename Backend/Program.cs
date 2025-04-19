@@ -1,14 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using DataBase;
 using DataBase.Models;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Backend.Models;
+using Backend;
 
 var adminRole = new Role("admin");
 var managerRole = new Role("manager");
@@ -16,8 +15,6 @@ var companyRole = new Role("company");
 
 var builder = WebApplication.CreateBuilder();
 
-//Swagger может понадобиться в будущем, но пока что оно нужно было лишь для теста backend,
-//Лично я использовал postman
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -30,35 +27,34 @@ builder.Services.AddDbContextFactory<PriazovContext>(options =>
 
 builder.Services.AddControllers();
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var accessTokenSecret = jwtSettings["AccessTokenSecret"]!;
+var refreshTokenSecret = jwtSettings["RefreshTokenSecret"]!;
 
-// Или альтернативный вариант с привязкой к экземпляру
-var jwtSettings = new JwtSettings();
-builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
-builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddSingleton<TokenService>(new TokenService(
+    accessTokenSecret,
+    refreshTokenSecret,
+    jwtSettings
+));
 
-//Console.WriteLine(jwtSettings.Issuer);
-//Console.WriteLine(jwtSettings.Audience);
-//Console.WriteLine(jwtSettings.SecretKey);
-
-builder.Services.AddAuthorization();
+// Настройка аутентификации
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(accessTokenSecret)),
             ValidateIssuer = true,
-            ValidIssuer = jwtSettings.Issuer,
+            ValidIssuer = jwtSettings["Issuer"],
             ValidateAudience = true,
-            ValidAudience = jwtSettings.Audience,
+            ValidAudience = jwtSettings["Audience"],
             ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-            ValidateIssuerSigningKey = true
+            ClockSkew = TimeSpan.Zero
         };
     });
 
 var app = builder.Build();
-
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -67,17 +63,19 @@ app.UseSwaggerUI();
 var factory = new DbContextFactory(builder.Configuration, "DefaultConnection");
 var db = factory.CreateDbContext();
 
+var managers = db.Users.OfType<Manager>();
+var companies = db.Users.OfType<Company>();
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapGet("/api/managers/{id:Guid}", async (Guid id) =>
 {
     // получаем пользователя по id
-    Manager? manager = await db.Managers.FirstOrDefaultAsync(u => u.Id == id);
+    Manager? manager = await managers.FirstOrDefaultAsync(u => u.Id == id);
 
     // если не найден, отправляем статусный код и сообщение об ошибке
     if (manager == null) return Results.NotFound(new { message = "Пользователь не найден" });
@@ -91,7 +89,7 @@ app.MapPost("/api/managers", async (Manager manager) =>
     manager.RoleName = managerRole.Name;
     manager.Password = PasswordHasher.HashPassword(manager.Password);
     // добавляем пользователя в массив
-    await db.Managers.AddAsync(manager);
+    await db.Users.AddAsync(manager);
     await db.SaveChangesAsync();
     return manager;
 }).WithTags("Managers");
@@ -99,7 +97,7 @@ app.MapPost("/api/managers", async (Manager manager) =>
 app.MapPut("/api/managers", async (Manager managerData) =>
 {
     // получаем пользователя по id
-    var manager = await db.Managers.FirstOrDefaultAsync(u => u.Id == managerData.Id);
+    var manager = await managers.FirstOrDefaultAsync(u => u.Id == managerData.Id);
 
     // если не найден, отправляем статусный код и сообщение об ошибке
     if (manager == null) return Results.NotFound(new { message = "Пользователь не найден" });
@@ -114,45 +112,15 @@ app.MapPut("/api/managers", async (Manager managerData) =>
     return Results.Json(manager);
 }).WithTags("Managers");
 
-app.MapPost("/login/managers", (Manager manager) =>
-{
-    // находим пользователя 
-    Manager? person = db.Managers.FirstOrDefault(p => p.Email == manager.Email);
-    // если пользователь не найден, отправляем статусный код 401
-    if (person is null) return Results.Unauthorized();
-    if (!PasswordHasher.VerifyPassword(manager.Password, person.Password)) return Results.Unauthorized();
-
-    var claims = new List<Claim> { new Claim(ClaimTypes.Name, person.Email) };
-    // создаем JWT-токен
-    var jwt = new JwtSecurityToken(
-            issuer: jwtSettings.Issuer,
-            audience: jwtSettings.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(60)),
-            signingCredentials: new SigningCredentials(new SymmetricSecurityKey
-            (Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-            SecurityAlgorithms.HmacSha256));
-    var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-    // формируем ответ
-    var response = new
-    {
-        access_token = encodedJwt,
-        email = person.Email
-    };
-
-    return Results.Json(response);
-}).WithTags("Managers");
-
 app.MapGet("/api/companies", async () =>
 {
-    return await db.Companies.ToListAsync();
+    return await companies.ToListAsync();
 }).WithTags("Companies");
 
 app.MapGet("/api/companies/{id:Guid}", async (Guid id) =>
 {
     // получаем пользователя по id
-    Company? company = await db.Companies.FirstOrDefaultAsync(c => c.Id == id);
+    Company? company = await companies.FirstOrDefaultAsync(c => c.Id == id);
 
     // если не найден, отправляем статусный код и сообщение об ошибке
     if (company == null) return Results.NotFound(new { message = "Компания не найдена" });
@@ -166,15 +134,16 @@ app.MapPost("/api/companies", async (Company company) =>
     company.RoleName = companyRole.Name;
     company.Password = PasswordHasher.HashPassword(company.Password);
     // добавляем пользователя в массив
-    await db.Companies.AddAsync(company);
+    await db.Users.AddAsync(company);
     await db.SaveChangesAsync();
     return company;
 }).WithTags("Companies");
 
+
 app.MapPut("/api/companies", async (Company companyData) =>
 {
     // получаем пользователя по id
-    var company = await db.Companies.FirstOrDefaultAsync(u => u.Id == companyData.Id);
+    var company = await companies.FirstOrDefaultAsync(u => u.Id == companyData.Id);
 
     // если не найден, отправляем статусный код и сообщение об ошибке
     if (company == null) return Results.NotFound(new { message = "Пользователь не найден" });
@@ -192,34 +161,55 @@ app.MapPut("/api/companies", async (Company companyData) =>
     return Results.Json(company);
 }).WithTags("Companies");
 
-app.MapPost("/login/companies", (Company company) =>
+app.MapPost("/login", async (User user, TokenService tokenService) =>
 {
-    // находим пользователя 
-    Company? person = db.Companies.FirstOrDefault(p => p.Email == company.Email);
-    // если пользователь не найден, отправляем статусный код 401
-    if (person is null) return Results.Unauthorized();
-    if (!PasswordHasher.VerifyPassword(company.Password, person.Password)) return Results.Unauthorized();
+    var person = await db.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+    if (person == null || !PasswordHasher
+        .VerifyPassword(user.Password, person.Password)) return Results.Unauthorized();
+    var newAccessToken = tokenService.GenerateAccessToken(Convert.ToString(person.Id)!,
+        person.Email, person.RoleName);
+    var newRefreshToken = tokenService.GenerateRefreshToken(Convert.ToString(person.Id)!);
 
-    var claims = new List<Claim> { new Claim(ClaimTypes.Name, person.Email) };
-    // создаем JWT-токен
-    var jwt = new JwtSecurityToken(
-            issuer: jwtSettings.Issuer,
-            audience: jwtSettings.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(60)),
-            signingCredentials: new SigningCredentials(new SymmetricSecurityKey
-            (Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-            SecurityAlgorithms.HmacSha256));
-    var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-    // формируем ответ
-    var response = new
+    //Обновление в БД
+    await db.Sessions.AddAsync(new UserSession()
     {
-        access_token = encodedJwt,
-        email = person.Email
-    };
+        RefreshToken = newRefreshToken,
+        UserId = person.Id,
+        User = person,
+        ExpiresAt = DateTime.UtcNow.AddDays(7)
+    });
+    await db.SaveChangesAsync();
+    return Results.Ok(new { AccessToken = newAccessToken, Email = person.Email });
+});
 
-    return Results.Json(response);
-}).WithTags("Companies");
+app.MapPost("/refresh", async (RefreshRequest request, TokenService tokenService) =>
+{
+    // 1. Валидация Refresh Token
+    var principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
+    if (principal == null)
+        return Results.Unauthorized();
+
+    var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+    // 2. Проверка в БД
+    var session = await db.Sessions
+        .FirstOrDefaultAsync(s => Convert.ToString(s.UserId) == userId && s.RefreshToken == request.RefreshToken);
+
+    if (session == null || session.ExpiresAt < DateTime.UtcNow)
+        return Results.Unauthorized();
+
+    // 3. Генерация новых токенов
+    var newAccessToken = tokenService.GenerateAccessToken(userId, session.User.Email, session.User.RoleName);
+    var newRefreshToken = tokenService.GenerateRefreshToken(userId);
+
+    // 4. Обновление в БД
+    session.RefreshToken = newRefreshToken;
+    session.ExpiresAt = DateTime.UtcNow.AddDays(7); // Обновляем срок
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
+})
+.WithName("RefreshToken")
+.AllowAnonymous();
 
 app.Run();

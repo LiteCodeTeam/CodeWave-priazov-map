@@ -13,11 +13,13 @@ namespace Controllers
         private readonly HttpResponse _response;
         private readonly PriazovContext _db;
 
+
         public ManagerController(HttpContext context, PriazovContext db)
         {
             _request = context.Request;
             _response = context.Response;
             _db = db;
+            
         }
 
         /// <summary>
@@ -26,7 +28,7 @@ namespace Controllers
         [HttpGet("{id}")]
         public async Task GetManager(Guid? id)
         {
-            Manager? user = _db.Managers.FirstOrDefault((u) => u.Id == id);
+            Manager? user = _db.Users.OfType<Manager>().FirstOrDefault((u) => u.Id == id);
             // если пользователь найден, отправляем его
             if (user != null)
             {
@@ -56,7 +58,7 @@ namespace Controllers
                     // устанавливаем id для нового пользователя
                     user.Id = Guid.NewGuid();
                     // добавляем пользователя в список
-                    await _db.Managers.AddAsync(user);
+                    await _db.Users.AddAsync(user);
                     await _db.SaveChangesAsync();
                     await _response.WriteAsJsonAsync(user);
                 }
@@ -86,7 +88,7 @@ namespace Controllers
                 if (userData != null)
                 {
                     // получаем данные пользователя из базы данных
-                    Manager? user = _db.Managers.FirstOrDefault((u) => u.Id == id);
+                    Manager? user = _db.Users.OfType<Manager>().FirstOrDefault((u) => u.Id == id);
                     // если пользователь найден, изменяем его данные
                     if (user != null)
                     {
