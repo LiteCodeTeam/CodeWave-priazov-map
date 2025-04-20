@@ -90,5 +90,28 @@ namespace Backend
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        public ClaimsPrincipal? ValidateExpiredToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                // Валидация без проверки срока действия
+                return tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_refreshTokenSecret)),
+                    ValidateIssuer = true,
+                    ValidIssuer = _jwtSettings["Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = _jwtSettings["Audience"],
+                    ValidateLifetime = false
+                }, out _);
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }
+

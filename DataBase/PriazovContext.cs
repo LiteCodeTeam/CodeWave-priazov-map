@@ -14,7 +14,8 @@ namespace DataBase
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<UserSession> Sessions { get; set; }
-
+        public DbSet<RevokedToken> RevokedTokens { get; set; }
+        public DbSet<UserPassword> Password { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -41,23 +42,27 @@ namespace DataBase
             modelBuilder.Entity<UserSession>()
                 .HasKey(i => i.Id);
 
-            // Настройка наследования (TPH)
-            modelBuilder.Entity<User>()
-                .ToTable("Users")
-                .HasDiscriminator<string>("UserType")
-                .HasValue<Manager>("Manager")
-                .HasValue<Company>("Company");
+            modelBuilder.Entity<UserPassword>()
+                .Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<UserPassword>()
+              .Property<Guid>("Id").IsRequired();
+            modelBuilder.Entity<UserPassword>()
+                .HasKey(i => i.Id);
 
-            // Явная настройка связи (1 к многим)
-            modelBuilder.Entity<UserSession>()
-                .HasOne(us => us.User)
-                .WithMany()
-                .HasForeignKey(us => us.UserId)
-                .IsRequired()
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Session)       // У User есть одна Session
+                .WithOne(s => s.User)         // У Session есть один User
+                .HasForeignKey<UserSession>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Убедимся, что не создаются лишние таблицы
-            modelBuilder.Entity<Manager>().ToTable("Users");
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Password)
+                .WithOne(p => p.User)
+                .HasForeignKey<UserPassword>(p => p.UserId);
+
+        // Убедимся, что не создаются лишние таблицы
+        modelBuilder.Entity<Manager>().ToTable("Users");
             modelBuilder.Entity<Company>().ToTable("Users");
 
 
