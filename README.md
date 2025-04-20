@@ -1,1 +1,1 @@
-# CodeWave-priazov-map
+# Priazov
