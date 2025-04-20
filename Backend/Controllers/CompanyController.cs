@@ -1,22 +1,17 @@
 ﻿using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class CompanyController : Controller
+    public class CompanyController : ControllerBase
     {
-        private readonly HttpRequest _request;
-        private readonly HttpResponse _response;
         private readonly PriazovContext _db;
 
-        public CompanyController(HttpContext context, PriazovContext db)
+        public CompanyController(PriazovContext db)
         {
-            _request = context.Request;
-            _response = context.Response;
             _db = db;
         }
 
@@ -24,29 +19,27 @@ namespace Controllers
         /// Выводит список компаний
         /// </summary>
         [HttpGet]
-        public async Task GetCompany()
+        public ActionResult<IEnumerable<Company>> GetCompany()
         {
-            await _db.Users.OfType<Company>().ToListAsync();
+            return Ok(_db.Users.OfType<Company>().ToListAsync(););
         }
 
         /// <summary>
         /// Выводит компанию по её id
         /// </summary>
         [HttpGet("{id}")]
-        public async Task GetCompany(Guid? id)
+        public IActionResult GetCompany(Guid? id)
         {
             Company? user = _db.Users.OfType<Company>().FirstOrDefault((u) => u.Id == id);
             // если компания найдена, отправляем её
             if (user != null)
             {
-                _response.StatusCode = 200;
-                await _response.WriteAsJsonAsync(user);
+                return Ok(user);
             }
             // если не найдена, отправляем статусный код и сообщение об ошибке
             else
             {
-                _response.StatusCode = 404;
-                await _response.WriteAsJsonAsync(new { message = "Компания не найдена" });
+                return NotFound(new { message = "Компания не найдена" });
             }
         }
 
@@ -54,20 +47,16 @@ namespace Controllers
         /// Создаёт новую компанию
         /// </summary>
         [HttpPost]
-        public async Task PostCompany()
+        public IActionResult PostCompany(Company company)
         {
             try
             {
-                // получаем данные компании
-                var user = await _request.ReadFromJsonAsync<Company>();
-                if (user != null)
+                if (company != null)
                 {
-                    // устанавливаем id для новой компании
-                    user.Id = Guid.NewGuid();
                     // добавляем компанию в список
-                    await _db.Users.AddAsync(user);
-                    await _db.SaveChangesAsync();
-                    await _response.WriteAsJsonAsync(user);
+                    _db.Companies.AddAsync(company);
+                    _db.SaveChangesAsync();
+                    return Ok(company);
                 }
                 // если не найдена, отправляем статусный код и сообщение об ошибке
                 else
@@ -77,8 +66,7 @@ namespace Controllers
             }
             catch (Exception)
             {
-                _response.StatusCode = 400;
-                await _response.WriteAsJsonAsync(new { message = "Некорректные данные" });
+                return BadRequest(new { message = "Некорректные данные" });
             }
         }
 
@@ -86,31 +74,27 @@ namespace Controllers
         /// Изменяет компанию по id
         /// </summary>
         [HttpPut("{id}")]
-        public async Task PutCompany(Guid? id)
+        public IActionResult PutCompany(Guid? id, Company company)
         {
             try
             {
-                // получаем данные компании
-                var userData = await _request.ReadFromJsonAsync<Company>();
-                if (userData != null)
+                if (company != null)
                 {
                     // получаем данные компании из базы данных
                     Company? user = _db.Users.OfType<Company>().FirstOrDefault((u) => u.Id == id);
                     // если компания найдена, изменяем его данные
                     if (user != null)
                     {
-                        _response.StatusCode = 200;
-                        user.Name = userData.Name;
-                        user.Email = userData.Email;
-                        user.Phone = userData.Phone;
-                        await _db.SaveChangesAsync();
-                        await _response.WriteAsJsonAsync(user);
+                        user.Name = company.Name;
+                        user.Email = company.Email;
+                        user.Phone = company.Phone;
+                        _db.SaveChangesAsync();
+                        return Ok(user);
                     }
                     // если не найдена, отправляем статусный код и сообщение об ошибке
                     else
                     {
-                        _response.StatusCode = 404;
-                        await _response.WriteAsJsonAsync(new { message = "Компания не найден" });
+                        return NotFound(new { message = "Компания не найден" });
                     }
                 }
                 // если не найдена, отправляем статусный код и сообщение об ошибке
@@ -121,8 +105,7 @@ namespace Controllers
             }
             catch (Exception)
             {
-                _response.StatusCode = 400;
-                await _response.WriteAsJsonAsync(new { message = "Некорректные данные" });
+                return BadRequest(new { message = "Некорректные данные" });
             }
         }
     }

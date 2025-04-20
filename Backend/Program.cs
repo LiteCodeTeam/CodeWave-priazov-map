@@ -4,7 +4,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using DataBase;
-using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Backend;
@@ -25,11 +24,12 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 });
 
-// Регистрируем DbContextFactory
+// ГђГҐГЈГЁГ±ГІГ°ГЁГ°ГіГҐГ¬ DbContextFactory
 builder.Services.AddDbContextFactory<PriazovContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
+
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var accessTokenSecret = jwtSettings["AccessTokenSecret"]!;
@@ -41,7 +41,7 @@ builder.Services.AddSingleton<TokenService>(new TokenService(
     jwtSettings
 ));
 
-// Настройка аутентификации
+// ГЌГ Г±ГІГ°Г®Г©ГЄГ  Г ГіГІГҐГ­ГІГЁГґГЁГЄГ Г¶ГЁГЁ
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -61,9 +61,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI();\
 
-//Создание фабрики и контекста бд
+//Г‘Г®Г§Г¤Г Г­ГЁГҐ ГґГ ГЎГ°ГЁГЄГЁ ГЁ ГЄГ®Г­ГІГҐГЄГ±ГІГ  ГЎГ¤
 var factory = new DbContextFactory(builder.Configuration, "DefaultConnection");
 var db = factory.CreateDbContext();
 
@@ -73,97 +73,9 @@ var companies = db.Users.OfType<Company>();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
-
-//app.MapGet("/api/managers/{id:Guid}", async (Guid id) =>
-//{
-//    // получаем пользователя по id
-//    Manager? manager = await managers.FirstOrDefaultAsync(u => u.Id == id);
-
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    if (manager == null) return Results.NotFound(new { message = "Пользователь не найден" });
-
-//    // если пользователь найден, отправляем его
-//    return Results.Json(manager);
-//}).WithTags("Managers");
-
-//app.MapPost("/api/managers", async (Manager manager) =>
-//{
-//    manager.RoleName = managerRole.Name;
-//    manager.Password.PasswordHash = PasswordHasher.HashPassword(manager.Password.PasswordHash);
-//    // добавляем пользователя в массив
-//    await db.Users.AddAsync(manager);
-//    await db.SaveChangesAsync();
-//    return manager;
-//}).WithTags("Managers");
-
-//app.MapPut("/api/managers", async (Manager managerData) =>
-//{
-//    // получаем пользователя по id
-//    var manager = await managers.FirstOrDefaultAsync(u => u.Id == managerData.Id);
-
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    if (manager == null) return Results.NotFound(new { message = "Пользователь не найден" });
-
-//    // если пользователь найден, изменяем его данные и отправляем обратно клиенту
-//    manager.Name = managerData.Name;
-//    manager.Email = managerData.Email;
-//    manager.Phone = managerData.Phone;
-//    manager.Password.PasswordHash = PasswordHasher.HashPassword(managerData.Password.PasswordHash);
-//    manager.PhotoIcon = managerData.PhotoIcon;
-//    await db.SaveChangesAsync();
-//    return Results.Json(manager);
-//}).WithTags("Managers");
-
-//app.MapGet("/api/companies", async () =>
-//{
-//    return await companies.ToListAsync();
-//}).WithTags("Companies");
-
-//app.MapGet("/api/companies/{id:Guid}", async (Guid id) =>
-//{
-//    // получаем пользователя по id
-//    Company? company = await companies.FirstOrDefaultAsync(c => c.Id == id);
-
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    if (company == null) return Results.NotFound(new { message = "Компания не найдена" });
-
-//    // если пользователь найден, отправляем его
-//    return Results.Json(company);
-//}).WithTags("Companies");
-
-//app.MapPost("/api/companies", async (Company company) =>
-//{
-//    company.RoleName = companyRole.Name;
-//    company.Password.PasswordHash = PasswordHasher.HashPassword(company.Password.PasswordHash);
-//    // добавляем пользователя в массив
-//    await db.Users.AddAsync(company);
-//    await db.SaveChangesAsync();
-//    return company;
-//}).WithTags("Companies");
-
-
-//app.MapPut("/api/companies", async (Company companyData) =>
-//{
-//    // получаем пользователя по id
-//    var company = await companies.FirstOrDefaultAsync(u => u.Id == companyData.Id);
-
-//    // если не найден, отправляем статусный код и сообщение об ошибке
-//    if (company == null) return Results.NotFound(new { message = "Пользователь не найден" });
-
-//    // если пользователь найден, изменяем его данные и отправляем обратно клиенту
-//    company.Name = companyData.Name;
-//    company.Email = companyData.Email;
-//    company.Phone = companyData.Phone;
-//    company.Password.PasswordHash = PasswordHasher.HashPassword(companyData.Password.PasswordHash);
-//    company.PhotoIcon = companyData.PhotoIcon;
-//    company.Projects = companyData.Projects;
-//    company.Address = companyData.Address;
-//    company.Description = companyData.Description;
-//    await db.SaveChangesAsync();
-//    return Results.Json(company);
-//}).WithTags("Companies");
 
 app.MapPost("/login", async (LoginRequest request, [FromServices] TokenService tokenService) =>
 {
@@ -180,7 +92,7 @@ app.MapPost("/login", async (LoginRequest request, [FromServices] TokenService t
         person.Email, person.RoleName);
     var newRefreshToken = tokenService.GenerateRefreshToken(Convert.ToString(person.Id)!);
 
-    //Обновление в БД
+    //ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ Гў ГЃГ„
     await db.Sessions.AddAsync(new UserSession()
     {
         RefreshToken = newRefreshToken,
@@ -194,27 +106,27 @@ app.MapPost("/login", async (LoginRequest request, [FromServices] TokenService t
 
 app.MapPost("/refresh", async (RefreshRequest request, [FromServices] TokenService tokenService) =>
 {
-    // 1. Валидация Refresh Token
+    // 1. Г‚Г Г«ГЁГ¤Г Г¶ГЁГї Refresh Token
     var principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
     if (principal == null)
         return Results.Unauthorized();
 
     var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-    // 2. Проверка в БД
+    // 2. ГЏГ°Г®ГўГҐГ°ГЄГ  Гў ГЃГ„
     var session = await db.Sessions
         .FirstOrDefaultAsync(s => Convert.ToString(s.UserId) == userId && s.RefreshToken == request.RefreshToken);
 
     if (session == null || session.ExpiresAt < DateTime.UtcNow)
         return Results.Unauthorized();
 
-    // 3. Генерация новых токенов
+    // 3. ГѓГҐГ­ГҐГ°Г Г¶ГЁГї Г­Г®ГўГ»Гµ ГІГ®ГЄГҐГ­Г®Гў
     var newAccessToken = tokenService.GenerateAccessToken(userId, session.User.Email, session.User.RoleName);
     var newRefreshToken = tokenService.GenerateRefreshToken(userId);
 
-    // 4. Обновление в БД
+    // 4. ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ Гў ГЃГ„
     session.RefreshToken = newRefreshToken;
-    session.ExpiresAt = DateTime.UtcNow.AddDays(7); // Обновляем срок
+    session.ExpiresAt = DateTime.UtcNow.AddDays(7); // ГЋГЎГ­Г®ГўГ«ГїГҐГ¬ Г±Г°Г®ГЄ
     await db.SaveChangesAsync();
 
     return Results.Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
@@ -225,13 +137,13 @@ app.MapPost("/refresh", async (RefreshRequest request, [FromServices] TokenServi
 // Program.cs
 app.MapPost("/logout", async (HttpContext context) =>
 {
-    // 1. Получаем refresh token из запроса
+    // 1. ГЏГ®Г«ГіГ·Г ГҐГ¬ refresh token ГЁГ§ Г§Г ГЇГ°Г®Г±Г 
     var refreshToken = context.Request.Headers["X-Refresh-Token"].ToString();
 
     if (string.IsNullOrEmpty(refreshToken))
         return Results.BadRequest("Refresh token is required");
 
-    // 2. Находим и удаляем сессию в БД
+    // 2. ГЌГ ГµГ®Г¤ГЁГ¬ ГЁ ГіГ¤Г Г«ГїГҐГ¬ Г±ГҐГ±Г±ГЁГѕ Гў ГЃГ„
     var session = await db.Sessions
         .FirstOrDefaultAsync(s => s.RefreshToken == refreshToken);
 

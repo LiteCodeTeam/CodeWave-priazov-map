@@ -1,23 +1,17 @@
 ﻿using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class ManagerController : Controller
+    public class ManagerController : ControllerBase
     {
-        private readonly HttpRequest _request;
-        private readonly HttpResponse _response;
         private readonly PriazovContext _db;
 
-
-        public ManagerController(HttpContext context, PriazovContext db)
+        public ManagerController(PriazovContext db)
         {
-            _request = context.Request;
-            _response = context.Response;
             _db = db;
             
         }
@@ -26,20 +20,18 @@ namespace Controllers
         /// Выводит менеджера по его id
         /// </summary>
         [HttpGet("{id}")]
-        public async Task GetManager(Guid? id)
+        public IActionResult GetManager(Guid? id)
         {
             Manager? user = _db.Users.OfType<Manager>().FirstOrDefault((u) => u.Id == id);
             // если пользователь найден, отправляем его
             if (user != null)
             {
-                _response.StatusCode = 200;
-                await _response.WriteAsJsonAsync(user);
+                return Ok(user);
             }
             // если не найден, отправляем статусный код и сообщение об ошибке
             else
             {
-                _response.StatusCode = 404;
-                await _response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
+                return NotFound(new { message = "Пользователь не найден" });
             }
         }
 
@@ -47,20 +39,17 @@ namespace Controllers
         /// Создаёт нового менеджера
         /// </summary>
         [HttpPost]
-        public async Task PostManager()
+        public IActionResult PostManager(Manager manager)
         {
             try
             {
                 // получаем данные пользователя
-                var user = await _request.ReadFromJsonAsync<Manager>();
-                if (user != null)
+                if (manager != null)
                 {
-                    // устанавливаем id для нового пользователя
-                    user.Id = Guid.NewGuid();
                     // добавляем пользователя в список
-                    await _db.Users.AddAsync(user);
-                    await _db.SaveChangesAsync();
-                    await _response.WriteAsJsonAsync(user);
+                    _db.Managers.AddAsync(manager);
+                    _db.SaveChangesAsync();
+                    return Ok(manager);
                 }
                 // если не найден, отправляем статусный код и сообщение об ошибке
                 else
@@ -70,8 +59,7 @@ namespace Controllers
             }
             catch (Exception)
             {
-                _response.StatusCode = 400;
-                await _response.WriteAsJsonAsync(new { message = "Некорректные данные" });
+                return BadRequest(new { message = "Некорректные данные" });
             }
         }
 
@@ -79,31 +67,27 @@ namespace Controllers
         /// Изменяет менеджера по id
         /// </summary>
         [HttpPut("{id}")]
-        public async Task PutManager(Guid? id)
+        public IActionResult PutManager(Guid? id, Manager manager)
         {
             try
             {
-                // получаем данные пользователя
-                var userData = await _request.ReadFromJsonAsync<Manager>();
-                if (userData != null)
+                if (manager != null)
                 {
                     // получаем данные пользователя из базы данных
                     Manager? user = _db.Users.OfType<Manager>().FirstOrDefault((u) => u.Id == id);
                     // если пользователь найден, изменяем его данные
                     if (user != null)
                     {
-                        _response.StatusCode = 200;
-                        user.Name = userData.Name;
-                        user.Email = userData.Email;
-                        user.Phone = userData.Phone;
-                        await _db.SaveChangesAsync();
-                        await _response.WriteAsJsonAsync(user);
+                        user.Name = manager.Name;
+                        user.Email = manager.Email;
+                        user.Phone = manager.Phone;
+                        _db.SaveChangesAsync();
+                        return Ok(user);
                     }
                     // если не найден, отправляем статусный код и сообщение об ошибке
                     else
                     {
-                        _response.StatusCode = 404;
-                        await _response.WriteAsJsonAsync(new { message = "Пользователь не найден" });
+                        return NotFound(new { message = "Пользователь не найден" });
                     }
                 }
                 // если не найден, отправляем статусный код и сообщение об ошибке
@@ -114,8 +98,7 @@ namespace Controllers
             }
             catch (Exception)
             {
-                _response.StatusCode = 400;
-                await _response.WriteAsJsonAsync(new { message = "Некорректные данные" });
+                return BadRequest(new { message = "Некорректные данные" });
             }
         }
     }
