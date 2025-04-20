@@ -61,7 +61,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();\
+app.UseSwaggerUI();
 
 //Ñîçäàíèå ôàáðèêè è êîíòåêñòà áä
 var factory = new DbContextFactory(builder.Configuration, "DefaultConnection");
