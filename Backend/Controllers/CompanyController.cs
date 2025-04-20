@@ -21,7 +21,7 @@ namespace Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Company>> GetCompany()
         {
-            return Ok(_db.Companies.ToList());
+            return Ok(_db.Users.OfType<Company>().ToListAsync(););
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Controllers
         [HttpGet("{id}")]
         public IActionResult GetCompany(Guid? id)
         {
-            Company? user = _db.Companies.FirstOrDefault((u) => u.Id == id);
+            Company? user = _db.Users.OfType<Company>().FirstOrDefault((u) => u.Id == id);
             // если компания найдена, отправляем её
             if (user != null)
             {
@@ -54,8 +54,8 @@ namespace Controllers
                 if (company != null)
                 {
                     // добавляем компанию в список
-                    _db.Companies.Add(company);
-                    _db.SaveChanges();
+                    _db.Companies.AddAsync(company);
+                    _db.SaveChangesAsync();
                     return Ok(company);
                 }
                 // если не найдена, отправляем статусный код и сообщение об ошибке
@@ -81,14 +81,14 @@ namespace Controllers
                 if (company != null)
                 {
                     // получаем данные компании из базы данных
-                    Company? user = _db.Companies.FirstOrDefault((u) => u.Id == id);
+                    Company? user = _db.Users.OfType<Company>().FirstOrDefault((u) => u.Id == id);
                     // если компания найдена, изменяем его данные
                     if (user != null)
                     {
                         user.Name = company.Name;
                         user.Email = company.Email;
                         user.Phone = company.Phone;
-                        _db.SaveChanges();
+                        _db.SaveChangesAsync();
                         return Ok(user);
                     }
                     // если не найдена, отправляем статусный код и сообщение об ошибке

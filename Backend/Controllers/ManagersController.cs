@@ -13,6 +13,7 @@ namespace Controllers
         public ManagerController(PriazovContext db)
         {
             _db = db;
+            
         }
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace Controllers
         [HttpGet("{id}")]
         public IActionResult GetManager(Guid? id)
         {
-            Manager? user = _db.Managers.FirstOrDefault((u) => u.Id == id);
+            Manager? user = _db.Users.OfType<Manager>().FirstOrDefault((u) => u.Id == id);
             // если пользователь найден, отправляем его
             if (user != null)
             {
@@ -73,14 +74,14 @@ namespace Controllers
                 if (manager != null)
                 {
                     // получаем данные пользователя из базы данных
-                    Manager? user = _db.Managers.FirstOrDefault((u) => u.Id == id);
+                    Manager? user = _db.Users.OfType<Manager>().FirstOrDefault((u) => u.Id == id);
                     // если пользователь найден, изменяем его данные
                     if (user != null)
                     {
                         user.Name = manager.Name;
                         user.Email = manager.Email;
                         user.Phone = manager.Phone;
-                        _db.SaveChanges();
+                        _db.SaveChangesAsync();
                         return Ok(user);
                     }
                     // если не найден, отправляем статусный код и сообщение об ошибке
