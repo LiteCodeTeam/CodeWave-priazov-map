@@ -11,7 +11,7 @@ namespace DataBase.Models
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
 
-        // Хэш пароля (не сам пароль!)
+        // Хэш пароля
         [MaxLength(256)]
         public string PasswordHash { get; set; } = null!;
 
@@ -29,7 +29,7 @@ namespace DataBase.Models
         [MaxLength(12)]
         public string Phone { get; set; } = null!;
         [MaxLength(18)]
-        public string RoleName { get; set; } = null!;
+        public string Role { get; set; } = null!;
         public byte[]? PhotoIcon { get; set; }
         public UserSession? Session { get; set; }
     }

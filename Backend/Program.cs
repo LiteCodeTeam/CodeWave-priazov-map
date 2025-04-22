@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using DataBase;
+using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Backend;
@@ -12,9 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity.Data;
 using System.ComponentModel.DataAnnotations;
 
-var adminRole = new Role("admin");
-var managerRole = new Role("manager");
-var companyRole = new Role("company");
+var adminRole = new Role("Admin");
+var managerRole = new Role("Manager");
+var companyRole = new Role("Company");
 
 var builder = WebApplication.CreateBuilder();
 
@@ -79,17 +80,22 @@ app.UseAuthorization();
 
 app.MapPost("/login", async (LoginRequest request, [FromServices] TokenService tokenService) =>
 {
-
     if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
         return Results.BadRequest("Email and password are required");
 
     var person = await db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+    if (person == null)
+        return Results.Unauthorized();
 
-    if (person == null || !PasswordHasher
-        .VerifyPassword(request.Password, person.Password.PasswordHash)) return Results.Unauthorized();
+    var password = await db.Password.FirstOrDefaultAsync(p => p.UserId == person.Id);
+    if (password == null)
+        return Results.Unauthorized();
+
+    //if (!PasswordHasher.VerifyPassword(request.Password, password.PasswordHash))
+    //    return Results.Unauthorized();
 
     var newAccessToken = tokenService.GenerateAccessToken(Convert.ToString(person.Id)!,
-        person.Email, person.RoleName);
+        person.Email, person.Role);
     var newRefreshToken = tokenService.GenerateRefreshToken(Convert.ToString(person.Id)!);
 
     //Îáíîâëåíèå â ÁÄ
@@ -101,60 +107,84 @@ app.MapPost("/login", async (LoginRequest request, [FromServices] TokenService t
         ExpiresAt = DateTime.UtcNow.AddDays(Convert.ToDouble(jwtSettings["RefreshTokenExpiryDays"]))
     });
     await db.SaveChangesAsync();
-    return Results.Ok(new { AccessToken = newAccessToken, Email = person.Email });
+
+    return Results.Ok(new { AccessToken = newAccessToken, Email = person.Email }); // Статус 200
 });
 
 app.MapPost("/refresh", async (RefreshRequest request, [FromServices] TokenService tokenService) =>
 {
-    // 1. Âàëèäàöèÿ Refresh Token
-    var principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
-    if (principal == null)
-        return Results.Unauthorized();
+    if (string.IsNullOrEmpty(request.RefreshToken))
+        return Results.BadRequest("Refresh token is required");
+
+    ClaimsPrincipal? principal;
+    try
+    {
+        principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
+        if (principal == null)
+            return Results.Unauthorized();
+    }
+    catch (SecurityTokenException ex)
+    {
+        return Results.BadRequest($"Invalid token: {ex.Message}");
+    }
+
 
     var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
     // 2. Ïðîâåðêà â ÁÄ
     var session = await db.Sessions
-        .FirstOrDefaultAsync(s => Convert.ToString(s.UserId) == userId && s.RefreshToken == request.RefreshToken);
+        .FirstOrDefaultAsync(s => Convert.ToString(s.UserId) == userId);
+    var user = await db.Users
+        .FirstOrDefaultAsync(s => Convert.ToString(s.Id) == userId);
 
     if (session == null || session.ExpiresAt < DateTime.UtcNow)
         return Results.Unauthorized();
 
-    // 3. Ãåíåðàöèÿ íîâûõ òîêåíîâ
-    var newAccessToken = tokenService.GenerateAccessToken(userId, session.User.Email, session.User.RoleName);
+    var newAccessToken = tokenService.GenerateAccessToken(userId, user.Email, user.Role);
     var newRefreshToken = tokenService.GenerateRefreshToken(userId);
 
     // 4. Îáíîâëåíèå â ÁÄ
     session.RefreshToken = newRefreshToken;
-    session.ExpiresAt = DateTime.UtcNow.AddDays(7); // Îáíîâëÿåì ñðîê
+    session.ExpiresAt = DateTime.UtcNow.AddDays
+        (Convert.ToDouble(jwtSettings["RefreshTokenExpiryDays"])); // Дата окончания resfresh-токена
     await db.SaveChangesAsync();
 
-    return Results.Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
+    return Results.Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken }); // Статус 200
 })
 .WithName("RefreshToken")
 .AllowAnonymous();
 
 // Program.cs
-app.MapPost("/logout", async (HttpContext context) =>
+app.MapPost("/logout", async (RefreshRequest request, [FromServices] TokenService tokenService) =>
 {
-    // 1. Ïîëó÷àåì refresh token èç çàïðîñà
-    var refreshToken = context.Request.Headers["X-Refresh-Token"].ToString();
-
-    if (string.IsNullOrEmpty(refreshToken))
+    if (string.IsNullOrEmpty(request.RefreshToken))
         return Results.BadRequest("Refresh token is required");
 
-    // 2. Íàõîäèì è óäàëÿåì ñåññèþ â ÁÄ
-    var session = await db.Sessions
-        .FirstOrDefaultAsync(s => s.RefreshToken == refreshToken);
-
-    if (session != null)
+    ClaimsPrincipal? principal;
+    try
     {
-        db.Sessions.Remove(session);
-        await db.SaveChangesAsync();
+        principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
+        if (principal == null)
+            return Results.Unauthorized();
+    }
+    catch (SecurityTokenException ex)
+    {
+        return Results.BadRequest($"Invalid token: {ex.Message}");
     }
 
-    return Results.Ok("Logged out successfully");
-}).RequireAuthorization();
+    var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+    await db.Sessions.Where(s => Convert.ToString(s.UserId) == userId).ExecuteDeleteAsync();
+
+    await db.RevokedTokens.AddAsync(new RevokedToken
+    {
+        Token = request.RefreshToken,
+        ExpiresAt = DateTime.UtcNow.AddDays(Convert.ToDouble(jwtSettings["RefreshTokenExpiryDays"]))
+    });
+    await db.SaveChangesAsync();
+
+    return Results.NoContent(); // Статус 204
+});
 
 app.Run();
 

@@ -47,7 +47,7 @@ namespace Controllers
                 if (manager != null)
                 {
                     // добавляем пользователя в список
-                    _db.Managers.AddAsync(manager);
+                    _db.Users.AddAsync(manager);
                     _db.SaveChangesAsync();
                     return Ok(manager);
                 }

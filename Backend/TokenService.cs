@@ -60,8 +60,9 @@ namespace Backend
                 new Claim(ClaimTypes.NameIdentifier, userId),
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Role, role),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())  // Уникальный ID токена
             }),
+                Issuer = _jwtSettings["Issuer"],
+                Audience = _jwtSettings["Audience"],
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings["AccessTokenExpiryMinutes"])),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
@@ -81,6 +82,8 @@ namespace Backend
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, userId) }),
+                Issuer = _jwtSettings["Issuer"],
+                Audience = _jwtSettings["Audience"],
                 Expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_jwtSettings["RefreshTokenExpiryDays"])),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),

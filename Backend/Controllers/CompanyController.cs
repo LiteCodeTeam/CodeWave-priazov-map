@@ -1,6 +1,7 @@
 ﻿using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Controllers
 {
@@ -21,7 +22,7 @@ namespace Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Company>> GetCompany()
         {
-            return Ok(_db.Users.OfType<Company>().ToListAsync(););
+            return Ok(_db.Users.OfType<Company>().ToListAsync());
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Controllers
                 if (company != null)
                 {
                     // добавляем компанию в список
-                    _db.Companies.AddAsync(company);
+                    _db.Users.AddAsync(company);
                     _db.SaveChangesAsync();
                     return Ok(company);
                 }

@@ -17,7 +17,7 @@ namespace DataBase.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -59,9 +59,10 @@ namespace DataBase.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TokenId")
+                    b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.HasKey("Id");
 
@@ -73,11 +74,6 @@ namespace DataBase.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -97,7 +93,7 @@ namespace DataBase.Migrations
                     b.Property<byte[]>("PhotoIcon")
                         .HasColumnType("bytea");
 
-                    b.Property<string>("RoleName")
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(18)
                         .HasColumnType("character varying(18)");
@@ -106,7 +102,7 @@ namespace DataBase.Migrations
 
                     b.ToTable("Users");
 
-                    b.HasDiscriminator().HasValue("User");
+                    b.HasDiscriminator<string>("Role").HasValue("User");
 
                     b.UseTphMappingStrategy();
                 });
@@ -147,7 +143,8 @@ namespace DataBase.Migrations
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -173,16 +170,12 @@ namespace DataBase.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.ToTable("Users", (string)null);
-
                     b.HasDiscriminator().HasValue("Company");
                 });
 
             modelBuilder.Entity("DataBase.Models.Manager", b =>
                 {
                     b.HasBaseType("DataBase.Models.User");
-
-                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator().HasValue("Manager");
                 });

@@ -8,7 +8,7 @@ namespace DataBase.Models
     {
         public Guid Id { get; set; }
         [MaxLength(1024)]
-        public string TokenId { get; set; } = null!; // jti из JWT
+        public string Token { get; set; } = null!; 
         public DateTime ExpiresAt { get; set; }  // Когда токен истечёт естественным путём
     }
     public class UserSession

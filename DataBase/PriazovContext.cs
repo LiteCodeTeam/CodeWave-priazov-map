@@ -20,6 +20,15 @@ namespace DataBase
         {
 
             //Настройки таблиц
+
+            modelBuilder.Entity<User>()
+                .Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<User>()
+               .Property<Guid>("Id").IsRequired();
+            modelBuilder.Entity<User>()
+                .HasKey(i => i.Id);
+
             modelBuilder.Entity<Project>()
                 .Property<Guid>("Id")
                 .ValueGeneratedOnAdd();
@@ -61,9 +70,12 @@ namespace DataBase
                 .WithOne(p => p.User)
                 .HasForeignKey<UserPassword>(p => p.UserId);
 
-        // Убедимся, что не создаются лишние таблицы
-        modelBuilder.Entity<Manager>().ToTable("Users");
-            modelBuilder.Entity<Company>().ToTable("Users");
+            // Убедимся, что не создаются лишние таблицы
+
+            modelBuilder.Entity<User>()
+                .HasDiscriminator<string>("Role")
+                .HasValue<Manager>("Manager")
+                .HasValue<Company>("Company");
 
 
             //modelBuilder.Entity<Address>()

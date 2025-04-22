@@ -16,7 +16,7 @@ namespace DataBase.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TokenId = table.Column<string>(type: "text", nullable: false),
+                    Token = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -32,9 +32,8 @@ namespace DataBase.Migrations
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     Phone = table.Column<string>(type: "character varying(12)", maxLength: 12, nullable: false),
-                    RoleName = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: false),
+                    Role = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: false),
                     PhotoIcon = table.Column<byte[]>(type: "bytea", nullable: true),
-                    Discriminator = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     IndustryName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Address_JsonString = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
@@ -93,7 +92,7 @@ namespace DataBase.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RefreshToken = table.Column<string>(type: "text", nullable: false),
+                    RefreshToken = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
