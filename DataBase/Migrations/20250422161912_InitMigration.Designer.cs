@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataBase.Migrations
 {
     [DbContext(typeof(PriazovContext))]
-    [Migration("20250422080953_InitMigration")]
+    [Migration("20250422161912_InitMigration")]
     partial class InitMigration
     {
         /// <inheritdoc />
@@ -24,6 +24,29 @@ namespace DataBase.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens");
+                });
 
             modelBuilder.Entity("DataBase.Models.Project", b =>
                 {
@@ -181,6 +204,17 @@ namespace DataBase.Migrations
                     b.HasBaseType("DataBase.Models.User");
 
                     b.HasDiscriminator().HasValue("Manager");
+                });
+
+            modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("DataBase.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataBase.Models.Project", b =>

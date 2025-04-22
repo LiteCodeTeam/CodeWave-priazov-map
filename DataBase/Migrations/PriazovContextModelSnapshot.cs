@@ -22,6 +22,29 @@ namespace DataBase.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
             modelBuilder.Entity("DataBase.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -178,6 +201,17 @@ namespace DataBase.Migrations
                     b.HasBaseType("DataBase.Models.User");
 
                     b.HasDiscriminator().HasValue("Manager");
+                });
+
+            modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("DataBase.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataBase.Models.Project", b =>

@@ -33,6 +33,7 @@ builder.Services.AddControllers();
 
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var smtp = builder.Configuration.GetSection("SMTP");
 var accessTokenSecret = jwtSettings["AccessTokenSecret"]!;
 var refreshTokenSecret = jwtSettings["RefreshTokenSecret"]!;
 
@@ -83,16 +84,15 @@ app.MapPost("/login", async (LoginRequest request, [FromServices] TokenService t
     if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
         return Results.BadRequest("Email and password are required");
 
-    var person = await db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+    var person = await db.Users
+        .Include(u => u.Password)
+        .FirstOrDefaultAsync(u => u.Email == request.Email);
     if (person == null)
         return Results.Unauthorized();
 
-    var password = await db.Password.FirstOrDefaultAsync(p => p.UserId == person.Id);
-    if (password == null)
-        return Results.Unauthorized();
 
-    //if (!PasswordHasher.VerifyPassword(request.Password, password.PasswordHash))
-    //    return Results.Unauthorized();
+    if (!PasswordHasher.VerifyPassword(request.Password, person.Password.PasswordHash))
+        return Results.Unauthorized();
 
     var newAccessToken = tokenService.GenerateAccessToken(Convert.ToString(person.Id)!,
         person.Email, person.Role);
@@ -133,14 +133,13 @@ app.MapPost("/refresh", async (RefreshRequest request, [FromServices] TokenServi
 
     // 2. Ïðîâåðêà â ÁÄ
     var session = await db.Sessions
+        .Include(s => s.User)
         .FirstOrDefaultAsync(s => Convert.ToString(s.UserId) == userId);
-    var user = await db.Users
-        .FirstOrDefaultAsync(s => Convert.ToString(s.Id) == userId);
 
     if (session == null || session.ExpiresAt < DateTime.UtcNow)
         return Results.Unauthorized();
 
-    var newAccessToken = tokenService.GenerateAccessToken(userId, user.Email, user.Role);
+    var newAccessToken = tokenService.GenerateAccessToken(userId, session.User.Email, session.User.Role);
     var newRefreshToken = tokenService.GenerateRefreshToken(userId);
 
     // 4. Îáíîâëåíèå â ÁÄ
@@ -186,6 +185,73 @@ app.MapPost("/logout", async (RefreshRequest request, [FromServices] TokenServic
     return Results.NoContent(); // Статус 204
 });
 
+app.MapPost("/forgot-password", async (ForgotPasswordRequest request, PriazovContext db) =>
+{
+    // 1. Находим пользователя по email
+    var user = await db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+    if (user == null)
+        return Results.Ok(); // Не сообщаем, что email не найден (безопасность)
+
+    // 2. Генерируем токен и сохраняем его
+    var token = new PasswordResetToken
+    {
+        Token = Guid.NewGuid().ToString() + Guid.NewGuid().ToString(), // 32 символа
+        UserId = user.Id,
+        ExpiresAt = DateTime.UtcNow.AddHours(1)
+    };
+    db.PasswordResetTokens.Add(token);
+    await db.SaveChangesAsync();
+
+    // 3. Отправляем email со ссылкой (реализуйте свой EmailService)
+    var resetLink = $"http://localhost:5145/reset-password?token={token.Token}";
+    await EmailService.SendPasswordResetEmail(user.Email, resetLink, smtp);
+
+    return Results.Ok();
+});
+
+app.MapGet("/reset-password", (string token) =>
+{
+    // Проверяем валидность токена
+    var isValid = db.PasswordResetTokens.Any(t => t.Token == token && t.ExpiresAt > DateTime.UtcNow);
+
+    if (!isValid)
+        return Results.BadRequest("Недействительная или просроченная ссылка");
+
+    return Results.Content(
+        $"""
+        <form method="post" action="/reset-password">
+            <input type="hidden" name="token" value="{token}">
+            <input type="password" name="newPassword" placeholder="Password" required>
+            <input type="password" name="confirmPassword" placeholder="Repeat Password" required>
+            <button type="submit">Save</button>
+        </form>
+        """, "text/html");
+});
+
+app.MapPost("/reset-password", async (ResetPasswordRequest request, PriazovContext db) =>
+{
+    var token = await db.PasswordResetTokens
+        .FirstOrDefaultAsync(t => t.Token == request.Token && t.ExpiresAt > DateTime.UtcNow);
+    if (token == null)
+        return Results.BadRequest("Недействительный или просроченный токен.");
+
+    var user = await db.Users
+        .Include(u => u.Password)
+        .FirstOrDefaultAsync(u => u.Id == token.UserId);
+    if (user == null)
+        return Results.NotFound("Пользователь не найден.");
+
+    // 3. Хешируем новый пароль и обновляем
+    user.Password.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword, 12);
+    user.Password.LastUpdated = DateTime.UtcNow;
+
+    // 4. Удаляем токен (одноразовый)
+    db.PasswordResetTokens.Remove(token);
+    await db.SaveChangesAsync();
+
+    return Results.Ok("Пароль успешно изменён.");
+});
+
 app.Run();
 
 public record LoginRequest(
@@ -195,3 +261,6 @@ public record LoginRequest(
 public record RefreshRequest(
     [Required] string RefreshToken
 );
+
+public record ForgotPasswordRequest(string Email);
+public record ResetPasswordRequest(string Token, string NewPassword);
