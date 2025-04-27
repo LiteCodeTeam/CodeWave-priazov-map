@@ -71,12 +71,23 @@ namespace DataBase
                 .WithOne(p => p.User)
                 .HasForeignKey<UserPassword>(p => p.UserId);
 
+            modelBuilder.Entity<User>()
+               .HasOne(u => u.PasswordResetToken)
+               .WithOne(p => p.User)
+               .HasForeignKey<PasswordResetToken>(p => p.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Address)
+                .WithOne(a => a.User)
+                .HasForeignKey<Address>(a =>  a.UserId);
+
             // Убедимся, что не создаются лишние таблицы
 
             modelBuilder.Entity<User>()
                 .HasDiscriminator<string>("Role")
                 .HasValue<Manager>("Manager")
-                .HasValue<Company>("Company");
+                .HasValue<Company>("Company")
+                .HasValue<Admin>("Admin");
         }
     }
 }

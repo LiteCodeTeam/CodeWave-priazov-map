@@ -20,6 +20,7 @@ namespace DataBase.Models
     public class PasswordResetToken
     {
         public Guid Id { get; set; }
+        [MaxLength(6)]
         public string Token { get; set; } = null!; // Уникальный токен
         public Guid UserId { get; set; }   // Связь с пользователем
         public User User { get; set; } = null!;    // Навигационное свойство

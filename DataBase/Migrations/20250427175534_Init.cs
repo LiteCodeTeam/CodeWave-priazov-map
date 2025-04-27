@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace DataBase.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigration : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,17 +32,44 @@ namespace DataBase.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(12)", maxLength: 12, nullable: false),
-                    Role = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: false),
-                    PhotoIcon = table.Column<byte[]>(type: "bytea", nullable: true),
-                    IndustryName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    Address_JsonString = table.Column<string>(type: "text", nullable: true),
+                    Phone = table.Column<string>(type: "character varying(12)", maxLength: 12, nullable: true),
+                    PhotoIcon = table.Column<byte[]>(type: "bytea", maxLength: 18, nullable: true),
+                    Role = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
+                    Industry = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    LeaderName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Description = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    PhotoHeader = table.Column<byte[]>(type: "bytea", nullable: true),
                     Contacts_JsonString = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Address",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Street = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Apartment = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    City = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Country = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    PostalCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Latitude = table.Column<decimal>(type: "numeric(10,7)", nullable: false),
+                    Longitude = table.Column<decimal>(type: "numeric(10,7)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Address", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Address_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,7 +97,7 @@ namespace DataBase.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Token = table.Column<string>(type: "text", nullable: false),
+                    Token = table.Column<string>(type: "character varying(6)", maxLength: 6, nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -127,6 +155,12 @@ namespace DataBase.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Address_UserId",
+                table: "Address",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Password_UserId",
                 table: "Password",
                 column: "UserId",
@@ -135,7 +169,8 @@ namespace DataBase.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetTokens_UserId",
                 table: "PasswordResetTokens",
-                column: "UserId");
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_CompanyId",
@@ -152,6 +187,9 @@ namespace DataBase.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Address");
+
             migrationBuilder.DropTable(
                 name: "Password");
 

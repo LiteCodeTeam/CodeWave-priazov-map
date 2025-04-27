@@ -1,29 +1,27 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Backend.Models;
 using DataBase.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Backend
 {
     public class TokenService
     {
-        private readonly string _accessTokenSecret;
-        private readonly string _refreshTokenSecret;
-        private readonly IConfigurationSection _jwtSettings;
+        private readonly JwtSettings _jwtSettings;
 
-        public TokenService(string accessTokenSecret, string refreshTokenSecret, IConfigurationSection jwtSettings)
+        public TokenService(IOptions<JwtSettings> jwtSettings)
         {
-            _accessTokenSecret = accessTokenSecret;
-            _refreshTokenSecret = refreshTokenSecret;
-            _jwtSettings = jwtSettings;
+            _jwtSettings = jwtSettings.Value;
         }
 
         // Валидация токена (для Access и Refresh)
         public ClaimsPrincipal? ValidateToken(string token, bool isAccessToken)
         {
             var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-                isAccessToken ? _accessTokenSecret : _refreshTokenSecret));
+                isAccessToken ? _jwtSettings.AccessTokenSecret : _jwtSettings.RefreshTokenSecret));
 
             var validator = new JwtSecurityTokenHandler();
             try
@@ -33,9 +31,9 @@ namespace Backend
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = key,
                     ValidateIssuer = true,
-                    ValidIssuer = _jwtSettings["Issuer"],
+                    ValidIssuer = _jwtSettings.Issuer,
                     ValidateAudience = true,
-                    ValidAudience = _jwtSettings["Audience"],
+                    ValidAudience = _jwtSettings.Audience,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 }, out _);
@@ -51,7 +49,7 @@ namespace Backend
         public string GenerateAccessToken(string userId, string email, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_accessTokenSecret);
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.AccessTokenSecret);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -61,9 +59,9 @@ namespace Backend
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Role, role),
             }),
-                Issuer = _jwtSettings["Issuer"],
-                Audience = _jwtSettings["Audience"],
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_jwtSettings["AccessTokenExpiryMinutes"])),
+                Issuer = _jwtSettings.Issuer,
+                Audience = _jwtSettings.Audience,
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
@@ -77,14 +75,14 @@ namespace Backend
         public string GenerateRefreshToken(string userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_refreshTokenSecret);
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.RefreshTokenSecret);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, userId) }),
-                Issuer = _jwtSettings["Issuer"],
-                Audience = _jwtSettings["Audience"],
-                Expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_jwtSettings["RefreshTokenExpiryDays"])),
+                Issuer = _jwtSettings.Issuer,
+                Audience = _jwtSettings.Audience,
+                Expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_jwtSettings.RefreshTokenExpiryDays)),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
@@ -102,11 +100,11 @@ namespace Backend
                 return tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_refreshTokenSecret)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.RefreshTokenSecret)),
                     ValidateIssuer = true,
-                    ValidIssuer = _jwtSettings["Issuer"],
+                    ValidIssuer = _jwtSettings.Issuer,
                     ValidateAudience = true,
-                    ValidAudience = _jwtSettings["Audience"],
+                    ValidAudience = _jwtSettings.Audience,
                     ValidateLifetime = false
                 }, out _);
             }

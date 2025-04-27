@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataBase.Migrations
 {
     [DbContext(typeof(PriazovContext))]
-    [Migration("20250422161912_InitMigration")]
-    partial class InitMigration
+    [Migration("20250427175534_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,54 @@ namespace DataBase.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("DataBase.Models.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Apartment")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(10, 7)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(10, 7)");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Address");
+                });
 
             modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
                 {
@@ -36,14 +84,16 @@ namespace DataBase.Migrations
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("PasswordResetTokens");
                 });
@@ -112,17 +162,17 @@ namespace DataBase.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("character varying(12)");
 
                     b.Property<byte[]>("PhotoIcon")
+                        .HasMaxLength(18)
                         .HasColumnType("bytea");
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(18)
-                        .HasColumnType("character varying(18)");
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.HasKey("Id");
 
@@ -183,6 +233,13 @@ namespace DataBase.Migrations
                     b.ToTable("Sessions");
                 });
 
+            modelBuilder.Entity("DataBase.Models.Admin", b =>
+                {
+                    b.HasBaseType("DataBase.Models.User");
+
+                    b.HasDiscriminator().HasValue("Admin");
+                });
+
             modelBuilder.Entity("DataBase.Models.Company", b =>
                 {
                     b.HasBaseType("DataBase.Models.User");
@@ -191,10 +248,18 @@ namespace DataBase.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)");
 
-                    b.Property<string>("IndustryName")
+                    b.Property<string>("Industry")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LeaderName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("PhotoHeader")
+                        .HasColumnType("bytea");
 
                     b.HasDiscriminator().HasValue("Company");
                 });
@@ -206,11 +271,22 @@ namespace DataBase.Migrations
                     b.HasDiscriminator().HasValue("Manager");
                 });
 
+            modelBuilder.Entity("DataBase.Models.Address", b =>
+                {
+                    b.HasOne("DataBase.Models.User", "User")
+                        .WithOne("Address")
+                        .HasForeignKey("DataBase.Models.Address", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
                 {
                     b.HasOne("DataBase.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne("PasswordResetToken")
+                        .HasForeignKey("DataBase.Models.PasswordResetToken", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -243,7 +319,8 @@ namespace DataBase.Migrations
 
                     b.Navigation("Company");
 
-                    b.Navigation("Photos");
+                    b.Navigation("Photos")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DataBase.Models.UserPassword", b =>
@@ -270,22 +347,6 @@ namespace DataBase.Migrations
 
             modelBuilder.Entity("DataBase.Models.Company", b =>
                 {
-                    b.OwnsOne("JsonProperty.EFCore.JsonDictionary<string, string>", "Address", b1 =>
-                        {
-                            b1.Property<Guid>("CompanyId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("JsonString")
-                                .HasColumnType("text");
-
-                            b1.HasKey("CompanyId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CompanyId");
-                        });
-
                     b.OwnsOne("JsonProperty.EFCore.JsonList<string>", "Contacts", b1 =>
                         {
                             b1.Property<Guid>("CompanyId")
@@ -302,16 +363,19 @@ namespace DataBase.Migrations
                                 .HasForeignKey("CompanyId");
                         });
 
-                    b.Navigation("Address")
+                    b.Navigation("Contacts")
                         .IsRequired();
-
-                    b.Navigation("Contacts");
                 });
 
             modelBuilder.Entity("DataBase.Models.User", b =>
                 {
+                    b.Navigation("Address")
+                        .IsRequired();
+
                     b.Navigation("Password")
                         .IsRequired();
+
+                    b.Navigation("PasswordResetToken");
 
                     b.Navigation("Session");
                 });
