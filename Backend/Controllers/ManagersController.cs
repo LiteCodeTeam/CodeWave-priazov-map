@@ -1,20 +1,16 @@
 ﻿using DataBase;
 using DataBase.Models;
+using Backend.Validation;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class ManagerController : ControllerBase
+    public class ManagerController(PriazovContext db) : ControllerBase
     {
-        private readonly PriazovContext _db;
-
-        public ManagerController(PriazovContext db)
-        {
-            _db = db;
-            
-        }
+        private readonly PriazovContext _db = db;
 
         /// <summary>
         /// Выводит менеджера по его id
@@ -46,6 +42,14 @@ namespace Controllers
                 // получаем данные пользователя
                 if (manager != null)
                 {
+
+                    if (manager.Name == "" ||
+                    !RegexUtilities.IsValidEmail(manager.Email) ||
+                    Regex.Match(manager.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                    {
+                        throw new Exception("Некорректные данные");
+                    }
+
                     // добавляем пользователя в список
                     _db.Users.AddAsync(manager);
                     _db.SaveChangesAsync();
@@ -71,16 +75,25 @@ namespace Controllers
         {
             try
             {
-                if (manager != null)
+                if (manager != null && RegexUtilities.IsValidEmail(manager.Email))
                 {
                     // получаем данные пользователя из базы данных
                     Manager? user = _db.Users.OfType<Manager>().FirstOrDefault((u) => u.Id == id);
                     // если пользователь найден, изменяем его данные
                     if (user != null)
                     {
+
+                        if (manager.Name == "" ||
+                        !RegexUtilities.IsValidEmail(manager.Email) ||
+                        Regex.Match(manager.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                        {
+                            throw new Exception("Некорректные данные");
+                        }
+
                         user.Name = manager.Name;
                         user.Email = manager.Email;
                         user.Phone = manager.Phone;
+                        user.Password = manager.Password;
                         _db.SaveChangesAsync();
                         return Ok(user);
                     }
