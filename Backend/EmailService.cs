@@ -18,7 +18,7 @@ namespace Backend
         public async Task SendPasswordResetEmail(string email, string resetCode)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Priazov-Impact", "dedpylqwer@gmail.com"));
+            message.From.Add(new MailboxAddress("Priazov-Impact", "priazovimpact@gmail.com"));
             message.To.Add(new MailboxAddress("", email));
             message.Subject = "Сброс пароля";
             message.Body = new TextPart("html")
@@ -43,7 +43,7 @@ namespace Backend
         public async Task SendPasswordOkayEmail(string email)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Priazov-Impact", "dedpylqwer@gmail.com"));
+            message.From.Add(new MailboxAddress("Priazov-Impact", "priazovimpact@gmail.com"));
             message.To.Add(new MailboxAddress("", email));
             message.Subject = "Пароль успешно изменён";
             message.Body = new TextPart("html")
