@@ -157,6 +157,29 @@ namespace DataBase.Migrations
                     b.ToTable("Sessions");
                 });
 
+            modelBuilder.Entity("MapMark", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("GeoLat")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("GeoLong")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("PlaceName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MapMark");
+                });
+
             modelBuilder.Entity("DataBase.Models.Company", b =>
                 {
                     b.HasBaseType("DataBase.Models.User");

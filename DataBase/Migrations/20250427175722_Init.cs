@@ -1,16 +1,32 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace DataBase.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigration : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "MapMark",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PlaceName = table.Column<string>(type: "text", nullable: false),
+                    GeoLong = table.Column<double>(type: "double precision", nullable: false),
+                    GeoLat = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MapMark", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "RevokedTokens",
                 columns: table => new
@@ -127,6 +143,9 @@ namespace DataBase.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "MapMark");
+
             migrationBuilder.DropTable(
                 name: "Password");
 

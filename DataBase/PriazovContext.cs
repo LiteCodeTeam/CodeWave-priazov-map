@@ -16,6 +16,7 @@ namespace DataBase
         public DbSet<UserSession> Sessions { get; set; }
         public DbSet<RevokedToken> RevokedTokens { get; set; }
         public DbSet<UserPassword> Password { get; set; }
+        public DbSet<MapMark> MapMark { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
