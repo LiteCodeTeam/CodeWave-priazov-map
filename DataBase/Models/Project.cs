@@ -15,6 +15,7 @@ namespace DataBase.Models
         [MaxLength(1024)]
         public string? Description { get; set; }
         public byte[]? PhotoIcon { get; set; }
-        public JsonList<byte[]>? Photos { get; set; }
+        [MaxLength(1024)]
+        public JsonList<byte[]> Photos { get; set; } = new JsonList<byte[]>();
     }
 }
