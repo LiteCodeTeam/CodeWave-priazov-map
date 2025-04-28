@@ -17,6 +17,7 @@ namespace DataBase
         public DbSet<RevokedToken> RevokedTokens { get; set; }
         public DbSet<UserPassword> Password { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<MapMark> MapMark { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

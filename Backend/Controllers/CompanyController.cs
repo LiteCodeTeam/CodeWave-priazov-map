@@ -1,20 +1,17 @@
 ﻿using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Validation;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class CompanyController : ControllerBase
+    public class CompanyController(PriazovContext db) : ControllerBase
     {
-        private readonly PriazovContext _db;
-
-        public CompanyController(PriazovContext db)
-        {
-            _db = db;
-        }
+        private readonly PriazovContext _db = db;
 
         /// <summary>
         /// Выводит список компаний
@@ -54,6 +51,14 @@ namespace Controllers
             {
                 if (company != null)
                 {
+
+                    if (company.Name == "" || 
+                    !RegexUtilities.IsValidEmail(company.Email) || 
+                    Regex.Match(company.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                    {
+                        throw new Exception("Некорректные данные");
+                    }
+
                     // добавляем компанию в список
                     _db.Users.AddAsync(company);
                     _db.SaveChangesAsync();
@@ -79,16 +84,25 @@ namespace Controllers
         {
             try
             {
-                if (company != null)
+                if (company != null && RegexUtilities.IsValidEmail(company.Email))
                 {
                     // получаем данные компании из базы данных
                     Company? user = _db.Users.OfType<Company>().FirstOrDefault((u) => u.Id == id);
                     // если компания найдена, изменяем его данные
                     if (user != null)
                     {
+
+                        if (company.Name == "" ||
+                        !RegexUtilities.IsValidEmail(company.Email) ||
+                        Regex.Match(company.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                        {
+                            throw new Exception("Некорректные данные");
+                        }
+
                         user.Name = company.Name;
                         user.Email = company.Email;
                         user.Phone = company.Phone;
+                        user.Password = company.Password;
                         _db.SaveChangesAsync();
                         return Ok(user);
                     }
