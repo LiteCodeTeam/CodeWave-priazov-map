@@ -31,31 +31,46 @@ namespace Backend.Mapping
         }
 
         private static async Task<IResult> FilterCompanies(
-            [FromQuery] List<string>? industries,
+            [FromQuery] string? industries,
             [FromServices] IDbContextFactory<PriazovContext> factory)
         {
-            if (industries?.Count > 0 && industries.Any(i => !_allowedIndustries.Contains(i)))
+            List<string>? industryList = null;
+            if (!string.IsNullOrEmpty(industries))
+            {
+                industryList = industries.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                        .Select(i => i.Trim())
+                                        .ToList();
+            }
+            if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
                 return Results.BadRequest("Недопустимые значения индустрий.");
 
             using var db = await factory.CreateDbContextAsync();
 
             var query = db.Users.OfType<Company>().AsQueryable();
 
-            if (industries?.Count > 0)
-                query = query.Where(c => industries.Contains(c.Industry)).OrderBy(c => c.Name);
+            if (industryList?.Count > 0)
+                query = query.Where(c => industryList.Contains(c.Industry)).OrderBy(c => c.Name);
 
             var companies = await query.ToListAsync();
             return Results.Ok(companies);
         }
 
         private static async Task<IResult> SearchCompanies(
-            [FromQuery] List<string>? industries,
+            [FromQuery] string? industries,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromQuery] string searchTerm = "",
             [FromQuery] int limit = 10) // Лимит результатов
         {
+            List<string>? industryList = null;
+            if (!string.IsNullOrEmpty(industries))
+            {
+                industryList = industries.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                        .Select(i => i.Trim())
+                                        .ToList();
+            }
+
             // Валидация индустрий
-            if (industries?.Count > 0 && industries.Any(i => !_allowedIndustries.Contains(i)))
+            if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
                 return Results.BadRequest("Недопустимые значения индустрий.");
 
             using var db = await factory.CreateDbContextAsync();
@@ -63,8 +78,8 @@ namespace Backend.Mapping
             var query = db.Users.OfType<Company>().AsQueryable();
 
             // Применяем фильтр по индустрии если есть
-            if (industries?.Count > 0)
-                query = query.Where(c => industries.Contains(c.Industry));
+            if (industryList?.Count > 0)
+                query = query.Where(c => industryList.Contains(c.Industry));
 
             // Поиск по вхождению строки без учета регистра
             if (!string.IsNullOrWhiteSpace(searchTerm))
