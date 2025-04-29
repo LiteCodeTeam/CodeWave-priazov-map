@@ -2,6 +2,8 @@
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using static System.Collections.Specialized.BitVector32;
 
 namespace GoogleMaps.Controllers
@@ -20,7 +22,12 @@ namespace GoogleMaps.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<MapMark>> GetDataMap()
         {
-            return Ok(_db.MapMark.ToListAsync());
+            return Ok(_db.Addresses.Select(m => new MapMark()
+                { 
+                    PlaceName = m.User.Name,
+                    GeoLat = m.Latitude,
+                    GeoLong = m.Longitude
+                }).ToList());
         }
 
         [NonAction]
@@ -29,18 +36,25 @@ namespace GoogleMaps.Controllers
             List<MapMark> stations = new List<MapMark>();
             stations.Add(new MapMark()
             {
-                Id = 1,
                 PlaceName = "Точка 1",
-                GeoLat = 37.610489,
-                GeoLong = 55.752308,
+                GeoLat = (decimal)37.610489,
+                GeoLong = (decimal)55.752308,
             });
             stations.Add(new MapMark()
             {
-                Id = 2,
                 PlaceName = "Точка 2",
-                GeoLat = 37.608644,
-                GeoLong = 55.75226,
+                GeoLat = (decimal)37.608644,
+                GeoLong = (decimal)55.75226,
             });
         }
+    }
+    public class MapMark()
+    {
+        [MaxLength(128)]
+        public string PlaceName { get; set; } = null!;
+        [Column(TypeName = "decimal(10, 7)")]
+        public decimal GeoLat { get; set; } // Широта
+        [Column(TypeName = "decimal(10, 7)")]
+        public decimal GeoLong { get; set; } // Долгота
     }
 }

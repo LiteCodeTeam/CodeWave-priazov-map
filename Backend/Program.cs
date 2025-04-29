@@ -41,7 +41,6 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 
 builder.Services.AddScoped<EmailService>();
 
-// Íàñòðîéêà àóòåíòèôèêàöèè
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -78,6 +77,7 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapPasswordEndpoints();
+app.MapCompanyEndpoints();
 
 app.Run();
 

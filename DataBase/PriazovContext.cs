@@ -12,12 +12,12 @@ namespace DataBase
         }
         //Создание таблиц в бд
         public DbSet<User> Users { get; set; }
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<UserSession> Sessions { get; set; }
         public DbSet<RevokedToken> RevokedTokens { get; set; }
         public DbSet<UserPassword> Password { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
-        public DbSet<MapMark> MapMark { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
