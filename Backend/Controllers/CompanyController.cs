@@ -52,7 +52,7 @@ namespace Controllers
                 if (company != null)
                 {
 
-                    if (company.Name == "" || 
+                    if (string.IsNullOrEmpty(company.Name) || 
                     !RegexUtilities.IsValidEmail(company.Email) || 
                     Regex.Match(company.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
                     {
