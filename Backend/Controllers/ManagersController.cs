@@ -3,6 +3,7 @@ using DataBase.Models;
 using Backend.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Controllers
 {
@@ -43,7 +44,7 @@ namespace Controllers
                 if (manager != null)
                 {
 
-                    if (manager.Name == "" ||
+                    if (string.IsNullOrEmpty(manager.Name) ||
                     !RegexUtilities.IsValidEmail(manager.Email) ||
                     Regex.Match(manager.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
                     {
