@@ -24,11 +24,9 @@ namespace DataBase.Migrations
 
             modelBuilder.Entity("DataBase.Models.Address", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Apartment")
                         .HasMaxLength(100)
@@ -67,7 +65,7 @@ namespace DataBase.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Address");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
@@ -230,36 +228,11 @@ namespace DataBase.Migrations
                     b.ToTable("Sessions");
                 });
 
-
             modelBuilder.Entity("DataBase.Models.Admin", b =>
                 {
                     b.HasBaseType("DataBase.Models.User");
 
                     b.HasDiscriminator().HasValue("Admin");
-                    });
-
-            modelBuilder.Entity("MapMark", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("GeoLat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("GeoLong")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("PlaceName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MapMark");
-
                 });
 
             modelBuilder.Entity("DataBase.Models.Company", b =>

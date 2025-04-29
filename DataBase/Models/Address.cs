@@ -6,7 +6,7 @@ namespace DataBase.Models
 {
     public class Address
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [StringLength(200)]
         public string Street { get; set; } = null!; // Улица и дом (пример: "ул. Ленина, 10")
         [StringLength(100)]
@@ -24,7 +24,7 @@ namespace DataBase.Models
         [Column(TypeName = "decimal(10, 7)")]
         public decimal Longitude { get; set; } // Долгота
 
-        // Связь с компанией (1:1)
+       
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
 

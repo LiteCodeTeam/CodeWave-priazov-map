@@ -34,14 +34,13 @@ builder.Services.AddDbContextFactory<PriazovContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SMTP"));
-
+ 
 builder.Services.AddScoped<TokenService>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddScoped<EmailService>();
 
-// Íàñòðîéêà àóòåíòèôèêàöèè
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -78,6 +77,7 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapPasswordEndpoints();
+app.MapCompanyEndpoints();
 
 app.Run();
 

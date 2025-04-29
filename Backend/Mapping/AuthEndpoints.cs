@@ -143,7 +143,7 @@ namespace Backend.Mapping
     public record LoginRequest(
     [Required] string Email,
     [Required] string Password
-);
+    );
     public record RefreshRequest(
         [Required] string RefreshToken
     );
