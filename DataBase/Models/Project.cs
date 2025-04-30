@@ -1,6 +1,7 @@
 ﻿using JsonProperty.EFCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace DataBase.Models
 {
@@ -9,8 +10,9 @@ namespace DataBase.Models
         public Guid Id { get; set; }
         [MaxLength(150)]
         public string Name { get; set; } = null!;
+        [JsonIgnore]
         public Guid CompanyId { get; set; }
-        [NotMapped]
+        [JsonIgnore]
         public Company Company { get; set; } = null!;
         [MaxLength(1024)]
         public string? Description { get; set; }

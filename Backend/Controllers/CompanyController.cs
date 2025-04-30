@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Backend.Validation;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using System.ComponentModel.DataAnnotations;
+using JsonProperty.EFCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Controllers
 {
@@ -45,20 +48,41 @@ namespace Controllers
         /// Создаёт новую компанию
         /// </summary>
         [HttpPost]
-        public IActionResult PostCompany(Company company)
+        public IActionResult PostCompany(CompanyCreateDto companyDto)
         {
             try
             {
-                if (company != null)
+                if (companyDto != null)
                 {
-
-                    if (string.IsNullOrEmpty(company.Name) || 
-                    !RegexUtilities.IsValidEmail(company.Email) || 
-                    Regex.Match(company.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                    if (string.IsNullOrEmpty(companyDto.Name) || string.IsNullOrEmpty(companyDto.Phone) ||
+                    !RegexUtilities.IsValidEmail(companyDto.Email) ||
+                    Regex.Match(companyDto.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
                     {
                         throw new Exception("Некорректные данные");
                     }
-
+                    var company = new Company()
+                    {
+                        Name = companyDto.Name,
+                        Email = companyDto.Email,
+                        LeaderName = companyDto.LeaderName,
+                        Password = new UserPassword()
+                        {
+                            PasswordHash = PasswordHasher.HashPassword(companyDto.Password),
+                            LastUpdated = DateTime.UtcNow
+                        },
+                        Phone = companyDto.Phone,
+                        Address = new Address()
+                        {
+                            Street = companyDto.Address.Street,
+                            Apartment = companyDto.Address.Apartment,
+                            City = companyDto.Address.City,
+                            Country = companyDto.Address.Country,
+                            PostalCode = companyDto.Address.PostalCode,
+                            Latitude = 1,
+                            Longitude = 1
+                        },
+                        Industry = companyDto.Industry
+                    };
                     // добавляем компанию в список
                     _db.Users.AddAsync(company);
                     _db.SaveChangesAsync();
@@ -102,7 +126,7 @@ namespace Controllers
                         user.Name = company.Name;
                         user.Email = company.Email;
                         user.Phone = company.Phone;
-                        user.Password = company.Password;
+                        //user.Password = company.Password;
                         _db.SaveChangesAsync();
                         return Ok(user);
                     }
@@ -123,5 +147,21 @@ namespace Controllers
                 return BadRequest(new { message = "Некорректные данные" });
             }
         }
+    }
+    public class CompanyCreateDto()
+    {
+        [MaxLength(100)]
+        public string Name { get; set; } = null!;
+        [MaxLength(150)]
+        public string Email { get; set; } = null!;
+        [MaxLength(30)]
+        public string Password { get; set; } = null!;
+        [MaxLength(12)]
+        public string? Phone { get; set; }
+        public AddressDto Address { get; set; } = null!;
+        [MaxLength(100)]
+        public string Industry { get; set; } = null!;
+        [MaxLength(100)]
+        public string LeaderName { get; set; } = null!;
     }
 }

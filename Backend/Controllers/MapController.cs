@@ -34,18 +34,18 @@ namespace GoogleMaps.Controllers
         public void SetData()
         {
             List<MapMark> stations = new List<MapMark>();
-            stations.Add(new MapMark()
-            {
-                PlaceName = "Точка 1",
-                GeoLat = (decimal)37.610489,
-                GeoLong = (decimal)55.752308,
-            });
-            stations.Add(new MapMark()
-            {
-                PlaceName = "Точка 2",
-                GeoLat = (decimal)37.608644,
-                GeoLong = (decimal)55.75226,
-            });
+            //stations.Add(new MapMark()
+            //{
+            //    PlaceName = "Точка 1",
+            //    GeoLat = (decimal)37.610489,
+            //    GeoLong = (decimal)55.752308,
+            //});
+            //stations.Add(new MapMark()
+            //{
+            //    PlaceName = "Точка 2",
+            //    GeoLat = (decimal)37.608644,
+            //    GeoLong = (decimal)55.75226,
+            //});
         }
     }
     public class MapMark()
