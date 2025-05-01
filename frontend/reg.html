@@ -12,64 +12,86 @@
         <div class="header-container">
             <div class="logo-group">
                 <button class="menu-icon">
-                    <div class="menu-icon-bar"></div>
-                    <div class="menu-icon-bar"></div>
-                    <div class="menu-icon-bar"></div>
+                    <svg width="30" height="30" viewBox="0 0 30 30">
+                        <path d="M5,9 H25 M5,15 H25 M5,21 H25" 
+                              stroke="#000" 
+                              stroke-width="2" 
+                              stroke-linecap="round"/>
+                      </svg>
                 </button>
                 <div class="logo">Логотип</div>
             </div>
     </header>
-
+    
     <!-- Основное содержимое -->
     <main class="main-container">
-        <div class="registration-container">
-            <div class="tabs-container">
-                <button class="tab executor-tab active">
-                    <span class="tab-text">исполнитель</span>
-                </button>
-                <button class="tab investor-tab">
-                    <span class="tab-text">инвестор</span>
-                </button>
-            </div>
-
+        <div class="registration-container-all">
             <h1 class="registration-title">регистрация</h1>
+            <div class="registration-container">
+                <div class="tabs-container">
+                    <button class="tab executor-tab" href="http://127.0.0.1/reg.html">
+                        <span class="tab-text">исполнитель</span>
+                    </button>
+                    <button class="tab investor-tab" href="http://127.0.0.1/reg2.html">
+                        <span class="tab-text">инвестор</span>
+                    </button>
+                </div>
 
-            <form class="registration-form">
-                <div class="form-field">
-                    <input type="text" placeholder="название организации">
-                </div>
-                <div class="form-field">
-                    <input type="text" placeholder="КРАТКОЕ название организации">
-                </div>
-                <div class="form-field">
-                    <select required>
-                        <option value="" disabled selected hidden>категория (с выбором)</option>
-                        <option value="category1">Категория 1</option>
-                        <option value="category2">Категория 2</option>
-                    </select>
-                </div>
-                <div class="form-field">
-                    <input type="text" placeholder="чем занимается">
-                </div>
-                <div class="form-field">
-                    <input type="text" placeholder="электронная почта, вк/тг сайт">
-                </div>
-                <div class="form-field">
-                    <input type="text" placeholder="логин">
-                </div>
-                <div class="form-field">
-                    <input type="password" placeholder="пароль">
-                </div>
-                <div class="form-field">
-                    <input type="password" placeholder="повторите пароль">
-                </div>
-                <button type="submit" class="submit-btn">Зарегистрироваться</button>
-            </form>
+
+                <form class="registration-form" action="r.php" method="post">
+                    <br>
+                    <div class="form-field">
+                        <input type="text" placeholder="краткое название организации" name="ON">
+                    </div>
+                    <div class="form-field">
+                        <input type="text" placeholder="юридический адрес">
+                    </div>
+                    <div class="form-field" onclick="">
+                        <select required>
+                            <option value="" disabled selected hidden>категория (с выбором)</option>
+                            <option value="category1">Категория 1</option>
+                            <option value="category2">Категория 2</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <input type="tel" placeholder="ФИО руководителя">
+                    </div>
+                    <div class="form-field">
+                        <input type="tel" placeholder="телефон руководителя">
+                    </div>
+                    <div class="form-field">
+                        <input type="email" placeholder="электронная почта" name="mail">
+                    </div>
+                    <div class="form-field">
+                        <input type="password" minlength="8" maxlength="20" placeholder="пароль" name="p">
+                    </div>
+                    <div class="form-field">
+                        <input type="password"  placeholder="повторите пароль">
+                    </div>
+                    <button type="submit" class="submit-btn">Зарегистрироваться</button>
+                </form>
+            </div>
         </div>
     </main>
-
+    <div class="indent">
+      </div>
     <footer>
-
+        <div class="contacts">
+            <h3>Контакты</h3>
+            <div class="contact-item">
+                <span>✉</span>
+                <span>dobra.hol@example.com</span>
+            </div>
+            <div class="contact-item">
+                <span>📞</span>
+                <span>+7 (808) 555-0111</span>
+            </div>
+        </div>
+        <div class="help-section">
+            <br>
+            <div class="help-title">Помощь?</div>
+            <div>+7 (808) 555-0111</div>
+        </div>
     </footer>
 </body>
 </html>
