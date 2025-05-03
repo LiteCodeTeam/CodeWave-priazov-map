@@ -54,53 +54,49 @@ namespace Backend.Mapping
             });
             await db.SaveChangesAsync();
 
-            return Results.Ok(new { AccessToken = newAccessToken, person.Email }); // Статус 200
+            return Results.Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken,
+                person.Email }); // Статус 200
         }
 
         private static async Task<IResult> RefreshToken(
-            RefreshRequest request,
-            [FromServices] TokenService tokenService,
-            [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] JwtSettings jwtSettings)
+     RefreshRequest request,
+     [FromServices] TokenService tokenService,
+     [FromServices] IDbContextFactory<PriazovContext> factory,
+     [FromServices] JwtSettings jwtSettings)
         {
             await using var db = await factory.CreateDbContextAsync();
 
             if (string.IsNullOrEmpty(request.RefreshToken))
                 return Results.BadRequest("Refresh token is required");
 
-            ClaimsPrincipal? principal;
-            try
-            {
-                principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
-                if (principal == null)
-                    return Results.Unauthorized();
-            }
-            catch (SecurityTokenException ex)
-            {
-                return Results.BadRequest($"Invalid token: {ex.Message}");
-            }
-
+            var principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
+            if (principal == null)
+                return Results.Unauthorized();
 
             var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-            // 2. Ïðîâåðêà â ÁÄ
             var session = await db.Sessions
                 .Include(s => s.User)
-                .FirstOrDefaultAsync(s => Convert.ToString(s.UserId) == userId);
+                .FirstOrDefaultAsync(s => s.UserId == Guid.Parse(userId));
 
-            if (session == null || session.ExpiresAt < DateTime.UtcNow)
+            if (session == null || session.ExpiresAt < DateTime.UtcNow || session.RefreshToken != request.RefreshToken)
                 return Results.Unauthorized();
+
+            db.Sessions.Remove(session);
+            await db.SaveChangesAsync();
 
             var newAccessToken = tokenService.GenerateAccessToken(userId, session.User.Email, session.User.Role);
             var newRefreshToken = tokenService.GenerateRefreshToken(userId);
 
-            // 4. Îáíîâëåíèå â ÁÄ
-            session.RefreshToken = newRefreshToken;
-            session.ExpiresAt = DateTime.UtcNow.AddDays
-                (jwtSettings.RefreshTokenExpiryDays); // Дата окончания resfresh-токена
+            await db.Sessions.AddAsync(new UserSession
+            {
+                RefreshToken = newRefreshToken,
+                UserId = Guid.Parse(userId),
+                ExpiresAt = DateTime.UtcNow.AddDays(jwtSettings.RefreshTokenExpiryDays)
+            });
+
             await db.SaveChangesAsync();
 
-            return Results.Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken }); // Статус 200
+            return Results.Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
         }
 
         private static async Task<IResult> Logout(
@@ -114,28 +110,13 @@ namespace Backend.Mapping
         if (string.IsNullOrEmpty(request.RefreshToken))
             return Results.BadRequest("Refresh token is required");
 
-        ClaimsPrincipal? principal;
-        try
-        {
-            principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
-            if (principal == null)
-                return Results.Unauthorized();
-        }
-        catch (SecurityTokenException ex)
-        {
-            return Results.BadRequest($"Invalid token: {ex.Message}");
-        }
+        var principal = tokenService.ValidateToken(request.RefreshToken, isAccessToken: false);
+        if (principal == null)
+            return Results.Unauthorized();
 
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         await db.Sessions.Where(s => Convert.ToString(s.UserId) == userId).ExecuteDeleteAsync();
-
-        await db.RevokedTokens.AddAsync(new RevokedToken
-        {
-            Token = request.RefreshToken,
-            ExpiresAt = DateTime.UtcNow.AddDays(jwtSettings.RefreshTokenExpiryDays)
-        });
-        await db.SaveChangesAsync();
 
         return Results.NoContent(); // Статус 204
         }

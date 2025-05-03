@@ -6,7 +6,7 @@ namespace Backend
     public class CleanupService : BackgroundService
     {
         private readonly IServiceProvider _services;
-        private readonly TimeSpan _checkInterval = TimeSpan.FromHours(24); // Проверка каждые 24 часа
+        private readonly TimeSpan _checkInterval = TimeSpan.FromHours(1); // Проверка каждые 24 часа
 
         public CleanupService(IServiceProvider services)
         {

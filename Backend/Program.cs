@@ -24,7 +24,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddDbContextFactory<PriazovContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -76,6 +76,17 @@ builder.Services.AddSwaggerGen(opt =>
 
 var app = builder.Build();
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+}
+
+app.UseDefaultFiles();
+app.UseStaticFiles();   
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseSwagger(opt =>
 {
     opt.RouteTemplate = "openapi/{documentName}.json";
@@ -87,13 +98,8 @@ app.MapScalarApiReference(opt =>
     opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
 });
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
 
 app.MapControllers();
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.MapAuthEndpoints();
 app.MapPasswordEndpoints();
 app.MapCompanyEndpoints();
