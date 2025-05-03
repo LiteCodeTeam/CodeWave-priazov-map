@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataBase.Migrations
 {
     [DbContext(typeof(PriazovContext))]
-    [Migration("20250503161407_InitMigration")]
+    [Migration("20250503175308_InitMigration")]
     partial class InitMigration
     {
         /// <inheritdoc />
@@ -141,11 +141,10 @@ namespace DataBase.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(12)
-                        .HasColumnType("character varying(12)");
+                        .HasMaxLength(24)
+                        .HasColumnType("character varying(24)");
 
                     b.Property<byte[]>("PhotoIcon")
-                        .HasMaxLength(18)
                         .HasColumnType("bytea");
 
                     b.Property<string>("Role")

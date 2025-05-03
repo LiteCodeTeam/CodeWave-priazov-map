@@ -138,11 +138,10 @@ namespace DataBase.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(12)
-                        .HasColumnType("character varying(12)");
+                        .HasMaxLength(24)
+                        .HasColumnType("character varying(24)");
 
                     b.Property<byte[]>("PhotoIcon")
-                        .HasMaxLength(18)
                         .HasColumnType("bytea");
 
                     b.Property<string>("Role")

@@ -3,6 +3,7 @@ using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -24,7 +25,7 @@ namespace Backend.Mapping
             LoginRequest request,
             [FromServices] TokenService tokenService,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] JwtSettings jwtSettings)
+            [FromServices] IOptions<JwtSettings> jwtSettings)
         {
             await using var db = await factory.CreateDbContextAsync();
 
@@ -50,7 +51,7 @@ namespace Backend.Mapping
                 RefreshToken = newRefreshToken,
                 UserId = person.Id,
                 User = person,
-                ExpiresAt = DateTime.UtcNow.AddDays(Convert.ToDouble(jwtSettings.RefreshTokenExpiryDays))
+                ExpiresAt = DateTime.UtcNow.AddDays(Convert.ToDouble(jwtSettings.Value.RefreshTokenExpiryDays))
             });
             await db.SaveChangesAsync();
 
@@ -62,7 +63,7 @@ namespace Backend.Mapping
      RefreshRequest request,
      [FromServices] TokenService tokenService,
      [FromServices] IDbContextFactory<PriazovContext> factory,
-     [FromServices] JwtSettings jwtSettings)
+     [FromServices] IOptions<JwtSettings> jwtSettings)
         {
             await using var db = await factory.CreateDbContextAsync();
 
@@ -91,7 +92,7 @@ namespace Backend.Mapping
             {
                 RefreshToken = newRefreshToken,
                 UserId = Guid.Parse(userId),
-                ExpiresAt = DateTime.UtcNow.AddDays(jwtSettings.RefreshTokenExpiryDays)
+                ExpiresAt = DateTime.UtcNow.AddDays(jwtSettings.Value.RefreshTokenExpiryDays)
             });
 
             await db.SaveChangesAsync();
@@ -102,8 +103,7 @@ namespace Backend.Mapping
         private static async Task<IResult> Logout(
             RefreshRequest request,
             [FromServices] TokenService tokenService,
-            [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] JwtSettings jwtSettings)
+            [FromServices] IDbContextFactory<PriazovContext> factory)
         {
             await using var db = await factory.CreateDbContextAsync();
 
