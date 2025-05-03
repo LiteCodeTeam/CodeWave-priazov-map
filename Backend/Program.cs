@@ -1,45 +1,32 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using DataBase;
-using DataBase.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Backend;
-using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity.Data;
-using System.ComponentModel.DataAnnotations;
 using Backend.Models;
 using Backend.Mapping;
-
-var adminRole = new Role("Admin");
-var managerRole = new Role("Manager");
-var companyRole = new Role("Company");
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder();
 
-var smtpSettings = builder.Configuration.GetSection("SMTP");
+builder.Services.AddControllers();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-});
-
-// Ðåãèñòðèðóåì DbContextFactory
-builder.Services.AddDbContextFactory<PriazovContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddHostedService<CleanupService>();
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SMTP"));
- 
+
 builder.Services.AddScoped<TokenService>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddScoped<EmailService>();
+
+builder.Services.AddDbContextFactory<PriazovContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
+
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -59,22 +46,60 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddControllers();
-
-builder.Services.AddHostedService<CleanupService>();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "API V1", Version = "v1" });
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer"
+    });
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+}
 
 app.UseDefaultFiles();
-app.UseStaticFiles();
+app.UseStaticFiles();   
 
-app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseSwagger(opt =>
+{
+    opt.RouteTemplate = "openapi/{documentName}.json";
+});
+app.MapScalarApiReference(opt =>
+{
+    opt.Title = "Scalar Documentation";
+    opt.Theme = ScalarTheme.BluePlanet;
+    opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
+});
+
+
+app.MapControllers();
 app.MapAuthEndpoints();
 app.MapPasswordEndpoints();
 app.MapCompanyEndpoints();

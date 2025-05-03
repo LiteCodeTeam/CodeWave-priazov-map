@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DataBase.Models
 {
@@ -7,7 +8,9 @@ namespace DataBase.Models
         public Guid Id { get; set; }
 
         // Внешний ключ для связи с пользователем (1:1)
+        [JsonIgnore]
         public Guid UserId { get; set; }
+        [JsonIgnore]
         public User User { get; set; } = null!;
 
         // Хэш пароля

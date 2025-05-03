@@ -4,6 +4,7 @@ using Backend.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.ComponentModel.DataAnnotations;
 
 namespace Controllers
 {
@@ -36,21 +37,41 @@ namespace Controllers
         /// Создаёт нового менеджера
         /// </summary>
         [HttpPost]
-        public IActionResult PostManager(Manager manager)
+        public IActionResult PostManager(ManagerCreateDto managerDto)
         {
             try
             {
                 // получаем данные пользователя
-                if (manager != null)
+                if (managerDto != null)
                 {
 
-                    if (string.IsNullOrEmpty(manager.Name) ||
-                    !RegexUtilities.IsValidEmail(manager.Email) ||
-                    Regex.Match(manager.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                    //if (string.IsNullOrEmpty(managerDto.Name) ||
+                    //!RegexUtilities.IsValidEmail(managerDto.Email) ||
+                    //Regex.Match(managerDto.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                    //{
+                    //    throw new Exception("Некорректные данные");
+                    //}
+                    var manager = new Manager()
                     {
-                        throw new Exception("Некорректные данные");
-                    }
-
+                        Name = managerDto.Name,
+                        Email = managerDto.Email,
+                        Password = new UserPassword()
+                        {
+                            PasswordHash = PasswordHasher.HashPassword(managerDto.Password),
+                            LastUpdated = DateTime.UtcNow
+                        },
+                        Phone = managerDto.Phone,
+                        Address = new Address()
+                        {
+                            Street = managerDto.Address.Street,
+                            Apartment = managerDto.Address.Apartment,
+                            City = managerDto.Address.City,
+                            Country = managerDto.Address.Country,
+                            PostalCode = managerDto.Address.PostalCode,
+                            Latitude = 1,
+                            Longitude = 1
+                        }
+                    };
                     // добавляем пользователя в список
                     _db.Users.AddAsync(manager);
                     _db.SaveChangesAsync();
@@ -83,7 +104,6 @@ namespace Controllers
                     // если пользователь найден, изменяем его данные
                     if (user != null)
                     {
-
                         if (manager.Name == "" ||
                         !RegexUtilities.IsValidEmail(manager.Email) ||
                         Regex.Match(manager.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
@@ -115,5 +135,17 @@ namespace Controllers
                 return BadRequest(new { message = "Некорректные данные" });
             }
         }
+    }
+    public class ManagerCreateDto()
+    {
+        [MaxLength(100)]
+        public string Name { get; set; } = null!;
+        [MaxLength(150)]
+        public string Email { get; set; } = null!;
+        [MaxLength(30)]
+        public string Password { get; set; } = null!;
+        [MaxLength(12)]
+        public string? Phone { get; set; }
+        public AddressDto Address { get; set; } = null!;
     }
 }

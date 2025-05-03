@@ -16,7 +16,6 @@ namespace DataBase.Models
         public string? Phone { get; set; }
         [MaxLength(18)]
         public byte[]? PhotoIcon { get; set; }
-        [MaxLength(1024)]
         public Address Address { get; set; } = null!;
         public UserSession? Session { get; set; }
         public PasswordResetToken? PasswordResetToken { get; set; }

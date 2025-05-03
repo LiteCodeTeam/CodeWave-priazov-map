@@ -13,7 +13,7 @@ namespace Backend.Mapping
 
             group.MapPost("/forgot-password", ForgotPassword);
             group.MapPost("/reset-password", PostResetPassword);
-            group.MapGet("/reset-password", GetResetPassword);
+            //group.MapGet("/reset-password", GetResetPassword);
         }
         private static async Task<IResult> ForgotPassword(ForgotPasswordRequest request,
             [FromServices] EmailService emailService,
@@ -57,6 +57,8 @@ namespace Backend.Mapping
         {
             await using var db = await factory.CreateDbContextAsync();
 
+            
+
             var token = await db.PasswordResetTokens
                 .FirstOrDefaultAsync(t => t.Token == request.Token && t.ExpiresAt > DateTime.UtcNow);
             if (token == null)
@@ -78,27 +80,27 @@ namespace Backend.Mapping
 
             return Results.Ok("Пароль успешно изменён.");
         }
-        private static async Task<IResult> GetResetPassword(string token,
-            [FromServices] IDbContextFactory<PriazovContext> factory)
-        {
-            await using var db = await factory.CreateDbContextAsync();
+        //private static async Task<IResult> GetResetPassword(string token,
+        //    [FromServices] IDbContextFactory<PriazovContext> factory)
+        //{
+        //    await using var db = await factory.CreateDbContextAsync();
 
-            // Проверяем валидность токена
-            var isValid = db.PasswordResetTokens.Any(t => t.Token == token && t.ExpiresAt > DateTime.UtcNow);
+        //    // Проверяем валидность токена
+        //    var isValid = db.PasswordResetTokens.Any(t => t.Token == token && t.ExpiresAt > DateTime.UtcNow);
 
-            if (!isValid)
-                return Results.BadRequest("Недействительная или просроченная ссылка");
+        //    if (!isValid)
+        //        return Results.BadRequest("Недействительная или просроченная ссылка");
 
-            return Results.Content(
-                $"""
-               <form method="post" action="/reset-password">
-                   <input type="hidden" name="token" value="{token}">
-                   <input type="password" name="newPassword" placeholder="Password" required>
-                   <input type="password" name="confirmPassword" placeholder="Repeat Password" required>
-                   <button type="submit">Save</button>
-               </form>
-               """, "text/html");
-        }
+        //    return Results.Content(
+        //        $"""
+        //       <form method="post" action="/reset-password">
+        //           <input type="hidden" name="token" value="{token}">
+        //           <input type="password" name="newPassword" placeholder="Password" required>
+        //           <input type="password" name="confirmPassword" placeholder="Repeat Password" required>
+        //           <button type="submit">Save</button>
+        //       </form>
+        //       """, "text/html");
+        //}
     }
     public record ForgotPasswordRequest(string Email);
     public record ResetPasswordRequest(string Token, string NewPassword);
