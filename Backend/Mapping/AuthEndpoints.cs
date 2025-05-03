@@ -45,7 +45,8 @@ namespace Backend.Mapping
                 person.Email, person.Role);
             var newRefreshToken = tokenService.GenerateRefreshToken(Convert.ToString(person.Id)!);
 
-            //Îáíîâëåíèå â ÁÄ
+            await db.Sessions.Where(s => s.UserId == person.Id).ExecuteDeleteAsync();
+
             await db.Sessions.AddAsync(new UserSession()
             {
                 RefreshToken = newRefreshToken,

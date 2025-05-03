@@ -21,12 +21,10 @@ namespace Backend.Mapping
         {
             await using var db = await factory.CreateDbContextAsync();
 
-            // 1. Находим пользователя по email
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
-                return Results.Ok(); // Не сообщаем, что email не найден (безопасность)
+                return Results.Ok();
 
-            // 2. Генерируем токен и сохраняем его
             var token = new PasswordResetToken
             {
                 Token = Guid.NewGuid().ToString()[..6],
@@ -46,7 +44,6 @@ namespace Backend.Mapping
                 await db.SaveChangesAsync();
             }
 
-            // 3. Отправляем email со ссылкой (реализуйте свой EmailService)
             await emailService.SendPasswordResetEmail(user.Email, token.Token);
 
             return Results.Ok();
@@ -57,8 +54,6 @@ namespace Backend.Mapping
         {
             await using var db = await factory.CreateDbContextAsync();
 
-            
-
             var token = await db.PasswordResetTokens
                 .FirstOrDefaultAsync(t => t.Token == request.Token && t.ExpiresAt > DateTime.UtcNow);
             if (token == null)
@@ -66,15 +61,23 @@ namespace Backend.Mapping
 
             var user = await db.Users
                 .Include(u => u.Password)
+                .Include(u => u.Session)
                 .FirstOrDefaultAsync(u => u.Id == token.UserId);
             if (user == null)
                 return Results.NotFound("Пользователь не найден.");
+            if (PasswordHasher.VerifyPassword(request.NewPassword, user.Password.PasswordHash))
+                return Results.Problem("Пароль не должен совпадать с предыдущим");
 
-            // 3. Хешируем новый пароль и обновляем
+            var result = Zxcvbn.Core.EvaluatePassword(request.NewPassword);
+            if (result.Score < 3) // 0-4 (0 - очень слабый, 4 - очень сильный)
+                return Results.Problem("Слабый пароль");
+
             user.Password.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
             user.Password.LastUpdated = DateTime.UtcNow;
 
             db.PasswordResetTokens.Remove(token);
+            if (user.Session != null)
+                db.Sessions.Remove(user.Session);
             await db.SaveChangesAsync();
             await emailService.SendPasswordOkayEmail(user.Email);
 
