@@ -121,25 +121,6 @@ namespace DataBase.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("DataBase.Models.RevokedToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RevokedTokens");
-                });
-
             modelBuilder.Entity("DataBase.Models.User", b =>
                 {
                     b.Property<Guid>("Id")

@@ -12,9 +12,8 @@ namespace DataBase.Models
         [MaxLength(150)]
         public string Email { get; set; } = null!;
         public UserPassword Password { get; set; } = null!;
-        [MaxLength(12)]
+        [MaxLength(24)]
         public string? Phone { get; set; }
-        [MaxLength(18)]
         public byte[]? PhotoIcon { get; set; }
         public Address Address { get; set; } = null!;
         public UserSession? Session { get; set; }

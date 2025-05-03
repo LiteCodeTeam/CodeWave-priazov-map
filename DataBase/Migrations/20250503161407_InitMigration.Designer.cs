@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataBase.Migrations
 {
     [DbContext(typeof(PriazovContext))]
-    [Migration("20250429084004_InitMigration")]
+    [Migration("20250503161407_InitMigration")]
     partial class InitMigration
     {
         /// <inheritdoc />
@@ -122,25 +122,6 @@ namespace DataBase.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("DataBase.Models.RevokedToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RevokedTokens");
                 });
 
             modelBuilder.Entity("DataBase.Models.User", b =>

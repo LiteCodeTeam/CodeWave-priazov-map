@@ -4,14 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace DataBase.Models
 {
-
-    public class RevokedToken
-    {
-        public Guid Id { get; set; }
-        [MaxLength(1024)]
-        public string Token { get; set; } = null!; 
-        public DateTime ExpiresAt { get; set; }  // Когда токен истечёт естественным путём
-    }
     public class UserSession
     {
         public Guid Id { get; set; }
