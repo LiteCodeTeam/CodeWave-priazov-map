@@ -19,7 +19,7 @@
                               stroke-linecap="round"/>
                       </svg>
                 </button>
-                <img src="static/img/лого.svg">
+                <img src="static/img/лого.svg"onclick="location.href='index.html'">
             </div>
     </header>
     
@@ -35,14 +35,14 @@
                         <span class="tab-text">инвестор</span>
                     </button>
                 </div>
-                <form class="registration-form" action="r.php" method="post">
+                <form class="registration-form" onsubmit="return formValidation();" method="post" name="myForm">
                     <div class="form-field">
-                        <input type="text" placeholder="краткое название организации" name="ON">
+                        <input type="text" placeholder="краткое название организации" name="organizationName">
                     </div>
                     <div class="form-field">
-                        <input type="text" placeholder="юридический адрес">
+                        <input type="text" placeholder="юридический адрес" name="adress">
                     </div>
-                    <div class="form-field" onclick="">
+                    <div class="form-field" onclick="" name="form">
                         <select required>
                             <option value="" disabled selected hidden>категория (с выбором)</option>
                             <option value="category1">Категория 1</option>
@@ -50,19 +50,19 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <input type="tel" placeholder="ФИО руководителя">
+                        <input type="text" placeholder="ФИО руководителя" name="FIO">
                     </div>
                     <div class="form-field">
-                        <input type="tel" placeholder="телефон руководителя">
+                        <input type="tel" id="phone" name="phone" placeholder="7(XXX)XXX-XX-XX"  maxlength="11" required/>
                     </div>
                     <div class="form-field">
                         <input type="email" placeholder="электронная почта" name="mail">
                     </div>
                     <div class="form-field">
-                        <input type="password" minlength="8" maxlength="20" placeholder="пароль" name="p">
+                        <input type="password" minlength="8" maxlength="20" placeholder="пароль" name="password">
                     </div>
                     <div class="form-field">
-                        <input type="password"  placeholder="повторите пароль">
+                        <input type="password"  placeholder="повторите пароль" name="password2">
                     </div>
                     <button type="submit" class="submit-btn">Зарегистрироваться</button>
                 </form>
@@ -89,5 +89,35 @@
           <div>+7 (808) 555-0111</div>
       </div>
   </footer>
+
+  <script>
+     function formValidation ( )
+    {
+        event.preventDefault();
+            flag = true;
+            pass = document.myForm.password.value;
+            rpass = document.myForm.password2.value
+            if (pass != rpass)
+            {alert("Пароли не совпадают"); flag = false;}
+            if (document.myForm.organizationName.value == "" )
+            {alert("Заполните строку краткое название организации"); flag = false;}
+            if (document.myForm.adress.value == "" )
+            {alert("Заполните строку юридический адрес"); flag = false;}
+            if (document.myForm.FIO.value == "" )
+            {alert("Заполните строку ФИО руководителя"); flag = false;}
+            if (document.myForm.phone.value == "" )
+            {alert("Заполните строку телефон руководителя"); flag = false;}
+            if (document.myForm.mail.value == "" )
+            {alert("Заполните строку электронная почта"); flag = false;}
+            if (document.myForm.password.value == "" )
+            {alert("Заполните строку пароль"); flag == false;}
+            if (document.myForm.password2.value == "" )
+            {alert("Заполните строку повторите пароль"); flag = false;}
+            if (flag===true)
+            {
+                alert("Thank you for your time! Your details have been submitted!");
+            }
+    }
+  </script>
 </body>
 </html>
