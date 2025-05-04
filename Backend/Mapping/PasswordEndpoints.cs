@@ -66,11 +66,15 @@ namespace Backend.Mapping
             if (user == null)
                 return Results.NotFound("Пользователь не найден.");
             if (PasswordHasher.VerifyPassword(request.NewPassword, user.Password.PasswordHash))
-                return Results.Problem("Пароль не должен совпадать с предыдущим");
+                return Results.Problem(
+                    detail: "Пароль не должен повторять предыдущий",
+                    statusCode: StatusCodes.Status400BadRequest);
 
             var result = Zxcvbn.Core.EvaluatePassword(request.NewPassword);
             if (result.Score < 3) // 0-4 (0 - очень слабый, 4 - очень сильный)
-                return Results.Problem("Слабый пароль");
+                return Results.Problem(
+                    detail: "Слабый пароль",
+                    statusCode: StatusCodes.Status400BadRequest);
 
             user.Password.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
             user.Password.LastUpdated = DateTime.UtcNow;
