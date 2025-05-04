@@ -21,6 +21,7 @@
                 </button>
                 <img src="static/img/лого.svg"onclick="location.href='index.html'">
             </div>
+        </div>
     </header>
     
     <!-- Основное содержимое -->
@@ -35,12 +36,12 @@
                         <span class="tab-text">инвестор</span>
                     </button>
                 </div>
-                <form class="registration-form" onsubmit="return formValidation();" method="post" name="myForm">
+                <form class="registration-form" onsubmit="return formValidation();" method="post" name="myForm" action="r.php">
                     <div class="form-field">
                         <input type="text" placeholder="краткое название организации" name="organizationName">
                     </div>
                     <div class="form-field">
-                        <input type="text" placeholder="юридический адрес" name="adress">
+                        <input type="address" placeholder="юридический адрес" name="address">
                     </div>
                     <div class="form-field" onclick="" name="form">
                         <select required>
@@ -53,7 +54,7 @@
                         <input type="text" placeholder="ФИО руководителя" name="FIO">
                     </div>
                     <div class="form-field">
-                        <input type="tel" id="phone" name="phone" placeholder="7(XXX)XXX-XX-XX"  maxlength="11" required/>
+                        <input type="tel" id="phone" name="phone" placeholder="7 (XXX) XXX-XX-XX"  maxlength="11" required/>
                     </div>
                     <div class="form-field">
                         <input type="email" placeholder="электронная почта" name="mail">
@@ -93,7 +94,7 @@
   <script>
      function formValidation ( )
     {
-        event.preventDefault();
+        
             flag = true;
             pass = document.myForm.password.value;
             rpass = document.myForm.password2.value
@@ -101,7 +102,7 @@
             {alert("Пароли не совпадают"); flag = false;}
             if (document.myForm.organizationName.value == "" )
             {alert("Заполните строку краткое название организации"); flag = false;}
-            if (document.myForm.adress.value == "" )
+            if (document.myForm.address.value == "" )
             {alert("Заполните строку юридический адрес"); flag = false;}
             if (document.myForm.FIO.value == "" )
             {alert("Заполните строку ФИО руководителя"); flag = false;}
@@ -116,6 +117,9 @@
             if (flag===true)
             {
                 alert("Thank you for your time! Your details have been submitted!");
+            }
+            else {
+                event.preventDefault();
             }
     }
   </script>
