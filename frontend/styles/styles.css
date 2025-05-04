@@ -1,12 +1,13 @@
 body {
-    background-color: #F0F0F0;
+    background-color: #fdf9f9;
     margin: 0;
     font-family: 'Inter', sans-serif;
+    width: 100%;
 }
 
 .header {
     width: 100%;
-    background: #D9D9D9;
+    background: linear-gradient(#ffffff 98%,#f0eded 2%);
     height: 3.125rem;
     display: flex;
     justify-content: center;
@@ -30,13 +31,22 @@ body {
 }
 
 .menu-icon {
+    left: 100px;
     background: none;
     border: none;
-    padding: 0.3125rem;
+    padding: 5px;
     cursor: pointer;
     display: flex;
+    background: 0%;
     flex-direction: column;
-    gap: 0.1875rem;
+    gap: 3px;
+    transition: all 0.4s;
+    border-radius: 50%;
+}
+  
+
+.menu-icon:hover {
+    background: #ececec;
 }
 
 .menu-icon-bar {
@@ -65,12 +75,12 @@ body {
 }
 
 .catalog-button {
-    background: #F0F0F0;
+    background: #0E6466;
     border-radius: 0.9375rem;
     padding: 0.5rem 1.25rem;
     font-weight: 500;
     font-size: 0.875rem;
-    color: #464646;
+    color: #f0f0f0;
     letter-spacing: 0.04em;
     cursor: pointer;
     height: 1.4rem;
@@ -79,30 +89,34 @@ body {
     white-space: nowrap;
 }
 
-.user-controls {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-.account-button {
-    background: none;
-    border: none;
+.login-button {
+    background-color: #F0F0F0;
+    border-radius: 0.9375rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #0E6466;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    padding: 0;
+    height: 1.4rem;
     display: flex;
     align-items: center;
-    gap: 0.625rem;
+    white-space: nowrap;
 }
 
-.account-icon {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    overflow: hidden;
+.register-button {
+    background: #0E6466;
+    border-radius: 0.9375rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #f0f0f0;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    height: 1.4rem;
     display: flex;
     align-items: center;
-    justify-content: center;
+    white-space: nowrap;
 }
 
 .profile-icon {
@@ -127,7 +141,7 @@ body {
 .title-section {
     width: 100%;
     min-height: 18.75rem;
-    background: #F0F0F0;
+    background: #fdf9f9;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -177,22 +191,28 @@ body {
     gap: 3.125rem;
 }
 
-.stats-map {
+.map {
     flex: 1;
-    background: #fff;
+    background: #ffffff;
     border-radius: 0.9375rem;
     padding: 1.5rem;
     height: 39.375rem;
     display: flex;
     align-items: center;
     justify-content: center;
-}
+  }
+
+  [class*="copyrights-pane"] {
+    display: none !important;
+  }
 
 .map-placeholder {
+    font-family: 'Inter', sans-serif;
     font-weight: 300;
     font-size: 2rem;
+    color: #000000;
     opacity: 0.5;
-}
+  }
 
 .stats-menu {
     width: 27.3125rem;
@@ -206,6 +226,26 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 0;
+}
+
+input[type="radio"] {
+    width: 1.4375rem;
+    height: 1.4375rem;
+    border: 0.03125rem;
+    border-radius: 0.3125rem;
+    position: relative;
+    flex-shrink: 0;
+    accent-color: #d1d3d1;
+}
+
+input[type="radio"]:checked {
+    width: 1.4375rem;
+    height: 1.4375rem;
+    border: 0.03125rem;
+    border-radius: 0.3125rem;
+    position: relative;
+    flex-shrink: 0;
+    accent-color: #707070;
 }
 
 .custom-checkbox {
@@ -591,11 +631,26 @@ body {
 
 footer {
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 10px 180px;
-    gap: 10px;
+    align-items: center;
     width: 100%;
-    height: 49px;
-    background: #D9D9D9;
+    font-size: 14px;
+    color: var(--text-color);
+    padding: 10px 180px;
+    background: #0E6466;
+    justify-content: left 1rem;
+    color: white;
+    gap: 1rem;
+    position: relative;
+}
+.contacts {
+    margin-left: 10rem;
+}
+
+.contact-item {
+    position: relative;
+    top: -1rem;
+}
+
+.interm {
+    height: 10rem;
 }
