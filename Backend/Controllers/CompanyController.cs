@@ -156,7 +156,7 @@ namespace Controllers
         public string Email { get; set; } = null!;
         [MaxLength(30)]
         public string Password { get; set; } = null!;
-        [MaxLength(12)]
+        [MaxLength(24)]
         public string? Phone { get; set; }
         public AddressDto Address { get; set; } = null!;
         [MaxLength(100)]

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Backend.Models;
 using DataBase.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,15 +12,24 @@ namespace Backend
     public class TokenService
     {
         private readonly JwtSettings _jwtSettings;
+        private readonly IMemoryCache _cache;
 
-        public TokenService(IOptions<JwtSettings> jwtSettings)
+        public TokenService(IOptions<JwtSettings> jwtSettings, IMemoryCache cache)
         {
             _jwtSettings = jwtSettings.Value;
+            _cache = cache;
         }
 
         // Валидация токена (для Access и Refresh)
         public ClaimsPrincipal? ValidateToken(string token, bool isAccessToken)
         {
+            var cacheKey = $"token_validation_{token}";
+
+            if (_cache.TryGetValue(cacheKey, out ClaimsPrincipal? cachedPrincipal))
+            {
+                return cachedPrincipal;
+            }
+
             var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
                 isAccessToken ? _jwtSettings.AccessTokenSecret : _jwtSettings.RefreshTokenSecret));
 
@@ -37,6 +47,8 @@ namespace Backend
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 }, out _);
+
+                _cache.Set(cacheKey, principal, TimeSpan.FromMinutes(1));
 
                 return principal;
             }

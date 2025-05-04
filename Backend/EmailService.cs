@@ -34,10 +34,29 @@ namespace Backend
             };
 
             using var client = new SmtpClient();
-            await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-            await client.AuthenticateAsync(_smtpSettings.Login, _smtpSettings.Password);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            try
+            {
+                await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(_smtpSettings.Login, _smtpSettings.Password);
+                await client.SendAsync(message);
+            }
+            catch (SmtpCommandException ex) when (ex.StatusCode == SmtpStatusCode.MailboxBusy)
+            {
+                await Task.Delay(5000);
+                await SendPasswordResetEmail(email, resetCode);
+            }
+            catch (SmtpCommandException ex)
+            {
+                throw new ApplicationException($"SMTP error: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Failed to send email: {ex.Message}", ex);
+            }
+            finally
+            {
+                await client.DisconnectAsync(true);
+            }
         }
 
         public async Task SendPasswordOkayEmail(string email)
@@ -57,10 +76,29 @@ namespace Backend
             };
 
             using var client = new SmtpClient();
-            await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-            await client.AuthenticateAsync(_smtpSettings.Login, _smtpSettings.Password);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            try
+            {
+                await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(_smtpSettings.Login, _smtpSettings.Password);
+                await client.SendAsync(message);
+            }
+            catch (SmtpCommandException ex) when (ex.StatusCode == SmtpStatusCode.MailboxBusy)
+            {
+                await Task.Delay(5000);
+                await SendPasswordOkayEmail(email);
+            }
+            catch (SmtpCommandException ex)
+            {
+                throw new ApplicationException($"SMTP error: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Failed to send email: {ex.Message}", ex);
+            }
+            finally
+            {
+                await client.DisconnectAsync(true);
+            }
         }
     }
 }

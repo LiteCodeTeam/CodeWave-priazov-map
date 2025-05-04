@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataBase.Migrations
 {
     [DbContext(typeof(PriazovContext))]
-    [Migration("20250429084004_InitMigration")]
+    [Migration("20250503175308_InitMigration")]
     partial class InitMigration
     {
         /// <inheritdoc />
@@ -124,25 +124,6 @@ namespace DataBase.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("DataBase.Models.RevokedToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RevokedTokens");
-                });
-
             modelBuilder.Entity("DataBase.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -160,11 +141,10 @@ namespace DataBase.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(12)
-                        .HasColumnType("character varying(12)");
+                        .HasMaxLength(24)
+                        .HasColumnType("character varying(24)");
 
                     b.Property<byte[]>("PhotoIcon")
-                        .HasMaxLength(18)
                         .HasColumnType("bytea");
 
                     b.Property<string>("Role")

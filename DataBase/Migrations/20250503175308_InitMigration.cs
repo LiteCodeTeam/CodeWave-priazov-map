@@ -12,27 +12,14 @@ namespace DataBase.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "RevokedTokens",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Token = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
-                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RevokedTokens", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(12)", maxLength: 12, nullable: true),
-                    PhotoIcon = table.Column<byte[]>(type: "bytea", maxLength: 18, nullable: true),
+                    Phone = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: true),
+                    PhotoIcon = table.Column<byte[]>(type: "bytea", nullable: true),
                     Role = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     Industry = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     LeaderName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
@@ -196,9 +183,6 @@ namespace DataBase.Migrations
 
             migrationBuilder.DropTable(
                 name: "Projects");
-
-            migrationBuilder.DropTable(
-                name: "RevokedTokens");
 
             migrationBuilder.DropTable(
                 name: "Sessions");

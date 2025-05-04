@@ -13,7 +13,8 @@ var builder = WebApplication.CreateBuilder();
 
 builder.Services.AddControllers();
 
-builder.Services.AddHostedService<CleanupService>();
+builder.Services.AddHostedService<SessionsCleanupService>();
+builder.Services.AddHostedService<PasswordTokensCleanupService>();
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SMTP"));
 
@@ -23,8 +24,10 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 
 builder.Services.AddScoped<EmailService>();
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddDbContextFactory<PriazovContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Singleton);
 
 builder.Services.AddEndpointsApiExplorer();
 

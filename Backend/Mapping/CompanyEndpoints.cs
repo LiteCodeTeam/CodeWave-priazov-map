@@ -2,6 +2,7 @@
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Backend.Mapping
 {
@@ -22,6 +23,11 @@ namespace Backend.Mapping
             "Отраслевое событие / научная конференция",
             "Другое"
         };
+        private static readonly MemoryCacheEntryOptions CacheOptions = new()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        };
+
 
         public static void MapCompanyEndpoints(this WebApplication app)
         {
@@ -32,8 +38,16 @@ namespace Backend.Mapping
 
         private static async Task<IResult> FilterCompanies(
             [FromQuery] string? industries,
-            [FromServices] IDbContextFactory<PriazovContext> factory)
+            [FromServices] IDbContextFactory<PriazovContext> factory,
+            [FromServices] IMemoryCache cache)
         {
+            var cacheKey = $"companies_filter_{industries ?? "all"}";
+
+            if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
+            {
+                return Results.Ok(cachedCompanies);
+            }
+
             List<string>? industryList = null;
             if (!string.IsNullOrEmpty(industries))
             {
@@ -52,15 +66,25 @@ namespace Backend.Mapping
                 query = query.Where(c => industryList.Contains(c.Industry)).OrderBy(c => c.Name);
 
             var companies = await query.ToListAsync();
+
+            cache.Set(cacheKey, companies, CacheOptions);
             return Results.Ok(companies);
         }
 
         private static async Task<IResult> SearchCompanies(
             [FromQuery] string? industries,
             [FromServices] IDbContextFactory<PriazovContext> factory,
+            [FromServices] IMemoryCache cache,
             [FromQuery] string searchTerm = "",
             [FromQuery] int limit = 10) // Лимит результатов
         {
+            var cacheKey = $"companies_search_{industries ?? "all"}_{searchTerm}_{limit}";
+
+            if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
+            {
+                return Results.Ok(cachedCompanies);
+            }
+
             List<string>? industryList = null;
             if (!string.IsNullOrEmpty(industries))
             {
@@ -90,6 +114,8 @@ namespace Backend.Mapping
                 .OrderBy(c => c.Name)
                 .Take(limit)
                 .ToListAsync();
+
+            cache.Set(cacheKey, companies, CacheOptions);
 
             return Results.Ok(companies);
         }
