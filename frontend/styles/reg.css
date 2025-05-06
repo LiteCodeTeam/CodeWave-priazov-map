@@ -1,22 +1,35 @@
 :root {
     font-size: 16px;
-    --primary-color: #0E6466;
-    --secondary-color: #E7F0F2;
+    --primary-color: #0e6466;
+    --secondary-color: #e7f0f1;
     --accent-color: #8CB5BB;
     --text-color: #1E1E1E;
-    --light-text: #E7F0F2;
-    --border-color: rgba(70, 70, 70, 0.5);
+    --light-text: #FFFFFF;
+    --border-color: var(--primary-color);
+    --header-bg: #FFFFFF;
+    --header-border: #e0e0e0;
+    --menu-hover: #ececec;
+    --logo-bg: var(--accent-color);
+    --container-bg: var(--secondary-color);
+    --container-border: rgba(70, 70, 70, 0.8);
+    --tab-gradient-start: var(--primary-color);
+    --tab-gradient-end: var(--header-bg);
+    --executor-text: var(--primary-color);
+    --investor-text: var(--secondary-color);
+    --field-bg: var(--header-bg);
+    --btn-hover: #073434;
+    --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 body {
-    background: #fdf9f9;
+    background: var(--header-bg);
     color: var(--text-color);
     line-height: 1.5;
     min-height: 100vh;
@@ -24,15 +37,21 @@ body {
     flex-direction: column;
 }
 
+
 .header {
-    width: 100%;
-    background: linear-gradient(#ffffff 98%,#f0eded 2%);
+    background: linear-gradient(#ffffff 98%,rgba(31, 111, 112, 0.01) 2%);
     height: 3.125rem;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 0 1.875rem;
     box-sizing: border-box;
+    border-bottom: 1px solid var(--header-border);
+    width: 100%;
+    box-shadow: 0px 48px 19px rgba(31, 111, 112, 0.01), 
+                0px 27px 16px rgba(31, 111, 112, 0.03), 
+                0px 12px 12px rgba(31, 111, 112, 0.04), 
+                0px 3px 7px rgba(31, 111, 112, 0.05);
 }
   
 .header-container {
@@ -109,7 +128,7 @@ body {
 .tabs-container {
     display: flex;
     height: 80px;
-    background: linear-gradient(#0E6466 50%, #E7F0F2 50%);
+    background: linear-gradient(#0E6466 50%, var(--secondary-color) 50%);
 }
 
 .tab {
