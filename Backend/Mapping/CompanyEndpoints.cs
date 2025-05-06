@@ -44,17 +44,14 @@ namespace Backend.Mapping
             var cacheKey = $"companies_filter_{industries ?? "all"}";
 
             if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
-            {
                 return Results.Ok(cachedCompanies);
-            }
 
             List<string>? industryList = null;
             if (!string.IsNullOrEmpty(industries))
-            {
                 industryList = industries.Split(',', StringSplitOptions.RemoveEmptyEntries)
                                         .Select(i => i.Trim())
                                         .ToList();
-            }
+
             if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
                 return Results.BadRequest("Недопустимые значения индустрий.");
 
@@ -63,9 +60,9 @@ namespace Backend.Mapping
             var query = db.Users.OfType<Company>().AsQueryable();
 
             if (industryList?.Count > 0)
-                query = query.Where(c => industryList.Contains(c.Industry)).OrderBy(c => c.Name);
+                query = query.Where(c => industryList.Contains(c.Industry));
 
-            var companies = await query.ToListAsync();
+            var companies = await query.OrderBy(c => c.Name).ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
             return Results.Ok(companies);
@@ -81,17 +78,13 @@ namespace Backend.Mapping
             var cacheKey = $"companies_search_{industries ?? "all"}_{searchTerm}_{limit}";
 
             if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
-            {
                 return Results.Ok(cachedCompanies);
-            }
 
             List<string>? industryList = null;
             if (!string.IsNullOrEmpty(industries))
-            {
                 industryList = industries.Split(',', StringSplitOptions.RemoveEmptyEntries)
                                         .Select(i => i.Trim())
                                         .ToList();
-            }
 
             // Валидация индустрий
             if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
