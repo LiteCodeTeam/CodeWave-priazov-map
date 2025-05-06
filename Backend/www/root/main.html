@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проекты социального воздействия Приазовья</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Itim&family=Natasha:wght@700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-group">
+                <button class="menu-icon">
+                    <svg width="30" height="30" viewBox="0 0 30 30">
+                        <path d="M5,9 H25 M5,15 H25 M5,21 H25" 
+                              stroke="#000" 
+                              stroke-width="2" 
+                              stroke-linecap="round"/>
+                      </svg>
+                </button>
+                <img src="static/img/лого.svg"onclick="location.href='main.html'">
+            </div>
+
+            <div class="right-section">
+                <div class="catalog-button">
+                    <span>Каталог проектов</span>
+                </div>
+                <div class="login-button">
+                    <span>Вход</span>
+                </div>
+                <div class="register-button" onclick="location.href='reg.html'">
+                    <span>Регистрация</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-container">
+                <h1 class="hero-title">ПРОЕКТЫ СОЦИАЛЬНОГО ВОЗДЕЙСТВИЯ ПРИАЗОВЬЯ</h1>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <div class="about-container">
+                <button class="nav-button prev-button">
+                    <div class="nav-icon">←</div>
+                </button>
+                <div class="about-card">
+                    <div class="about-image"></div>
+                    <div class="about-content">
+                        <h2 class="about-title">Что такое проект социального воздействия?</h2>
+                        <p class="about-text">
+                            Проект социального воздействия — это комплекс мероприятий, направленных на достижение измеримого социального эффекта в жизни конкретных людей-участников проекта. Например, мероприятия по повышению успеваемости школьников на определенной территории или вовлечение людей в диспансеризацию, содействие в получении мер социальной поддержки.
+                        </p>
+                        <button class="about-button">Подробнее</button>
+                    </div>
+                </div>
+                <button class="nav-button next-button">
+                    <div class="nav-icon">→</div>
+                </button>
+            </div>
+        </section>
+
+        <section class="organizations-section">
+            <div class="section-container">
+                <h2 class="section-title">ОРГАНИЗАЦИИ</h2>
+                <div class="organizations-content">
+                    <div class="map-filters-container">
+                        <div class="map-container">
+                            <script class="map-placeholder" type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Abb2e803e8888540af1464fa8f0916b00692e5b83676a91f7a37ed16dc7f2b64b&amp;lang=ru_RU&amp;scroll=true"></script>
+                            <script src="scripts.js"></script>
+                        </div>
+                        <div class="filters-menu">
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter1" class="filter-checkbox">
+                                <label for="filter1">Образовательное учреждение</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter2" class="filter-checkbox">
+                                <label for="filter2">Научно-исследовательский институт</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter3" class="filter-checkbox">
+                                <label for="filter3">Научно-образовательный проект</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter4" class="filter-checkbox">
+                                <label for="filter4">Государственное учреждение</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter5" class="filter-checkbox">
+                                <label for="filter5">Коммерческая деятельность</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter6" class="filter-checkbox">
+                                <label for="filter6">Некоммерческая организация</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter7" class="filter-checkbox">
+                                <label for="filter7">Финансы</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter8" class="filter-checkbox">
+                                <label for="filter8">Акселератор / инкубатор / технопарк</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter9" class="filter-checkbox">
+                                <label for="filter9">Ассоциация / объединение</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter10" class="filter-checkbox">
+                                <label for="filter10">Инициатива</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter11" class="filter-checkbox">
+                                <label for="filter11">Отраслевое событие / научная конференция</label>
+                            </div>
+                            <div class="filter-item">
+                                <input type="checkbox" id="filter12" class="filter-checkbox">
+                                <label for="filter12">Другое</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="organizations-grid">
+                        <div class="organization-card">
+                            <div class="org-image"></div>
+                            <h3 class="org-title">МБУ "ЦСО г. Таганрога"</h3>
+                            <p class="org-description">Муниципальное бюджетное учреждение «Центр социального обслуживания граждан пожилого возраста и инвалидов города Таганрога».</p>
+                            <div class="org-details">
+                                <div class="detail">
+                                    <span class="detail-icon">📍</span>
+                                    <span class="detail-text">Б. Садовый переулок, д. 11, Таганрог</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="detail-icon">🏛️</span>
+                                    <span class="detail-text">Государственное учреждение</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="organization-card">
+                            <div class="org-image"></div>
+                            <h3 class="org-title">АНО "Луч Надежды"</h3>
+                            <p class="org-description">Автономная некоммерческая организация по предоставлению социально-культурных услуг в Таганроге.</p>
+                            <div class="org-details">
+                                <div class="detail">
+                                    <span class="detail-icon">📍</span>
+                                    <span class="detail-text">г. Таганрог, Дубки, ул. Дзержинского, 171/2</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="detail-icon">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="organization-card">
+                            <div class="org-image"></div>
+                            <h3 class="org-title">БАНО "Золотые руки Ангела"</h3>
+                            <p class="org-description">Благотворительная автономная некоммерческая организация «Золотые Руки Ангела»</p>
+                            <div class="org-details">
+                                <div class="detail">
+                                    <span class="detail-icon">📍</span>
+                                    <span class="detail-text">г. Москва, ул Мосфильмовская, д. 175, помещ. 52</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="detail-icon">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="organization-card">
+                            <div class="org-image"></div>
+                            <h3 class="org-title">АНО "ДОННИИ ЭКОТЕХНОЛОГИЙ"</h3>
+                            <p class="org-description">Автономная некоммерческая организация «Донбасский научно-исследовательский институт экотехнологий»</p>
+                            <div class="org-details">
+                                <div class="detail">
+                                    <span class="detail-icon">📍</span>
+                                    <span class="detail-text">ЛНР, г. Алчевск, ул. Набережная, д. 10, ком. 6.108</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="detail-icon">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="organization-card">
+                            <div class="org-image"></div>
+                            <h3 class="org-title">РОО "СИЛ"</h3>
+                            <p class="org-description">Региональная Общественная Организация "Союз Инвалидов Луганщины"</p>
+                            <div class="org-details">
+                                <div class="detail">
+                                    <span class="detail-icon">📍</span>
+                                    <span class="detail-text">г. Красный Луч, ул. Косиора 10, каб. 104</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="detail-icon">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="organization-card more-projects">
+                            <div class="more-number">ЕЩЕ 2965</div>
+                            <div class="more-label">организаций</div>
+                            <button class="view-all-button">Смотреть все</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-section">
+            <div class="section-container">
+                <div class="faq-content">
+                    <h2 class="section-title">Часто задаваемые вопросы</h2>
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span class="question-text">Что такое проект социального воздействия?</span>
+                                <span class="farrow"></span>
+                            </div>
+                            <div class="faq-answer">
+                                Очень важный ответ
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span class="question-text">Роль ВЭБ.РФ</span>
+                                <span class="farrow"></span>
+                            </div>
+                            <div class="faq-answer">
+                                Очень важный ответ
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span class="question-text">Нормативная база</span>
+                                <span class="farrow"></span>
+                            </div>
+                            <div class="faq-answer">
+                                Очень важный ответ
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span class="question-text">Примеры успешных проектов</span>
+                                <span class="farrow"></span>
+                            </div>
+                            <div class="faq-answer">
+                                Очень важный ответ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="contacts">
+            <h3>Контакты</h3>
+            <div class="contact-item">
+                <span>✉</span>
+                <span>dobra.hol@example.com</span>
+            </div>
+            <div class="contact-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20.487 17.14L18.387 15.79C17.447 15.15 16.217 15.41 15.587 16.34L14.517 17.95C12.997 17.35 9.66705 14.33 9.03705 12.81L10.647 11.75C11.587 11.12 11.847 9.89 11.207 8.95L9.85705 6.85C9.21705 5.91 7.98705 5.66 7.05705 6.29L4.50705 8.09C3.57705 8.72 3.32705 9.96 3.96705 10.89L5.72705 13.9C7.96705 18.22 11.647 21.43 16.187 22.71C16.967 22.93 17.787 22.71 18.337 22.11L20.337 19.91C21.107 19.03 20.997 17.67 20.487 17.14Z" fill="currentColor"/>
+                </svg>
+                <span>+7 (808) 555-0111</span>
+            </div>
+        </div>
+        <div class="help-section">
+            <br>
+            <div class="help-title">Помощь?</div>
+            <div>+7 (808) 555-0111</div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                const arrow = item.querySelector('.farrow');
+                
+                question.addEventListener('click', () => {
+                    // Закрываем все открытые элементы, кроме текущего
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item && otherItem.classList.contains('active')) {
+                            otherItem.classList.remove('active');
+                            otherItem.querySelector('.farrow').classList.remove('farrow-rotated');
+                        }
+                    });
+                    
+                    // Переключаем текущий элемент
+                    item.classList.toggle('active');
+                    arrow.classList.toggle('farrow-rotated');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
