@@ -72,10 +72,9 @@ namespace Backend.Mapping
             [FromQuery] string? industries,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IMemoryCache cache,
-            [FromQuery] string searchTerm = "",
-            [FromQuery] int limit = 10) // Лимит результатов
+            [FromQuery] string searchTerm = "")
         {
-            var cacheKey = $"companies_search_{industries ?? "all"}_{searchTerm}_{limit}";
+            var cacheKey = $"companies_search_{industries ?? "all"}_{searchTerm}";
 
             if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
                 return Results.Ok(cachedCompanies);
@@ -105,7 +104,6 @@ namespace Backend.Mapping
             // Сортировка и ограничение количества результатов
             var companies = await query
                 .OrderBy(c => c.Name)
-                .Take(limit)
                 .ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
