@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
-    <link rel="stylesheet" href="styles/reg.css">
+    <link rel="stylesheet" href="styles/reg.css"
+    
 </head>
 <body>
     <!-- Шапка -->
@@ -29,21 +30,21 @@
             <h1 class="registration-title">регистрация</h1>
             <div class="registration-container">
                 <div class="tabs-container">
-                    <button class="tab executor-tab" href="http://127.0.0.1/reg.html">
+                    <button class="tab executor-tab">
                         <span class="tab-text">исполнитель</span>
                     </button>
-                    <button class="tab investor-tab" href="http://127.0.0.1/reg2.html">
+                    <button class="tab investor-tab">
                         <span class="tab-text">инвестор</span>
                     </button>
                 </div>
-                <form class="registration-form" onsubmit="return formValidation();" method="post" name="myForm" action="r.php">
+                <form class="registration-form" onsubmit="return formValidation();" method="post" name="myForm">
                     <div class="form-field">
-                        <input type="text" placeholder="краткое название организации" name="organizationName">
+                        <input type="text" placeholder="краткое название организации" name="organizationName" id="organizationName">
                     </div>
                     <div class="form-field">
-                        <input type="address" placeholder="юридический адрес" name="address">
+                        <input type="address" placeholder="юридический адрес" name="address" id="address">
                     </div>
-                    <div class="form-field" onclick="" name="form">
+                    <div class="form-field" onclick="" name="formfield" id="form">
                         <select required>
                             <option value="" disabled selected hidden>категория (с выбором)</option>
                             <option value="category1">Категория 1</option>
@@ -51,19 +52,19 @@
                         </select>
                     </div>
                     <div class="form-field">
-                        <input type="text" placeholder="ФИО руководителя" name="FIO">
+                        <input type="text" placeholder="ФИО руководителя" name="FIO" id="FIO">
                     </div>
                     <div class="form-field">
                         <input type="tel" id="phone" name="phone" placeholder="7 (XXX) XXX-XX-XX"  maxlength="11" required/>
                     </div>
                     <div class="form-field">
-                        <input type="email" placeholder="электронная почта" name="mail">
+                        <input type="email" placeholder="электронная почта" name="mail" id="mail">
                     </div>
                     <div class="form-field">
-                        <input type="password" minlength="8" maxlength="20" placeholder="пароль" name="password">
+                        <input type="password" minlength="8" maxlength="20" placeholder="пароль" name="password" id="password">
                     </div>
                     <div class="form-field">
-                        <input type="password"  placeholder="повторите пароль" name="password2">
+                        <input type="password" minlength="8" maxlength="20" placeholder="повторите пароль" name="password2" id="password2">
                     </div>
                     <button type="submit" class="submit-btn">Зарегистрироваться</button>
                 </form>
@@ -91,37 +92,8 @@
       </div>
   </footer>
 
-  <script>
-     function formValidation ( )
-    {
-        
-            flag = true;
-            pass = document.myForm.password.value;
-            rpass = document.myForm.password2.value
-            if (pass != rpass)
-            {alert("Пароли не совпадают"); flag = false;}
-            if (document.myForm.organizationName.value == "" )
-            {alert("Заполните строку краткое название организации"); flag = false;}
-            if (document.myForm.address.value == "" )
-            {alert("Заполните строку юридический адрес"); flag = false;}
-            if (document.myForm.FIO.value == "" )
-            {alert("Заполните строку ФИО руководителя"); flag = false;}
-            if (document.myForm.phone.value == "" )
-            {alert("Заполните строку телефон руководителя"); flag = false;}
-            if (document.myForm.mail.value == "" )
-            {alert("Заполните строку электронная почта"); flag = false;}
-            if (document.myForm.password.value == "" )
-            {alert("Заполните строку пароль"); flag == false;}
-            if (document.myForm.password2.value == "" )
-            {alert("Заполните строку повторите пароль"); flag = false;}
-            if (flag===true)
-            {
-                alert("Thank you for your time! Your details have been submitted!");
-            }
-            else {
-                event.preventDefault();
-            }
-    }
+  <script src="scripts/fetch.js">
+
   </script>
 </body>
 </html>
