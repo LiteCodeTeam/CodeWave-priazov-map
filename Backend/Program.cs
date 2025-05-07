@@ -7,9 +7,16 @@ using Microsoft.OpenApi.Models;
 using Backend;
 using Backend.Models;
 using Backend.Mapping;
+using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 builder.Services.AddControllers();
 
@@ -79,28 +86,34 @@ builder.Services.AddSwaggerGen(opt =>
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
+    app.UseHttpsRedirection();
+}
+else
+{
+    app.UseSwagger(opt =>
+    {
+        opt.RouteTemplate = "openapi/{documentName}.json";
+    });
+    app.UseSwaggerUI();
 }
 
 app.UseDefaultFiles();
-app.UseStaticFiles();   
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwagger(opt =>
-{
-    opt.RouteTemplate = "openapi/{documentName}.json";
-});
 app.MapScalarApiReference(opt =>
 {
     opt.Title = "Scalar Documentation";
     opt.Theme = ScalarTheme.BluePlanet;
     opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
 });
-
 
 app.MapControllers();
 app.MapAuthEndpoints();
