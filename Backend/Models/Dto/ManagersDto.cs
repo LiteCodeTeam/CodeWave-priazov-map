@@ -12,4 +12,18 @@ namespace Backend.Models.Dto
         ErrorMessage = "Пароль слишком слабый")]
         public string Password { get; set; } = null!;
     }
+
+    public class ManagerResponseDto : UserDto
+    {
+        public byte[]? PhotoIcon { get; set; }
+
+        public ManagerResponseDto() { }
+        public ManagerResponseDto(Manager manager)
+        {
+            Name = manager.Name;
+            Email = manager.Email;
+            Phone = manager.Phone;
+            FullAddress = manager.FullAddress;
+        }
+    }
 }

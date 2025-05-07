@@ -10,21 +10,22 @@ namespace Backend.Mapping
 {
     public static class ManagerEndpoints
     {
+        private static readonly MemoryCacheEntryOptions CacheOptions = new()
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        };
+
         public static void MapManagerEndpoints(this WebApplication app)
         {
             var group = app.MapGroup("/managers");
             group.MapPost("/create", Create);
-            //group.MapGet("/review", Review);
-            //group.MapGet("account", Account);
-            //group.MapGet("/filter", FilterCompanies);
-            //group.MapGet("/search", SearchCompanies);
-            //group.MapPut("/change", Change);
+            group.MapGet("account", Account);
+            group.MapPut("/change", Change);
         }
 
         private static async Task<IResult> Create(
-            [FromBody] CompanyCreateDto managerDto,
-            [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IMemoryCache cache)
+            [FromBody] ManagerCreateDto managerDto,
+            [FromServices] IDbContextFactory<PriazovContext> factory)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -53,16 +54,88 @@ namespace Backend.Mapping
             if (db.Users.Any(u => u.Email == managerDto.Email || u.Phone == managerDto.Phone))
                 return Results.Conflict("Почта или телефон есть в реесте");
 
-            //var manager = new Manager()
-            //{ 
-                
-            //}
-            //await db.AddAsync(manager);
-            //await db.SaveChangesAsync();
+            var manager = new Manager()
+            {
+                Name = managerDto.Name,
+                Email = managerDto.Email,
+                Phone = managerDto.Phone,
+                FullAddress = managerDto.FullAddress
+            };
 
-            cache.Remove("companies_review");
-            return Results.Ok();
-            //return Results.Ok(new CompanyResponseDto(manager));
+            await db.Users.AddAsync(manager);
+            await db.SaveChangesAsync();
+
+            return Results.Ok(new ManagerResponseDto(manager));
+        }
+
+        public static async Task<IResult> Account([FromQuery] Guid? id,
+            [FromServices] IDbContextFactory<PriazovContext> factory,
+            [FromServices] IMemoryCache cache)
+        {
+            if (id == null)
+                return Results.BadRequest("Id пуст");
+
+            var cacheKey = $"managers_{id}";
+            if (cache.TryGetValue(cacheKey, out ManagerResponseDto? cachedManager))
+                return Results.Ok(cachedManager);
+
+            using var db = await factory.CreateDbContextAsync();
+
+            var manager = await db.Users.OfType<Manager>().FirstOrDefaultAsync(c => c.Id == id);
+
+            if (manager == null)
+                return Results.NotFound();
+
+            var managerResponse = new ManagerResponseDto(manager);
+
+            cache.Set(cacheKey, managerResponse, CacheOptions);
+
+            return Results.Ok(managerResponse);
+        }
+
+        public static async Task<IResult> Change([FromQuery] Guid? id,
+            [FromBody] ManagerResponseDto managerDto,
+            [FromServices] IDbContextFactory<PriazovContext> factory)
+        {
+            var validationResults = new List<ValidationResult>();
+            bool isValid = Validator.TryValidateObject(
+                managerDto,
+                new ValidationContext(managerDto),
+                validationResults,
+                validateAllProperties: true
+            );
+
+            if (!isValid)
+            {
+                var errors = validationResults
+                    .GroupBy(v => v.MemberNames.FirstOrDefault() ?? "")
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(v => v.ErrorMessage ?? "Неизвестная ошибка").ToArray()
+                    );
+                return Results.ValidationProblem(errors);
+            }
+
+            using var db = await factory.CreateDbContextAsync();
+
+            if (db.Users.Any(u => (u.Email == managerDto.Email || u.Phone == managerDto.Phone)
+            && u.Id != id))
+                return Results.Conflict("Почта или телефон есть в реестре");
+
+            var company = db.Users.OfType<Manager>().FirstOrDefault(c => c.Id == id);
+
+            if (company == null)
+                return Results.NotFound();
+
+            company.Name = managerDto.Name;
+            company.Email = managerDto.Email;
+            company.Phone = managerDto.Phone;
+            company.PhotoIcon = managerDto.PhotoIcon;
+            company.FullAddress = managerDto.FullAddress;
+
+            await db.SaveChangesAsync();
+
+            return Results.Ok(managerDto);
         }
     }
 }

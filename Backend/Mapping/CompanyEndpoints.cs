@@ -92,7 +92,7 @@ namespace Backend.Mapping
                 Industry = companyDto.Industry,
                 LeaderName = companyDto.LeaderName
             };
-            await db.AddAsync(company);
+            await db.Users.AddAsync(company);
             await db.SaveChangesAsync();
 
             cache.Remove("companies_review");
@@ -112,8 +112,8 @@ namespace Backend.Mapping
             
             var query = await db.Users.OfType<Company>()
                 .AsQueryable()
-                .Take(5)
                 .OrderBy(c => c.Name)
+                .Take(5)
                 .Select(c => new CompanyResponseDto(c))
                 .ToListAsync();
 

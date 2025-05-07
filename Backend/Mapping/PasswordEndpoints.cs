@@ -40,7 +40,7 @@ namespace Backend.Mapping
 
             if (update == 0)
             {
-                db.PasswordResetTokens.Add(token);
+                await db.PasswordResetTokens.AddAsync(token);
                 await db.SaveChangesAsync();
             }
 
