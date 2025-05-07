@@ -20,6 +20,7 @@ namespace DataBase.Migrations
                     Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     Phone = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: true),
                     PhotoIcon = table.Column<byte[]>(type: "bytea", nullable: true),
+                    FullAddress = table.Column<string>(type: "text", nullable: false),
                     Role = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     Industry = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     LeaderName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
@@ -142,8 +143,7 @@ namespace DataBase.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_UserId",
                 table: "Addresses",
-                column: "UserId",
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Password_UserId",

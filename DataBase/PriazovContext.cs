@@ -76,12 +76,11 @@ namespace DataBase
                .WithOne(p => p.User)
                .HasForeignKey<PasswordResetToken>(p => p.UserId);
 
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Address)
-                .WithOne(a => a.User)
-                .HasForeignKey<Address>(a =>  a.UserId);
-
-            // Убедимся, что не создаются лишние таблицы
+            //Временная мера, пока адрес одной строкой
+            //modelBuilder.Entity<User>()
+            //    .HasOne(u => u.Address)
+            //    .WithOne(a => a.User)
+            //    .HasForeignKey<Address>(a =>  a.UserId);
 
             modelBuilder.Entity<User>()
                 .HasDiscriminator<string>("Role")

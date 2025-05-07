@@ -62,8 +62,7 @@ namespace DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Addresses");
                 });
@@ -131,6 +130,10 @@ namespace DataBase.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
+
+                    b.Property<string>("FullAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -249,8 +252,8 @@ namespace DataBase.Migrations
             modelBuilder.Entity("DataBase.Models.Address", b =>
                 {
                     b.HasOne("DataBase.Models.User", "User")
-                        .WithOne("Address")
-                        .HasForeignKey("DataBase.Models.Address", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -344,9 +347,6 @@ namespace DataBase.Migrations
 
             modelBuilder.Entity("DataBase.Models.User", b =>
                 {
-                    b.Navigation("Address")
-                        .IsRequired();
-
                     b.Navigation("Password")
                         .IsRequired();
 
