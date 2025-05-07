@@ -15,11 +15,13 @@ namespace Backend.Models.Dto
 
     public class ManagerResponseDto : UserDto
     {
+        public Guid Id { get; set; }
         public byte[]? PhotoIcon { get; set; }
 
         public ManagerResponseDto() { }
         public ManagerResponseDto(Manager manager)
         {
+            Id = manager.Id;
             Name = manager.Name;
             Email = manager.Email;
             Phone = manager.Phone;

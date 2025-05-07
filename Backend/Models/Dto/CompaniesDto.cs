@@ -26,6 +26,7 @@ namespace Backend.Models.Dto
     }
     public class CompanyResponseDto : CompanyDto
     {
+        public Guid Id { get; set; }
         [MaxLength(1024)]
         public string? Description { get; set; }
         public byte[]? PhotoIcon { get; set; }
@@ -36,6 +37,7 @@ namespace Backend.Models.Dto
         public CompanyResponseDto() { }
         public CompanyResponseDto(Company company)
         {
+            Id = company.Id;
             Name = company.Name;
             Email = company.Email;
             Phone = company.Phone;
