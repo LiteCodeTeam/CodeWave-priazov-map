@@ -106,6 +106,7 @@ app.MapControllers();
 app.MapAuthEndpoints();
 app.MapPasswordEndpoints();
 app.MapCompanyEndpoints();
+app.MapManagerEndpoints();
 
 app.Run();
 

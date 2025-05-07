@@ -11,7 +11,7 @@ namespace Backend.Validation
             if (string.IsNullOrWhiteSpace(address))
                 return new ValidationResult("Адрес не может быть пустым");
 
-            var pattern = @"^[\p{L}0-9\s\.,\-–—()""№#/]{10,255}$";
+            var pattern = @"^\s*[\p{L}0-9\s\.,\-–—()""№#/]{10,255}\s*$";
 
             if (!Regex.IsMatch(address, pattern))
                 return new ValidationResult("Недопустимые символы в адресе");
