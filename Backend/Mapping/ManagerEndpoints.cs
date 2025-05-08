@@ -51,18 +51,23 @@ namespace Backend.Mapping
                 return Results.ValidationProblem(errors);
             }
 
+            managerDto.Name = managerDto.Name.Trim();
+            managerDto.Password = managerDto.Password.Trim();
+            managerDto.FullAddress = managerDto.FullAddress.Trim();
+            managerDto.Email = managerDto.Email.Trim();
+            managerDto.Phone = managerDto.Phone.Trim();
+
             if (Zxcvbn.Core.EvaluatePassword(managerDto.Password).Score < 3)
                 return Results.BadRequest("Слабый пароль");
 
             using var db = await factory.CreateDbContextAsync();
             var geocoderValidate = new NominatimGeocoder();
 
-            managerDto.FullAddress = managerDto.FullAddress.Trim();
-            managerDto.Email = managerDto.Email.Trim();
-            managerDto.Phone = managerDto.Phone.Trim();
 
-            if (db.Users.Any(u => u.Email == managerDto.Email || u.Phone == managerDto.Phone))
-                return Results.Conflict("Почта или телефон есть в реесте");
+
+            if (db.Users.Any(u => u.Email == managerDto.Email || u.Phone == managerDto.Phone ||
+            u.Name == managerDto.Name || u.Address.FullAddress == managerDto.FullAddress))
+                return Results.Conflict("Повтор уникальных данных");
 
             var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(managerDto.FullAddress);
 
@@ -73,7 +78,7 @@ namespace Backend.Mapping
 
             var manager = new Manager()
             {
-                Name = managerDto.Name.Trim(),
+                Name = managerDto.Name,
                 Email = managerDto.Email,
                 Phone = managerDto.Phone,
                 Address = new ShortAddressDto()
@@ -139,16 +144,17 @@ namespace Backend.Mapping
                 return Results.ValidationProblem(errors);
             }
 
-            using var db = await factory.CreateDbContextAsync();
-            var geocoderValidate = new NominatimGeocoder();
-
+            managerDto.Name = managerDto.Name.Trim();
             managerDto.FullAddress = managerDto.FullAddress.Trim();
             managerDto.Email = managerDto.Email.Trim();
             managerDto.Phone = managerDto.Phone.Trim();
 
-            if (db.Users.Any(u => (u.Email == managerDto.Email || u.Phone == managerDto.Phone)
-            && u.Id != id))
-                return Results.Conflict("Почта или телефон есть в реестре");
+            using var db = await factory.CreateDbContextAsync();
+            var geocoderValidate = new NominatimGeocoder();
+
+            if (db.Users.Any(u => (u.Email == managerDto.Email || u.Phone == managerDto.Phone ||
+            u.Name == managerDto.Name || u.Address.FullAddress == managerDto.FullAddress) && u.Id != id))
+                return Results.Conflict("Повтор уникальных данных");
 
             var manager = db.Users.OfType<Manager>().FirstOrDefault(c => c.Id == id);
 
@@ -162,7 +168,7 @@ namespace Backend.Mapping
 
             var coords = await geocoding.GetCoordinatesAsync(managerDto.FullAddress);
 
-            manager.Name = managerDto.Name.Trim();
+            manager.Name = managerDto.Name;
             manager.Email = managerDto.Email;
             manager.Phone = managerDto.Phone;
             manager.PhotoIcon = managerDto.PhotoIcon;

@@ -84,6 +84,7 @@ namespace Backend.Mapping
             }
 
             companyDto.Name = companyDto.Name.Trim();
+            companyDto.Password = companyDto.Password.Trim();
             companyDto.FullAddress = companyDto.FullAddress.Trim();
             companyDto.Email = companyDto.Email.Trim();
             companyDto.Phone = companyDto.Phone.Trim();
@@ -133,7 +134,6 @@ namespace Backend.Mapping
             await db.Users.AddAsync(company);
             await db.SaveChangesAsync();
 
-            cache.Remove("companies_review");
             return Results.Ok(new CompanyResponseDto(company));
         }
 
@@ -316,13 +316,10 @@ namespace Backend.Mapping
             var geocoderValidate = new NominatimGeocoder();
 
             if (db.Users.Any(u => (u.Email == companyDto.Email || u.Phone == companyDto.Phone ||
-            u.Name == companyDto.Name) && u.Id != id))
+            u.Name == companyDto.Name || u.Address.FullAddress == companyDto.FullAddress) && u.Id != id))
                 return Results.Conflict("Повтор уникальных данных");
 
-            if (db.Addresses.Any(a => a.FullAddress == companyDto.FullAddress))
-                return Results.Conflict("Адрес есть в реестре");
-
-            var company = db.Users.OfType<Company>().FirstOrDefault(c => c.Id == id);
+            var company = db.Users.OfType<Company>().Include(c => c.Address).FirstOrDefault(c => c.Id == id);
 
             if (company == null)
                 return Results.NotFound();
@@ -346,6 +343,7 @@ namespace Backend.Mapping
                 Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
                 Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
             };
+            company.Contacts.VirtualList = companyDto.Contacts.VirtualList.Select(i => i.Trim()).ToList();
             company.LeaderName = companyDto.LeaderName;
             company.Description = companyDto.Description;
 

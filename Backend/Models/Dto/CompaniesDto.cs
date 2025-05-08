@@ -32,6 +32,7 @@ namespace Backend.Models.Dto
         public string? Description { get; set; }
         public byte[]? PhotoIcon { get; set; }
         public byte[]? PhotoHeader { get; set; }
+        public JsonList<string> Contacts { get; set; } = new JsonList<string>();
         public CompanyResponseDto() { }
         public CompanyResponseDto(Company company)
         {
@@ -42,11 +43,16 @@ namespace Backend.Models.Dto
             FullAddress = company.Address.FullAddress;
             Industry = company.Industry;
             LeaderName = company.LeaderName;
+            PhotoIcon = company.PhotoIcon;
+            PhotoHeader = company.PhotoHeader;
+            Contacts = company.Contacts;
         }
     }
 
     public class CompanyChangeDto : CompanyDto
     {
+        [JsonListValidation]
+        public JsonList<string> Contacts { get; set; } = new JsonList<string>();
         public string? Description { get; set; }
         public byte[]? PhotoIcon { get; set; }
         public byte[]? PhotoHeader { get; set; }
