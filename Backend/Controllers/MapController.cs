@@ -20,20 +20,18 @@ namespace GoogleMaps.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<MapMark>> GetDataMap()
+        public ActionResult<IEnumerable<ShortAddressDto>> GetDataMap()
         {
-            return Ok(_db.Addresses.Select(m => new MapMark()
+            return Ok(_db.Addresses.Select(m => new ShortAddressDto()
                 { 
-                    PlaceName = m.User.Name,
-                    GeoLat = m.Latitude,
-                    GeoLong = m.Longitude
+                    
                 }).ToList());
         }
 
         [NonAction]
         public void SetData()
         {
-            List<MapMark> stations = new List<MapMark>();
+            List<ShortAddressDto> stations = new List<ShortAddressDto>();
             //stations.Add(new MapMark()
             //{
             //    PlaceName = "Точка 1",
@@ -47,14 +45,5 @@ namespace GoogleMaps.Controllers
             //    GeoLong = (decimal)55.75226,
             //});
         }
-    }
-    public class MapMark()
-    {
-        [MaxLength(128)]
-        public string PlaceName { get; set; } = null!;
-        [Column(TypeName = "decimal(10, 7)")]
-        public decimal GeoLat { get; set; } // Широта
-        [Column(TypeName = "decimal(10, 7)")]
-        public decimal GeoLong { get; set; } // Долгота
     }
 }

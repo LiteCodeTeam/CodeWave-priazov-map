@@ -40,7 +40,7 @@ namespace Backend.Mapping
 
             if (update == 0)
             {
-                db.PasswordResetTokens.Add(token);
+                await db.PasswordResetTokens.AddAsync(token);
                 await db.SaveChangesAsync();
             }
 
@@ -72,9 +72,7 @@ namespace Backend.Mapping
 
             var result = Zxcvbn.Core.EvaluatePassword(request.NewPassword);
             if (result.Score < 3) // 0-4 (0 - очень слабый, 4 - очень сильный)
-                return Results.Problem(
-                    detail: "Слабый пароль",
-                    statusCode: StatusCodes.Status400BadRequest);
+                return Results.BadRequest("Слабый пароль");
 
             user.Password.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
             user.Password.LastUpdated = DateTime.UtcNow;

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Проекты социального воздействия Приазовья</title>
-    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Itim&family=Natasha:wght@700&display=swap" rel="stylesheet">
 </head>
 
@@ -14,24 +14,25 @@
         <div class="header-container">
             <div class="logo-group">
                 <button class="menu-icon">
-                    <svg width="30" height="30" viewBox="0 0 30 30">
-                        <path d="M5,9 H25 M5,15 H25 M5,21 H25" 
-                              stroke="#000" 
-                              stroke-width="2" 
-                              stroke-linecap="round"/>
-                      </svg>
+                    <div class="menu-icon-bar"></div>
+                    <div class="menu-icon-bar"></div>
+                    <div class="menu-icon-bar"></div>
                 </button>
-                <img src="static/img/лого.svg"onclick="location.href='main.html'">
+                <div class="logo">
+                    <img width="65" height="42" viewBox="0 0 65 42" fill="none" src="static/main/Logo.svg">
+                        <rect width="65" height="42" fill="#0E6466"/>
+                    </img>
+                </div>
             </div>
 
             <div class="right-section">
                 <div class="catalog-button">
-                    <span>Каталог проектов</span>
+                    <span>Каталог организаций</span>
                 </div>
                 <div class="login-button">
                     <span>Вход</span>
                 </div>
-                <div class="register-button" onclick="location.href='reg.html'">
+                <div class="register-button" onclick="location.href='registration.html'">
                     <span>Регистрация</span>
                 </div>
             </div>
@@ -51,7 +52,9 @@
                     <div class="nav-icon">←</div>
                 </button>
                 <div class="about-card">
-                    <div class="about-image"></div>
+                    <div class="about-image">
+                        <img src="static/main/Social-effect.svg" alt="#">
+                    </div>
                     <div class="about-content">
                         <h2 class="about-title">Что такое проект социального воздействия?</h2>
                         <p class="about-text">
@@ -68,8 +71,8 @@
 
         <section class="organizations-section">
             <div class="section-container">
-                <h2 class="section-title">ОРГАНИЗАЦИИ</h2>
                 <div class="organizations-content">
+                    <h2 class="section-title">ОРГАНИЗАЦИИ</h2>
                     <div class="map-filters-container">
                         <div class="map-container">
                             <script class="map-placeholder" type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Abb2e803e8888540af1464fa8f0916b00692e5b83676a91f7a37ed16dc7f2b64b&amp;lang=ru_RU&amp;scroll=true"></script>

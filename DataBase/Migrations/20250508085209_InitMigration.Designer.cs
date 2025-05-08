@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataBase.Migrations
 {
     [DbContext(typeof(PriazovContext))]
-    [Migration("20250503175308_InitMigration")]
+    [Migration("20250508085209_InitMigration")]
     partial class InitMigration
     {
         /// <inheritdoc />
@@ -65,8 +65,7 @@ namespace DataBase.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Addresses");
                 });
@@ -124,6 +123,34 @@ namespace DataBase.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("DataBase.Models.ShortAddressDto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FullAddress")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(10, 7)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(10, 7)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ShortAddressDto");
+                });
+
             modelBuilder.Entity("DataBase.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -132,8 +159,8 @@ namespace DataBase.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -141,6 +168,7 @@ namespace DataBase.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasMaxLength(24)
                         .HasColumnType("character varying(24)");
 
@@ -149,8 +177,8 @@ namespace DataBase.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)");
+                        .HasMaxLength(12)
+                        .HasColumnType("character varying(12)");
 
                     b.HasKey("Id");
 
@@ -252,8 +280,8 @@ namespace DataBase.Migrations
             modelBuilder.Entity("DataBase.Models.Address", b =>
                 {
                     b.HasOne("DataBase.Models.User", "User")
-                        .WithOne("Address")
-                        .HasForeignKey("DataBase.Models.Address", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -299,6 +327,17 @@ namespace DataBase.Migrations
 
                     b.Navigation("Photos")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataBase.Models.ShortAddressDto", b =>
+                {
+                    b.HasOne("DataBase.Models.User", "User")
+                        .WithOne("Address")
+                        .HasForeignKey("DataBase.Models.ShortAddressDto", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataBase.Models.UserPassword", b =>
