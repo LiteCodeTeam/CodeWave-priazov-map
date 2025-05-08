@@ -29,8 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\main.html" />
-    <None Include="wwwroot\reg.html" />
+    <None Include="wwwroot\index.html" />
     <None Include="wwwroot\scripts\fetch.js" />
     <None Include="wwwroot\styles\reg.css" />
     <None Include="wwwroot\styles\styles.css" />
