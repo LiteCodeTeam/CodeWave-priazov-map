@@ -28,4 +28,8 @@ namespace Backend.Models.Dto
             FullAddress = manager.FullAddress;
         }
     }
+    public class ManagerChangeDto : UserDto
+    {
+        public byte[]? PhotoIcon { get; set; }
+    }
 }

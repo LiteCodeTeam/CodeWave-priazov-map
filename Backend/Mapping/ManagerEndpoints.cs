@@ -51,15 +51,18 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
+            managerDto.Email = managerDto.Email.Trim();
+            managerDto.Phone = managerDto.Phone.Trim();
+
             if (db.Users.Any(u => u.Email == managerDto.Email || u.Phone == managerDto.Phone))
                 return Results.Conflict("Почта или телефон есть в реесте");
 
             var manager = new Manager()
             {
-                Name = managerDto.Name,
+                Name = managerDto.Name.Trim(),
                 Email = managerDto.Email,
                 Phone = managerDto.Phone,
-                FullAddress = managerDto.FullAddress
+                FullAddress = managerDto.FullAddress.Trim()
             };
 
             await db.Users.AddAsync(manager);
@@ -94,7 +97,7 @@ namespace Backend.Mapping
         }
 
         public static async Task<IResult> Change([FromQuery] Guid? id,
-            [FromBody] ManagerResponseDto managerDto,
+            [FromBody] ManagerChangeDto managerDto,
             [FromServices] IDbContextFactory<PriazovContext> factory)
         {
             var validationResults = new List<ValidationResult>();
@@ -118,24 +121,27 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
+            managerDto.Email = managerDto.Email.Trim();
+            managerDto.Phone = managerDto.Phone.Trim();
+
             if (db.Users.Any(u => (u.Email == managerDto.Email || u.Phone == managerDto.Phone)
             && u.Id != id))
                 return Results.Conflict("Почта или телефон есть в реестре");
 
-            var company = db.Users.OfType<Manager>().FirstOrDefault(c => c.Id == id);
+            var manager = db.Users.OfType<Manager>().FirstOrDefault(c => c.Id == id);
 
-            if (company == null)
+            if (manager == null)
                 return Results.NotFound();
 
-            company.Name = managerDto.Name;
-            company.Email = managerDto.Email;
-            company.Phone = managerDto.Phone;
-            company.PhotoIcon = managerDto.PhotoIcon;
-            company.FullAddress = managerDto.FullAddress;
+            manager.Name = managerDto.Name.Trim();
+            manager.Email = managerDto.Email;
+            manager.Phone = managerDto.Phone;
+            manager.PhotoIcon = managerDto.PhotoIcon;
+            manager.FullAddress = managerDto.FullAddress.Trim();
 
             await db.SaveChangesAsync();
 
-            return Results.Ok(managerDto);
+            return Results.Ok(new ManagerResponseDto(manager));
         }
     }
 }

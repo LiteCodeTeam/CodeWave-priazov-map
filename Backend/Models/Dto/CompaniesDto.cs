@@ -1,4 +1,5 @@
-﻿using DataBase.Models;
+﻿using Backend.Validation;
+using DataBase.Models;
 using JsonProperty.EFCore;
 using System.ComponentModel.DataAnnotations;
 
@@ -31,9 +32,6 @@ namespace Backend.Models.Dto
         public string? Description { get; set; }
         public byte[]? PhotoIcon { get; set; }
         public byte[]? PhotoHeader { get; set; }
-        [MaxLength(1024)]
-        public JsonList<string> Contacts { get; set; } = new JsonList<string>();
-
         public CompanyResponseDto() { }
         public CompanyResponseDto(Company company)
         {
@@ -45,5 +43,12 @@ namespace Backend.Models.Dto
             Industry = company.Industry;
             LeaderName = company.LeaderName;
         }
+    }
+
+    public class CompanyChangeDto : CompanyDto
+    {
+        public string? Description { get; set; }
+        public byte[]? PhotoIcon { get; set; }
+        public byte[]? PhotoHeader { get; set; }
     }
 }

@@ -27,6 +27,16 @@ namespace Backend.Mapping
             "Отраслевое событие / научная конференция",
             "Другое"
         };
+        private static readonly HashSet<string> _allowedRegions = new()
+        {
+            "Ростовская область",
+            "Краснодарский край",
+            "ЛНР",
+            "ДНР",
+            "Республика Крым",
+            "Херсонская область",
+            "Запорожская область"
+        };
         private static readonly MemoryCacheEntryOptions CacheOptions = new()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
@@ -75,22 +85,25 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
+            companyDto.Email = companyDto.Email.Trim();
+            companyDto.Phone = companyDto.Phone.Trim();
+
             if (db.Users.Any(u => u.Email == companyDto.Email || u.Phone == companyDto.Phone))
                 return Results.Conflict("Почта или телефон есть в реесте");
 
             var company = new Company()
             {
-                Name = companyDto.Name,
+                Name = companyDto.Name.Trim(),
                 Email = companyDto.Email,
                 Password = new UserPassword()
                 {
-                    PasswordHash = PasswordHasher.HashPassword(companyDto.Password),
+                    PasswordHash = PasswordHasher.HashPassword(companyDto.Password.Trim()),
                     LastUpdated = DateTime.UtcNow
                 },
                 Phone = companyDto.Phone,
-                FullAddress = companyDto.FullAddress,
-                Industry = companyDto.Industry,
-                LeaderName = companyDto.LeaderName
+                FullAddress = companyDto.FullAddress.Trim(),
+                Industry = companyDto.Industry.Trim(),
+                LeaderName = companyDto.LeaderName.Trim()
             };
             await db.Users.AddAsync(company);
             await db.SaveChangesAsync();
@@ -150,30 +163,25 @@ namespace Backend.Mapping
         }
 
         private static async Task<IResult> FilterCompanies(
-            [FromQuery] string? industries,
+            [FromQuery] string? industry,
+            [FromQuery] string? region,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IMemoryCache cache)
         {
-            var cacheKey = $"companies_filter_{industries ?? "all"}";
+            var cacheKey = $"companies_filter_{industry ?? "all"}_{region ?? "all"}";
 
             if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
                 return Results.Ok(cachedCompanies);
 
-            List<string>? industryList = null;
-            if (!string.IsNullOrEmpty(industries))
-                industryList = industries.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                        .Select(i => i.Trim())
-                                        .ToList();
+            if (industry != null && !_allowedIndustries.Contains(industry))
+                return Results.BadRequest("Недопустимые значения индустрии");
 
-            if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
-                return Results.BadRequest("Недопустимые значения индустрий.");
+            if (region != null && !_allowedRegions.Contains(region))
+                return Results.BadRequest("Недопустимые значения региона");
 
             using var db = await factory.CreateDbContextAsync();
 
-            var query = db.Users.OfType<Company>().AsQueryable();
-
-            if (industryList?.Count > 0)
-                query = query.Where(c => industryList.Contains(c.Industry));
+            var query = db.Users.OfType<Company>().AsQueryable().Where(c => c.Industry == industry);
 
             var companies = await query.OrderBy(c => c.Name).ToListAsync();
 
@@ -182,39 +190,31 @@ namespace Backend.Mapping
         }
 
         private static async Task<IResult> SearchCompanies(
-            [FromQuery] string? industries,
+            [FromQuery] string? industry,
+            [FromQuery] string? region,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IMemoryCache cache,
             [FromQuery] string searchTerm = "")
         {
-            var cacheKey = $"companies_search_{industries ?? "all"}_{searchTerm}";
+            var cacheKey = $"companies_search_{industry ?? "all"}_{region ?? "all"}_{searchTerm}";
 
             if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
                 return Results.Ok(cachedCompanies);
 
-            List<string>? industryList = null;
-            if (!string.IsNullOrEmpty(industries))
-                industryList = industries.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                        .Select(i => i.Trim())
-                                        .ToList();
+            if (industry != null && !_allowedIndustries.Contains(industry))
+                return Results.BadRequest("Недопустимые значения индустрии");
 
-            // Валидация индустрий
-            if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
-                return Results.BadRequest("Недопустимые значения индустрий.");
+            if (region != null && !_allowedRegions.Contains(region))
+                return Results.BadRequest("Недопустимые значения региона");
 
             using var db = await factory.CreateDbContextAsync();
 
-            var query = db.Users.OfType<Company>().AsQueryable();
-
-            if (industryList?.Count > 0)
-                query = query.Where(c => industryList.Contains(c.Industry));
+            var query = db.Users.OfType<Company>().AsQueryable().Where(c => c.Industry == industry);
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
                 query = query.Where(c => EF.Functions.ILike(c.Name, $"%{searchTerm}%"));
 
-            var companies = await query
-                .OrderBy(c => c.Name)
-                .ToListAsync();
+            var companies = await query.OrderBy(c => c.Name).ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
 
@@ -222,7 +222,7 @@ namespace Backend.Mapping
         }
 
         public static async Task<IResult> Change([FromQuery] Guid? id,
-            [FromBody] CompanyResponseDto companyDto,
+            [FromBody] CompanyChangeDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory)
         {
             var validationResults = new List<ValidationResult>();
@@ -249,6 +249,9 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
+            companyDto.Email = companyDto.Email.Trim();
+            companyDto.Phone = companyDto.Phone.Trim();
+
             if (db.Users.Any(u => (u.Email == companyDto.Email || u.Phone == companyDto.Phone)
             && u.Id != id))
                 return Results.Conflict("Почта или телефон есть в реестре");
@@ -258,20 +261,19 @@ namespace Backend.Mapping
             if (company == null)
                 return Results.NotFound();
 
-            company.Name = companyDto.Name;
+            company.Name = companyDto.Name.Trim();
             company.Email = companyDto.Email;
             company.Phone = companyDto.Phone;
-            company.Industry = companyDto.Industry;
+            company.Industry = companyDto.Industry.Trim();
             company.PhotoIcon = companyDto.PhotoIcon;
             company.PhotoHeader = companyDto.PhotoHeader;
-            company.FullAddress = companyDto.FullAddress;
-            company.LeaderName = companyDto.LeaderName;
-            company.Description = companyDto.Description;
-            company.Contacts = companyDto.Contacts;
+            company.FullAddress = companyDto.FullAddress.Trim();
+            company.LeaderName = companyDto.LeaderName.Trim();
+            company.Description = companyDto.Description?.Trim();
 
             await db.SaveChangesAsync();
 
-            return Results.Ok(companyDto);
+            return Results.Ok(new CompanyResponseDto(company));
         }
     }
 }

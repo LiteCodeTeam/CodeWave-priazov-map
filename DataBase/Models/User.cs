@@ -11,7 +11,7 @@ namespace DataBase.Models
         [MaxLength(100)]
         public string Name { get; set; } = null!;
         [Required]
-        [MaxLength(150)]
+        [MaxLength(255)]
         public string Email { get; set; } = null!;
         public UserPassword Password { get; set; } = null!;
         [Required]
