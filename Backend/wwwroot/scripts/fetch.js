@@ -31,7 +31,7 @@ document.querySelector('.registration-form').addEventListener('submit', async fu
 
 //const requestURL = 'https://jsonplaceholder.typicode.com/users'
 // const requestURL = 'http://localhost:5145/api/Company'
-    const requestURL = '/api/Company';
+    const requestURL = '/companies/create';
 
     try {
         const response = await fetch(requestURL, {
