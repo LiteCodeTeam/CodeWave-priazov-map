@@ -89,8 +89,6 @@ builder.Services.AddSwaggerGen(opt =>
 
 var app = builder.Build();
 
-app.UseForwardedHeaders();
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -104,6 +102,8 @@ else
     });
     app.UseSwaggerUI();
 }
+
+app.UseForwardedHeaders();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

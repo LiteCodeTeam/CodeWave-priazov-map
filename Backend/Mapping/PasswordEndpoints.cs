@@ -71,7 +71,7 @@ namespace Backend.Mapping
                     statusCode: StatusCodes.Status400BadRequest);
 
             var result = Zxcvbn.Core.EvaluatePassword(request.NewPassword);
-            if (result.Score < 3) // 0-4 (0 - очень слабый, 4 - очень сильный)
+            if (result.Score < 3)
                 return Results.BadRequest("Слабый пароль");
 
             user.Password.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
@@ -85,27 +85,6 @@ namespace Backend.Mapping
 
             return Results.Ok("Пароль успешно изменён.");
         }
-        //private static async Task<IResult> GetResetPassword(string token,
-        //    [FromServices] IDbContextFactory<PriazovContext> factory)
-        //{
-        //    await using var db = await factory.CreateDbContextAsync();
-
-        //    // Проверяем валидность токена
-        //    var isValid = db.PasswordResetTokens.Any(t => t.Token == token && t.ExpiresAt > DateTime.UtcNow);
-
-        //    if (!isValid)
-        //        return Results.BadRequest("Недействительная или просроченная ссылка");
-
-        //    return Results.Content(
-        //        $"""
-        //       <form method="post" action="/reset-password">
-        //           <input type="hidden" name="token" value="{token}">
-        //           <input type="password" name="newPassword" placeholder="Password" required>
-        //           <input type="password" name="confirmPassword" placeholder="Repeat Password" required>
-        //           <button type="submit">Save</button>
-        //       </form>
-        //       """, "text/html");
-        //}
     }
     public record ForgotPasswordRequest(string Email);
     public record ResetPasswordRequest(string Token, string NewPassword);
