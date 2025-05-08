@@ -12,6 +12,7 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder();
 
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 
 builder.Services.AddHostedService<SessionsCleanupService>();
 builder.Services.AddHostedService<PasswordTokensCleanupService>();
@@ -23,6 +24,8 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddScoped<EmailService>();
+
+builder.Services.AddScoped<IGeocodingService, YandexGeocodingService>();
 
 builder.Services.AddMemoryCache();
 
@@ -106,6 +109,7 @@ app.MapControllers();
 app.MapAuthEndpoints();
 app.MapPasswordEndpoints();
 app.MapCompanyEndpoints();
+app.MapManagerEndpoints();
 
 app.Run();
 

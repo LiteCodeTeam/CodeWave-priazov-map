@@ -7,17 +7,23 @@ namespace DataBase.Models
     public class User
     {
         public Guid Id { get; set; }
+        [Required]
         [MaxLength(100)]
         public string Name { get; set; } = null!;
-        [MaxLength(150)]
+        [Required]
+        [MaxLength(255)]
         public string Email { get; set; } = null!;
         public UserPassword Password { get; set; } = null!;
+        [Required]
         [MaxLength(24)]
-        public string? Phone { get; set; }
+        public string Phone { get; set; } = null!;
         public byte[]? PhotoIcon { get; set; }
-        public Address Address { get; set; } = null!;
+        [Required]
+        [MaxLength(255)]
+        public ShortAddressDto Address { get; set; } = null!;
         public UserSession? Session { get; set; }
         public PasswordResetToken? PasswordResetToken { get; set; }
+        [MaxLength(12)]
         public string Role { get; set; } = null!;
     }
     public class Company : User
@@ -35,9 +41,4 @@ namespace DataBase.Models
     }
     public class Manager : User;
     public class Admin : User;
-    public class Role
-    {
-        public String Name { get; set; } = String.Empty;
-        public Role(string name) => Name = name;
-    }
 }

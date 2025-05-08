@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.ComponentModel.DataAnnotations;
 using JsonProperty.EFCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using Backend.Models.Dto;
 
 namespace Controllers
 {
@@ -71,16 +72,7 @@ namespace Controllers
                             LastUpdated = DateTime.UtcNow
                         },
                         Phone = companyDto.Phone,
-                        Address = new Address()
-                        {
-                            Street = companyDto.Address.Street,
-                            Apartment = companyDto.Address.Apartment,
-                            City = companyDto.Address.City,
-                            Country = companyDto.Address.Country,
-                            PostalCode = companyDto.Address.PostalCode,
-                            Latitude = 1,
-                            Longitude = 1
-                        },
+                        //FullAddress = companyDto.FullAddress,
                         Industry = companyDto.Industry
                     };
                     // добавляем компанию в список
@@ -148,20 +140,5 @@ namespace Controllers
             }
         }
     }
-    public class CompanyCreateDto()
-    {
-        [MaxLength(100)]
-        public string Name { get; set; } = null!;
-        [MaxLength(150)]
-        public string Email { get; set; } = null!;
-        [MaxLength(30)]
-        public string Password { get; set; } = null!;
-        [MaxLength(24)]
-        public string? Phone { get; set; }
-        public AddressDto Address { get; set; } = null!;
-        [MaxLength(100)]
-        public string Industry { get; set; } = null!;
-        [MaxLength(100)]
-        public string LeaderName { get; set; } = null!;
-    }
+
 }

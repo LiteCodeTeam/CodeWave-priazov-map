@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.ComponentModel.DataAnnotations;
+using Backend.Models.Dto;
 
 namespace Controllers
 {
@@ -61,16 +62,6 @@ namespace Controllers
                             LastUpdated = DateTime.UtcNow
                         },
                         Phone = managerDto.Phone,
-                        Address = new Address()
-                        {
-                            Street = managerDto.Address.Street,
-                            Apartment = managerDto.Address.Apartment,
-                            City = managerDto.Address.City,
-                            Country = managerDto.Address.Country,
-                            PostalCode = managerDto.Address.PostalCode,
-                            Latitude = 1,
-                            Longitude = 1
-                        }
                     };
                     // добавляем пользователя в список
                     _db.Users.AddAsync(manager);
@@ -135,17 +126,5 @@ namespace Controllers
                 return BadRequest(new { message = "Некорректные данные" });
             }
         }
-    }
-    public class ManagerCreateDto()
-    {
-        [MaxLength(100)]
-        public string Name { get; set; } = null!;
-        [MaxLength(150)]
-        public string Email { get; set; } = null!;
-        [MaxLength(30)]
-        public string Password { get; set; } = null!;
-        [MaxLength(24)]
-        public string? Phone { get; set; }
-        public AddressDto Address { get; set; } = null!;
     }
 }
