@@ -72,7 +72,7 @@ namespace Controllers
                             LastUpdated = DateTime.UtcNow
                         },
                         Phone = companyDto.Phone,
-                        FullAddress = companyDto.FullAddress,
+                        //FullAddress = companyDto.FullAddress,
                         Industry = companyDto.Industry
                     };
                     // добавляем компанию в список

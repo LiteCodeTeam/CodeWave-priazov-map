@@ -20,7 +20,7 @@ namespace DataBase.Models
         public byte[]? PhotoIcon { get; set; }
         [Required]
         [MaxLength(255)]
-        public string FullAddress { get; set; } = null!;
+        public ShortAddressDto Address { get; set; } = null!;
         public UserSession? Session { get; set; }
         public PasswordResetToken? PasswordResetToken { get; set; }
         [MaxLength(12)]

@@ -26,7 +26,7 @@ namespace Backend.Models.Dto
         public string Phone { get; set; } = null!;
         [Required]
         [StringLength(255, MinimumLength = 10, ErrorMessage = "Адрес должен содержать 10-255 символов")]
-        [AddressValidation(ErrorMessage = "Неверный формат адреса")]
+        //[AddressValidation(ErrorMessage = "Неверный формат адреса")]
         public string FullAddress { get; set; } = null!;
     }
 }

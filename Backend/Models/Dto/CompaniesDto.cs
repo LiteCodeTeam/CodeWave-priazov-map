@@ -39,7 +39,7 @@ namespace Backend.Models.Dto
             Name = company.Name;
             Email = company.Email;
             Phone = company.Phone;
-            FullAddress = company.FullAddress;
+            FullAddress = company.Address.FullAddress;
             Industry = company.Industry;
             LeaderName = company.LeaderName;
         }

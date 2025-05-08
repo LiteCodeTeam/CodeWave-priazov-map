@@ -77,10 +77,10 @@ namespace DataBase
                .HasForeignKey<PasswordResetToken>(p => p.UserId);
 
             //Временная мера, пока адрес одной строкой
-            //modelBuilder.Entity<User>()
-            //    .HasOne(u => u.Address)
-            //    .WithOne(a => a.User)
-            //    .HasForeignKey<Address>(a =>  a.UserId);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Address)
+                .WithOne(a => a.User)
+                .HasForeignKey<ShortAddressDto>(a => a.UserId);
 
             modelBuilder.Entity<User>()
                 .HasDiscriminator<string>("Role")

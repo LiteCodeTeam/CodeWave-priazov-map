@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel.DataAnnotations;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Text;
+using Backend.Validation;
+using System.Globalization;
 
 namespace Backend.Mapping
 {
@@ -25,7 +29,8 @@ namespace Backend.Mapping
 
         private static async Task<IResult> Create(
             [FromBody] ManagerCreateDto managerDto,
-            [FromServices] IDbContextFactory<PriazovContext> factory)
+            [FromServices] IDbContextFactory<PriazovContext> factory,
+            [FromServices] IGeocodingService geocoding)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -50,19 +55,33 @@ namespace Backend.Mapping
                 return Results.BadRequest("Слабый пароль");
 
             using var db = await factory.CreateDbContextAsync();
+            var geocoderValidate = new NominatimGeocoder();
 
+            managerDto.FullAddress = managerDto.FullAddress.Trim();
             managerDto.Email = managerDto.Email.Trim();
             managerDto.Phone = managerDto.Phone.Trim();
 
             if (db.Users.Any(u => u.Email == managerDto.Email || u.Phone == managerDto.Phone))
                 return Results.Conflict("Почта или телефон есть в реесте");
 
+            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(managerDto.FullAddress);
+
+            if (!isValidAddress)
+                return Results.NotFound(error);
+
+            var coords = await geocoding.GetCoordinatesAsync(managerDto.FullAddress);
+
             var manager = new Manager()
             {
                 Name = managerDto.Name.Trim(),
                 Email = managerDto.Email,
                 Phone = managerDto.Phone,
-                FullAddress = managerDto.FullAddress.Trim()
+                Address = new ShortAddressDto()
+                {
+                    FullAddress = managerDto.FullAddress,
+                    Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
+                    Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
+                }
             };
 
             await db.Users.AddAsync(manager);
@@ -98,7 +117,8 @@ namespace Backend.Mapping
 
         public static async Task<IResult> Change([FromQuery] Guid? id,
             [FromBody] ManagerChangeDto managerDto,
-            [FromServices] IDbContextFactory<PriazovContext> factory)
+            [FromServices] IDbContextFactory<PriazovContext> factory,
+            [FromServices] IGeocodingService geocoding)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -120,7 +140,9 @@ namespace Backend.Mapping
             }
 
             using var db = await factory.CreateDbContextAsync();
+            var geocoderValidate = new NominatimGeocoder();
 
+            managerDto.FullAddress = managerDto.FullAddress.Trim();
             managerDto.Email = managerDto.Email.Trim();
             managerDto.Phone = managerDto.Phone.Trim();
 
@@ -133,11 +155,23 @@ namespace Backend.Mapping
             if (manager == null)
                 return Results.NotFound();
 
+            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(managerDto.FullAddress);
+
+            if (!isValidAddress)
+                return Results.NotFound(error);
+
+            var coords = await geocoding.GetCoordinatesAsync(managerDto.FullAddress);
+
             manager.Name = managerDto.Name.Trim();
             manager.Email = managerDto.Email;
             manager.Phone = managerDto.Phone;
             manager.PhotoIcon = managerDto.PhotoIcon;
-            manager.FullAddress = managerDto.FullAddress.Trim();
+            manager.Address = new ShortAddressDto()
+            {
+                FullAddress = managerDto.FullAddress,
+                Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
+                Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
+            };
 
             await db.SaveChangesAsync();
 

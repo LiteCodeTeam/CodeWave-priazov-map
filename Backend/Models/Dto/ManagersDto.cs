@@ -25,7 +25,7 @@ namespace Backend.Models.Dto
             Name = manager.Name;
             Email = manager.Email;
             Phone = manager.Phone;
-            FullAddress = manager.FullAddress;
+            FullAddress = manager.Address.FullAddress;
         }
     }
     public class ManagerChangeDto : UserDto

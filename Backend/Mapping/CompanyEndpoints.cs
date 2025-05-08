@@ -1,11 +1,15 @@
 ﻿using Backend.Models.Dto;
+using Backend.Validation;
 using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Net.Http.Headers;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Backend.Mapping
@@ -49,14 +53,16 @@ namespace Backend.Mapping
             group.MapPost("/create", Create);
             group.MapGet("/review", Review);
             group.MapGet("account", Account);
-            group.MapGet("/filter", FilterCompanies);
+            group.MapGet("/filterCatalog", FilterCompanies);
+            group.MapGet("/filterMap", FilterMap);
             group.MapGet("/search", SearchCompanies);
             group.MapPut("/change", Change);
         }
 
         private static async Task<IResult> Create(CompanyCreateDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IMemoryCache cache)
+            [FromServices] IMemoryCache cache,
+            [FromServices] IGeocodingService geocoding)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -77,6 +83,13 @@ namespace Backend.Mapping
                 return Results.ValidationProblem(errors);
             }
 
+            companyDto.Name = companyDto.Name.Trim();
+            companyDto.FullAddress = companyDto.FullAddress.Trim();
+            companyDto.Email = companyDto.Email.Trim();
+            companyDto.Phone = companyDto.Phone.Trim();
+            companyDto.Industry = companyDto.Industry.Trim();
+            companyDto.LeaderName = companyDto.LeaderName.Trim();
+
             if (!_allowedIndustries.Any(i => i == companyDto.Industry))
                 return Results.BadRequest("Недопустимое значение индустрии");
 
@@ -84,16 +97,22 @@ namespace Backend.Mapping
                 return Results.BadRequest("Слабый пароль");
 
             using var db = await factory.CreateDbContextAsync();
+            var geocoderValidate = new NominatimGeocoder();
 
-            companyDto.Email = companyDto.Email.Trim();
-            companyDto.Phone = companyDto.Phone.Trim();
+            if (db.Users.Any(u => u.Email == companyDto.Email || u.Phone == companyDto.Phone ||
+            u.Name == companyDto.Name || u.Address.FullAddress == companyDto.FullAddress))
+                return Results.Conflict("Повтор уникальных данных");
 
-            if (db.Users.Any(u => u.Email == companyDto.Email || u.Phone == companyDto.Phone))
-                return Results.Conflict("Почта или телефон есть в реесте");
+            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(companyDto.FullAddress);
+
+            if (!isValidAddress)
+                return Results.NotFound(error);
+
+            var coords = await geocoding.GetCoordinatesAsync(companyDto.FullAddress);
 
             var company = new Company()
             {
-                Name = companyDto.Name.Trim(),
+                Name = companyDto.Name,
                 Email = companyDto.Email,
                 Password = new UserPassword()
                 {
@@ -101,9 +120,15 @@ namespace Backend.Mapping
                     LastUpdated = DateTime.UtcNow
                 },
                 Phone = companyDto.Phone,
-                FullAddress = companyDto.FullAddress.Trim(),
-                Industry = companyDto.Industry.Trim(),
-                LeaderName = companyDto.LeaderName.Trim()
+                Address = new ShortAddressDto()
+                {
+                    FullAddress = companyDto.FullAddress,
+                    Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
+                    Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
+                    
+                },
+                Industry = companyDto.Industry,
+                LeaderName = companyDto.LeaderName
             };
             await db.Users.AddAsync(company);
             await db.SaveChangesAsync();
@@ -220,10 +245,42 @@ namespace Backend.Mapping
 
             return Results.Ok(companies);
         }
+        public static async Task<IResult> FilterMap(
+                    [FromQuery] string? industries,
+                    [FromServices] IDbContextFactory<PriazovContext> factory,
+                    [FromServices] IMemoryCache cache)
+        {
+            var cacheKey = $"companies_filterMap_{industries ?? "all"}";
 
+            if (cache.TryGetValue(cacheKey, out List<Company>? cachedAddress))
+                return Results.Ok(cachedAddress);
+
+            List<string>? industryList = null;
+            if (!string.IsNullOrEmpty(industries))
+                industryList = industries.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                        .Select(i => i.Trim())
+                                        .ToList();
+
+            if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
+                return Results.BadRequest("Недопустимые значения индустрий.");
+
+
+            using var db = await factory.CreateDbContextAsync();
+
+            var query = db.Users.OfType<Company>().Include(c => c.Address).AsQueryable();
+
+            if (industryList?.Count > 0)
+                query = query.Where(c => industryList.Contains(c.Industry));
+
+            var addresses = await query.ToDictionaryAsync(c => c.Name, c=> c.Address);
+
+            cache.Set(cacheKey, addresses, CacheOptions);
+            return Results.Ok(addresses);
+        }
         public static async Task<IResult> Change([FromQuery] Guid? id,
             [FromBody] CompanyChangeDto companyDto,
-            [FromServices] IDbContextFactory<PriazovContext> factory)
+            [FromServices] IDbContextFactory<PriazovContext> factory,
+            [FromServices] IGeocodingService geocoding)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -244,32 +301,53 @@ namespace Backend.Mapping
                 return Results.ValidationProblem(errors);
             }
 
+            companyDto.Name = companyDto.Name.Trim();
+            companyDto.FullAddress = companyDto.FullAddress.Trim();
+            companyDto.Email = companyDto.Email.Trim();
+            companyDto.Phone = companyDto.Phone.Trim();
+            companyDto.Industry = companyDto.Industry.Trim();
+            companyDto.LeaderName = companyDto.LeaderName.Trim();
+            companyDto.Description = companyDto.Description?.Trim();
+
             if (!_allowedIndustries.Any(i => i ==  companyDto.Industry))
                 return Results.BadRequest("Недопустимое значение индустрии");
 
             using var db = await factory.CreateDbContextAsync();
+            var geocoderValidate = new NominatimGeocoder();
 
-            companyDto.Email = companyDto.Email.Trim();
-            companyDto.Phone = companyDto.Phone.Trim();
+            if (db.Users.Any(u => (u.Email == companyDto.Email || u.Phone == companyDto.Phone ||
+            u.Name == companyDto.Name) && u.Id != id))
+                return Results.Conflict("Повтор уникальных данных");
 
-            if (db.Users.Any(u => (u.Email == companyDto.Email || u.Phone == companyDto.Phone)
-            && u.Id != id))
-                return Results.Conflict("Почта или телефон есть в реестре");
+            if (db.Addresses.Any(a => a.FullAddress == companyDto.FullAddress))
+                return Results.Conflict("Адрес есть в реестре");
 
             var company = db.Users.OfType<Company>().FirstOrDefault(c => c.Id == id);
 
             if (company == null)
                 return Results.NotFound();
 
-            company.Name = companyDto.Name.Trim();
+            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(companyDto.FullAddress);
+
+            if (!isValidAddress)
+                return Results.NotFound(error);
+
+            var coords = await geocoding.GetCoordinatesAsync(companyDto.FullAddress);
+
+            company.Name = companyDto.Name;
             company.Email = companyDto.Email;
             company.Phone = companyDto.Phone;
-            company.Industry = companyDto.Industry.Trim();
+            company.Industry = companyDto.Industry;
             company.PhotoIcon = companyDto.PhotoIcon;
             company.PhotoHeader = companyDto.PhotoHeader;
-            company.FullAddress = companyDto.FullAddress.Trim();
-            company.LeaderName = companyDto.LeaderName.Trim();
-            company.Description = companyDto.Description?.Trim();
+            company.Address = new ShortAddressDto()
+            {
+                FullAddress = companyDto.FullAddress,
+                Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
+                Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
+            };
+            company.LeaderName = companyDto.LeaderName;
+            company.Description = companyDto.Description;
 
             await db.SaveChangesAsync();
 
