@@ -38,7 +38,8 @@ function formValidation ( )
         }
 }
 
-const requestURL = 'https://jsonplaceholder.typicode.com/users'
+//ILYA const requestURL = 'https://jsonplaceholder.typicode.com/users'
+    const requestURL = '/api/Company';
 
 function sendRequest(method, url, body = null){
     const headers = {

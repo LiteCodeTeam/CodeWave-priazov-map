@@ -56,8 +56,10 @@ namespace Controllers
                 if (companyDto != null)
                 {
                     if (string.IsNullOrEmpty(companyDto.Name) || string.IsNullOrEmpty(companyDto.Phone) ||
-                    !RegexUtilities.IsValidEmail(companyDto.Email) ||
-                    Regex.Match(companyDto.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success)
+                    !RegexUtilities.IsValidEmail(companyDto.Email)
+                        //TODO: Fix (Ilya)
+                    ////|| Regex.Match(companyDto.Phone, @"^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$", RegexOptions.IgnoreCase).Success
+                    )
                     {
                         throw new Exception("Некорректные данные");
                     }
@@ -72,8 +74,19 @@ namespace Controllers
                             LastUpdated = DateTime.UtcNow
                         },
                         Phone = companyDto.Phone,
-                        //FullAddress = companyDto.FullAddress,
-                        Industry = companyDto.Industry
+
+                        //TODO: Fix (Ilya)
+                        ////Address = new Address()
+                        ////{
+                        ////    Street = companyDto.Address.Street,
+                        ////    Apartment = companyDto.Address.Apartment,
+                        ////    City = companyDto.Address.City,
+                        ////    Country = companyDto.Address.Country,
+                        ////    PostalCode = companyDto.Address.PostalCode,
+                        ////    Latitude = 1,
+                        ////    Longitude = 1
+                        ////},
+                        ////Industry = companyDto.Industry
                     };
                     // добавляем компанию в список
                     _db.Users.AddAsync(company);
