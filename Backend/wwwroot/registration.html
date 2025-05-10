@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
-    <link rel="stylesheet" href="styles/registration.css"
+    <link rel="stylesheet" href="styles/registration.css" />
     
 </head>
 <body>
@@ -14,13 +14,13 @@
             <div class="logo-group">
                 <button class="menu-icon">
                     <svg width="30" height="30" viewBox="0 0 30 30">
-                        <path d="M5,9 H25 M5,15 H25 M5,21 H25" 
-                              stroke="#000" 
-                              stroke-width="2" 
-                              stroke-linecap="round"/>
-                      </svg>
+                        <path d="M5,9 H25 M5,15 H25 M5,21 H25"
+                              stroke="#000"
+                              stroke-width="2"
+                              stroke-linecap="round" />
+                    </svg>
                 </button>
-                <img src="static/img/лого.svg"onclick="location.href='index.html'">
+                    <img width="65" height="42" viewBox="0 0 65 42" fill="none" src="static/main/Logo.svg" onclick="location.href='index.html'">
             </div>
         </div>
     </header>
@@ -37,35 +37,36 @@
                         <span class="tab-text">инвестор</span>
                     </button>
                 </div>
-                <form class="registration-form" onsubmit="return formValidation();" method="post" name="myForm">
+                <form class="registration-form" method="post" name="myForm">
                     <div class="form-field">
                         <input type="text" placeholder="краткое название организации" name="organizationName" id="organizationName">
                     </div>
                     <div class="form-field">
-                        <input type="address" placeholder="юридический адрес" name="address" id="address">
+                        <input type="text" placeholder="юридический адрес" name="address" id="address">
                     </div>
-                    <div class="form-field" onclick="" name="formfield" id="form">
-                        <select required>
+                    <div class="form-field">
+                        <input type="text" list="browsers" id="industry" name="industry">
+                        <datalist id="browsers">
                             <option value="" disabled selected hidden>категория (с выбором)</option>
-                            <option value="Edu_Inst">Образовательное учреждение</option>
-                            <option value="Res_Inst">Научно-исследовательский институт</option>
-                            <option value="Sci_Edu_Proj">Научно-образовательный проект</option>
-                            <option value="Gov_Age">Государственное учреждение</option>
-                            <option value="Com_Act">Коммерческая деятельность</option>
-                            <option value="Startup">Стартап</option>
-                            <option value="Finance">Финансы</option>
-                            <option value="Acc_Inc_Tech">Акселератор / инкубатор / технопарк</option>
-                            <option value="Asso_Union">Ассоциация / объединение</option>
-                            <option value="Initiative">Инициатива</option>
-                            <option value="Ind_Sci">Отраслевое событие / научная конференция</option>
-                            <option value="Other">Другое</option>
-                        </select>
+                            <option value="Образовательное учреждение">Образовательное учреждение</option>
+                            <option value="Научно-исследовательский институт">Научно-исследовательский институт</option>
+                            <option value="Научно-образовательный проект">Научно-образовательный проект</option>
+                            <option value="Государственное учреждение">Государственное учреждение</option>
+                            <option value="Коммерческая деятельность">Коммерческая деятельность</option>
+                            <option value="Стартап">Стартап</option>
+                            <option value="Финансы">Финансы</option>
+                            <option value="Акселератор / инкубатор / технопарк">Акселератор / инкубатор / технопарк</option>
+                            <option value="Ассоциация / объединение">Ассоциация / объединение</option>
+                            <option value="Инициатива">Инициатива</option>
+                            <option value="Отраслевое событие / научная конференция">Отраслевое событие / научная конференция</option>
+                            <option value="Другое">Другое</option>
+                        </datalist>
                     </div>
                     <div class="form-field">
                         <input type="text" placeholder="ФИО руководителя" name="FIO" id="FIO">
                     </div>
                     <div class="form-field">
-                        <input type="tel" id="phone" name="phone" placeholder="7 (XXX) XXX-XX-XX"  maxlength="11" required/>
+                        <input type="tel" id="phone" name="phone" placeholder="7 (XXX) XXX-XX-XX" maxlength="20" required />
                     </div>
                     <div class="form-field">
                         <input type="email" placeholder="электронная почта" name="mail" id="mail">
@@ -78,7 +79,7 @@
                     </div>
                     <button type="submit" class="submit-btn">Зарегистрироваться</button>
                 </form>
-            </div>
+</div>
     </main>
     <div class="interm"></div>
   <footer>
@@ -102,8 +103,7 @@
       </div>
   </footer>
 
-  <script src="fetch.js">
-
+  <script src="scripts/fetch.js" async>
   </script>
 </body>
 </html>
