@@ -1,0 +1,755 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проекты социального воздействия Приазовья</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Itim&family=Natasha:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600&family=Inter:wght@400;500;600&family=Itim&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/natasha" rel="stylesheet">
+
+     <!--CSS--> 
+    <style>
+        :root {
+            --primary-color: #0E6466;
+            --text-color: #012021;
+            --background-light: #F5F5F5;
+            --accent-light: #E7F0F2;
+            --white: #FFFFFF;
+            --gray: #D9D9D9;
+            --border-gray: #808080;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --shadow-small: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            background: var(--white);
+        }
+
+        .section-title {
+            font-family: 'Natasha', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-color);
+        }
+
+        @media (min-width: 992px) {
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Header */
+        .header {
+            height: 3.5rem;
+        }
+
+        .menu-icon-bar {
+            width: 30px;
+            height: 3px;
+            background: var(--text-color);
+            margin: 2px 0;
+        }
+
+        .catalog-btn {
+            background: var(--primary-color);
+            border-radius: 15px;
+            color: var(--white);
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            padding: 8px 20px;
+        }
+
+        .login-btn {
+            background: var(--accent-light);
+            border-radius: 15px;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 8px 20px;
+        }
+
+        .register-btn {
+            background: var(--primary-color);
+            border-radius: 15px;
+            color: var(--white);
+            font-weight: 500;
+            padding: 8px 20px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            height: 300px;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('static/main/main-picture.svg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(0.5px);
+        }
+
+        .hero-title {
+            font-family: 'Natasha', sans-serif;
+            font-weight: 700;
+            color: #000000;
+            text-shadow: none;
+        }
+
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+                line-height: 1.2;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .hero-title {
+                font-size: 2rem;
+                line-height: 1.1;
+            }
+        }
+
+        /* About Section */
+        .about-section {
+            background: var(--background-light);
+        }
+
+        .about-card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .about-image {
+            height: 122px;
+            background: var(--gray);
+        }
+
+        .about-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .about-title {
+                font-size: 2rem;
+            }
+            .about-text {
+                font-size: 1.125rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .about-title {
+                font-size: 1.5rem;
+            }
+            .about-text {
+                font-size: 1rem;
+            }
+        }
+
+        .about-text {
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .about-btn {
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            font-weight: 500;
+            width: 184px;
+        }
+
+        /* Organizations Section */
+        .organizations-section {
+            background: var(--background-light);
+        }
+
+        .organizations-content {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .map-container {
+            background: var(--accent-light);
+            border: 1px solid var(--border-gray);
+        }
+
+        .filters-menu {
+            background: var(--accent-light);
+            box-shadow: var(--shadow-small);
+            border: 1px solid var(--border-gray);
+            border-radius: 16px;
+        }
+
+        .filter-checkbox {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--primary-color);
+            border-radius: 50%;
+            margin-right: 10px;
+            cursor: pointer;
+            background: white;
+            flex-shrink: 0;
+            position: relative;
+            top: -1px;
+        }
+
+        .filter-checkbox:checked {
+            background: white;
+        }
+
+        .filter-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .organization-card {
+            background: var(--white);
+            box-shadow: var(--shadow-small);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border-gray);
+            border-radius: 16px;
+            height: 100%;
+        }
+
+        .organization-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .org-image {
+            width: 100%;
+            height: 180px;
+            background: var(--gray);
+            border-radius: 12px;
+        }
+
+        .org-title {
+            font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            .org-title {
+                font-size: 1.25rem;
+            }
+            .org-description {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .org-title {
+                font-size: 1.1rem;
+            }
+            .org-description {
+                font-size: 0.9rem;
+            }
+        }
+
+        .org-description {
+            line-height: 1.5;
+        }
+
+        .detail-icon {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .detail-text {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .more-number {
+            font-family: 'Itim', cursive;
+            font-weight: 400;
+        }
+
+        @media (min-width: 768px) {
+            .more-number {
+                font-size: 3rem;
+            }
+            .more-label {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .more-number {
+                font-size: 2rem;
+            }
+            .more-label {
+                font-size: 1.25rem;
+            }
+        }
+
+        .more-label {
+            font-family: 'Itim', cursive;
+            font-weight: 400;
+        }
+
+        .view-all-btn {
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: var(--background-light);
+        }
+
+        .faq-content {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .faq-item {
+            background: var(--accent-light);
+            border: 1px solid var(--border-gray);
+            border-radius: 16px;
+            box-shadow: var(--shadow-small);
+        }
+
+        .faq-item:hover {
+            border-color: #000000;
+        }
+
+        .question-text {
+            font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            .question-text {
+                font-size: 1.125rem;
+            }
+            .faq-answer {
+                font-size: 1.125rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .question-text {
+                font-size: 1rem;
+            }
+            .faq-answer {
+                font-size: 1rem;
+            }
+        }
+
+        .farrow {
+            display: inline-block;
+            margin: 0 0.5em;
+            border-top: 6px solid transparent;
+            border-left: 8px solid #000000;
+            border-bottom: 6px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .farrow-rotated {
+            transform: rotate(90deg);
+            border-left-color: var(--primary-color);
+        }
+
+        .faq-answer {
+            line-height: 1.5;
+            color: #555;
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .contact-item a {
+            color: var(--white);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header py-2 sticky-top bg-white">
+        <div class="container px-0">
+            <div class="d-flex align-items-center">
+                <!-- Mobile menu button -->
+                <button class="btn p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                    <div class="menu-icon-bar pt-1"></div>
+                    <div class="menu-icon-bar pt-1"></div>
+                    <div class="menu-icon-bar pt-1"></div>
+                </button>
+    
+                <!-- Logo -->
+                <div class="me-3">
+                    <img src="static/main/Logo.svg" alt="Logo" width="65" height="42">
+                </div>
+                
+                <!-- Desktop buttons -->
+                <div class="d-none d-lg-block ms-auto">
+                    <button class="btn catalog-btn me-3">Каталог организаций</button>
+                    <button class="btn login-btn me-2">Вход</button>
+                    <button class="btn register-btn" onclick="location.href='registration.html'">Регистрация</button>
+                </div>
+                
+                <!-- Mobile buttons -->
+                <div class="ms-auto d-lg-none">
+                    <button class="btn catalog-btn">Каталог</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu offcanvas -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title">Меню</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body">
+                <button class="btn w-100 mb-2 login-btn">Вход</button>
+                <button class="btn w-100 register-btn" onclick="location.href='registration.html'">Регистрация</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section d-flex align-items-center justify-content-center">
+        <div class="container text-center px-3">
+            <h1 class="hero-title mb-0">ПРОЕКТЫ СОЦИАЛЬНОГО ВОЗДЕЙСТВИЯ ПРИАЗОВЬЯ</h1>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section py-5">
+        <div class="container position-relative">
+            <!-- Navigation arrows - hidden on mobile -->
+            <button class="btn nav-button position-absolute top-50 start-0 translate-middle-y d-none d-md-block">
+                <div class="fs-1 text-primary">←</div>
+            </button>
+            
+            <div class="about-card overflow-hidden">
+                <div class="about-image w-100"></div>
+                <div class="p-4">
+                    <h2 class="about-title mb-4">Что такое проект социального воздействия?</h2>
+                    <p class="about-text mb-4">
+                        Проект социального воздействия — это комплекс мероприятий, направленных на достижение измеримого социального эффекта в жизни конкретных людей-участников проекта. Например, мероприятия по повышению успеваемости школьников на определенной территории или вовлечение людей в диспансеризацию, содействие в получении мер социальной поддержки.
+                    </p>
+                    <button class="btn about-btn d-block mx-auto">Подробнее</button>
+                </div>
+            </div>
+            
+            <button class="btn nav-button position-absolute top-50 end-0 translate-middle-y d-none d-md-block">
+                <div class="fs-1 text-primary">→</div>
+            </button>
+        </div>
+    </section>
+
+    <!-- Organizations Section -->
+    <section class="organizations-section py-5">
+        <div class="container">
+            <div class="organizations-content p-3 p-md-4">
+                <h2 class="section-title text-center mb-4 mb-md-5">ОРГАНИЗАЦИИ</h2>
+                
+                <div class="row g-3 g-md-4 mb-4 mb-md-5">
+                    <div class="col-md-8">
+                        <div class="map-container ratio ratio-16x9">
+                            <script class="map-placeholder" type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Abb2e803e8888540af1464fa8f0916b00692e5b83676a91f7a37ed16dc7f2b64b&amp;lang=ru_RU&amp;scroll=true"></script>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="filters-menu p-3">
+                            <h5 class="mb-3">Фильтры</h5>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter1" class="filter-checkbox me-2">
+                                <label for="filter1">Образовательное учреждение</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter2" class="filter-checkbox me-2">
+                                <label for="filter2">Научно-исследовательский институт</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter3" class="filter-checkbox me-2">
+                                <label for="filter3">Научно-образовательный проект</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter4" class="filter-checkbox me-2">
+                                <label for="filter4">Государственное учреждение</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter5" class="filter-checkbox me-2">
+                                <label for="filter5">Коммерческая деятельность</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter6" class="filter-checkbox me-2">
+                                <label for="filter6">Некоммерческая организация</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter7" class="filter-checkbox me-2">
+                                <label for="filter7">Финансы</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter8" class="filter-checkbox me-2">
+                                <label for="filter8">Акселератор / инкубатор / технопарк</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter9" class="filter-checkbox me-2">
+                                <label for="filter9">Ассоциация / объединение</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter10" class="filter-checkbox me-2">
+                                <label for="filter10">Инициатива</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter11" class="filter-checkbox me-2">
+                                <label for="filter11">Отраслевое событие / научная конференция</label>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" id="filter12" class="filter-checkbox me-2">
+                                <label for="filter12">Другое</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-3 g-md-4">
+                    <!-- Organization Card 1 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="organization-card p-3 h-100">
+                            <div class="org-image mb-3"></div>
+                            <h3 class="org-title mb-2">МБУ "ЦСО г. Таганрога"</h3>
+                            <p class="org-description mb-3">Муниципальное бюджетное учреждение «Центр социального обслуживания граждан пожилого возраста и инвалидов города Таганрога».</p>
+                            <div>
+                                <div class="d-flex mb-2">
+                                    <span class="detail-icon me-2">📍</span>
+                                    <span class="detail-text">Б. Садовый переулок, д. 11, Таганрог</span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="detail-icon me-2">🏛️</span>
+                                    <span class="detail-text">Государственное учреждение</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Organization Card 2 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="organization-card p-3 h-100">
+                            <div class="org-image mb-3"></div>
+                            <h3 class="org-title mb-2">АНО "Луч Надежды"</h3>
+                            <p class="org-description mb-3">Автономная некоммерческая организация по предоставлению социально-культурных услуг в Таганроге.</p>
+                            <div>
+                                <div class="d-flex mb-2">
+                                    <span class="detail-icon me-2">📍</span>
+                                    <span class="detail-text">г. Таганрог, Дубки, ул. Дзержинского, 171/2</span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="detail-icon me-2">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Organization Card 3 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="organization-card p-3 h-100">
+                            <div class="org-image mb-3"></div>
+                            <h3 class="org-title mb-2">БАНО "Золотые руки Ангела"</h3>
+                            <p class="org-description mb-3">Благотворительная автономная некоммерческая организация «Золотые Руки Ангела»</p>
+                            <div>
+                                <div class="d-flex mb-2">
+                                    <span class="detail-icon me-2">📍</span>
+                                    <span class="detail-text">г. Москва, ул Мосфильмовская, д. 175, помещ. 52</span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="detail-icon me-2">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Organization Card 4 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="organization-card p-3 h-100">
+                            <div class="org-image mb-3"></div>
+                            <h3 class="org-title mb-2">АНО "ДОННИИ ЭКОТЕХНОЛОГИЙ"</h3>
+                            <p class="org-description mb-3">Автономная некоммерческая организация «Донбасский научно-исследовательский институт экотехнологий»</p>
+                            <div>
+                                <div class="d-flex mb-2">
+                                    <span class="detail-icon me-2">📍</span>
+                                    <span class="detail-text">ЛНР, г. Алчевск, ул. Набережная, д. 10, ком. 6.108</span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="detail-icon me-2">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Organization Card 5 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="organization-card p-3 h-100">
+                            <div class="org-image mb-3"></div>
+                            <h3 class="org-title mb-2">РОО "СИЛ"</h3>
+                            <p class="org-description mb-3">Региональная Общественная Организация "Союз Инвалидов Луганщины"</p>
+                            <div>
+                                <div class="d-flex mb-2">
+                                    <span class="detail-icon me-2">📍</span>
+                                    <span class="detail-text">г. Красный Луч, ул. Косиора 10, каб. 104</span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="detail-icon me-2">🏛️</span>
+                                    <span class="detail-text">Некоммерческая организация</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- More Projects Card -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="organization-card p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center">
+                            <div class="more-number text-primary mb-2">ЕЩЕ 2965</div>
+                            <div class="more-label mb-4">организаций</div>
+                            <button class="btn view-all-btn w-100">Смотреть все</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section py-5">
+        <div class="container">
+            <div class="faq-content p-4">
+                <h2 class="section-title text-center mb-4 mb-md-5">Часто задаваемые вопросы</h2>
+                
+                <div class="faq-list">
+                    <!-- FAQ Item 1 -->
+                    <div class="faq-item p-3 mb-3">
+                        <div class="faq-question d-flex justify-content-between align-items-center">
+                            <span class="question-text">Что такое проект социального воздействия?</span>
+                            <span class="farrow"></span>
+                        </div>
+                        <div class="faq-answer pt-3">
+                            Очень важный ответ
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ Item 2 -->
+                    <div class="faq-item p-3 mb-3">
+                        <div class="faq-question d-flex justify-content-between align-items-center">
+                            <span class="question-text">Роль ВЭБ.РФ</span>
+                            <span class="farrow"></span>
+                        </div>
+                        <div class="faq-answer pt-3">
+                            Очень важный ответ
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ Item 3 -->
+                    <div class="faq-item p-3 mb-3">
+                        <div class="faq-question d-flex justify-content-between align-items-center">
+                            <span class="question-text">Нормативная база</span>
+                            <span class="farrow"></span>
+                        </div>
+                        <div class="faq-answer pt-3">
+                            Очень важный ответ
+                        </div>
+                    </div>
+                    
+                    <!-- FAQ Item 4 -->
+                    <div class="faq-item p-3">
+                        <div class="faq-question d-flex justify-content-between align-items-center">
+                            <span class="question-text">Примеры успешных проектов</span>
+                            <span class="farrow"></span>
+                        </div>
+                        <div class="faq-answer pt-3">
+                            Очень важный ответ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-primary text-white">
+        <div class="container">
+            <div class="contacts">
+                <h3 class="h5 mb-3">Контакты</h3>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="me-2">✉</span>
+                    <a href="mailto:yugolets@priazovsocialimpact.ru">yugolets@priazovsocialimpact.ru</a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="me-2">
+                        <path d="M20.487 17.14L18.387 15.79C17.447 15.15 16.217 15.41 15.587 16.34L14.517 17.95C12.997 17.35 9.66705 14.33 9.03705 12.81L10.647 11.75C11.587 11.12 11.847 9.89 11.207 8.95L9.85705 6.85C9.21705 5.91 7.98705 5.66 7.05705 6.29L4.50705 8.09C3.57705 8.72 3.32705 9.96 3.96705 10.89L5.72705 13.9C7.96705 18.22 11.647 21.43 16.187 22.71C16.967 22.93 17.787 22.71 18.337 22.11L20.337 19.91C21.107 19.03 20.997 17.67 20.487 17.14Z"/>
+                    </svg>
+                    <a href="callto:+79185009038">+7 (918) 500-9039</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                const arrow = item.querySelector('.farrow');
+                
+                question.addEventListener('click', () => {
+                    // Close all other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item && otherItem.classList.contains('active')) {
+                            otherItem.classList.remove('active');
+                            otherItem.querySelector('.farrow').classList.remove('farrow-rotated');
+                        }
+                    });
+                    
+                    // Toggle current item
+                    item.classList.toggle('active');
+                    arrow.classList.toggle('farrow-rotated');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
