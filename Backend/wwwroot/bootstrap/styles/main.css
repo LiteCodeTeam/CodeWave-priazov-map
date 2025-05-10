@@ -72,6 +72,16 @@ body {
     padding: 8px 20px;
 }
 
+/* Выезжающее меню */
+.catalog {
+    transition: background-color 0.5s ease;
+    background-color: white;
+    border: solid;
+    border-width: 1px;
+    color: black;
+    height: 3em;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5) inset;
+}
 
 /* Секция с заголовком */
 .hero-section {
@@ -82,7 +92,7 @@ body {
     filter: blur(0.5px);
 }
 
-.hero-title {
+.hero-title {   
     font-family: 'Natasha', sans-serif;
     font-weight: 700;
     color: #000000;
@@ -115,9 +125,8 @@ body {
     box-shadow: var(--shadow);
 }
 
-.about-image {
-    height: 122px;
-    background: var(--gray);
+.about-image>img {
+    width: 100%;
 }
 
 .about-title {
