@@ -26,13 +26,13 @@ builder.Services.AddHostedService<PasswordTokensCleanupService>();
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SMTP"));
 
-builder.Services.AddScoped<TokenService>();
-
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-builder.Services.AddScoped<EmailService>();
+builder.Services.Configure<DadataSettings>(builder.Configuration.GetSection("Dadata"));
 
-builder.Services.AddScoped<IGeocodingService, YandexGeocodingService>();
+builder.Services.AddScoped<TokenService>();
+
+builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddMemoryCache();
 

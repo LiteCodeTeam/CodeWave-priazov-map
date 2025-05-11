@@ -1,10 +1,14 @@
-﻿using Backend.Models.Dto;
+﻿using Backend.Models;
+using Backend.Models.Dto;
 using Backend.Validation;
+using Dadata;
+using Dadata.Model;
 using DataBase;
 using DataBase.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.ComponentModel.DataAnnotations;
@@ -61,8 +65,7 @@ namespace Backend.Mapping
 
         private static async Task<IResult> Create(CompanyCreateDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IMemoryCache cache,
-            [FromServices] IGeocodingService geocoding)
+            [FromServices] IOptions<DadataSettings> dadata)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -94,22 +97,20 @@ namespace Backend.Mapping
             if (!_allowedIndustries.Any(i => i == companyDto.Industry))
                 return Results.BadRequest("Недопустимое значение индустрии");
 
-            if (Zxcvbn.Core.EvaluatePassword(companyDto.Password).Score < 3)
-                return Results.BadRequest("Слабый пароль");
+            //if (Zxcvbn.Core.EvaluatePassword(companyDto.Password).Score < 3)
+            //    return Results.BadRequest("Слабый пароль");
 
             using var db = await factory.CreateDbContextAsync();
-            var geocoderValidate = new NominatimGeocoder();
 
-            if (db.Users.Any(u => u.Email == companyDto.Email || u.Phone == companyDto.Phone ||
-            u.Name == companyDto.Name || u.Address.FullAddress == companyDto.FullAddress))
+            if (db.Users.Any(u => u.Email == companyDto.Email &&
+            u.Address.FullAddress == companyDto.FullAddress))
                 return Results.Conflict("Повтор уникальных данных");
 
-            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(companyDto.FullAddress);
+            var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
+            var cleanedAddress = await api.Clean<Dadata.Model.Address>(companyDto.FullAddress);
 
-            if (!isValidAddress)
-                return Results.NotFound(error);
-
-            var coords = await geocoding.GetCoordinatesAsync(companyDto.FullAddress);
+            if (cleanedAddress.result == null)
+                return Results.NotFound("Адрес не найден");
 
             var company = new Company()
             {
@@ -123,10 +124,9 @@ namespace Backend.Mapping
                 Phone = companyDto.Phone,
                 Address = new ShortAddressDto()
                 {
-                    FullAddress = companyDto.FullAddress,
-                    Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
-                    Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
-                    
+                    FullAddress = cleanedAddress.result,
+                    Latitude = decimal.Parse(cleanedAddress.geo_lat, CultureInfo.InvariantCulture),
+                    Longitude = decimal.Parse(cleanedAddress.geo_lon, CultureInfo.InvariantCulture)
                 },
                 Industry = companyDto.Industry,
                 LeaderName = companyDto.LeaderName
@@ -280,7 +280,7 @@ namespace Backend.Mapping
         public static async Task<IResult> Change([FromQuery] Guid? id,
             [FromBody] CompanyChangeDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IGeocodingService geocoding)
+            [FromServices] IOptions<DadataSettings> dadata)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -309,27 +309,25 @@ namespace Backend.Mapping
             companyDto.LeaderName = companyDto.LeaderName.Trim();
             companyDto.Description = companyDto.Description?.Trim();
 
-            if (!_allowedIndustries.Any(i => i ==  companyDto.Industry))
-                return Results.BadRequest("Недопустимое значение индустрии");
-
             using var db = await factory.CreateDbContextAsync();
-            var geocoderValidate = new NominatimGeocoder();
-
-            if (db.Users.Any(u => (u.Email == companyDto.Email || u.Phone == companyDto.Phone ||
-            u.Name == companyDto.Name || u.Address.FullAddress == companyDto.FullAddress) && u.Id != id))
-                return Results.Conflict("Повтор уникальных данных");
 
             var company = db.Users.OfType<Company>().Include(c => c.Address).FirstOrDefault(c => c.Id == id);
 
             if (company == null)
                 return Results.NotFound();
 
-            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(companyDto.FullAddress);
+            if (!_allowedIndustries.Any(i => i == companyDto.Industry))
+                return Results.BadRequest("Недопустимое значение индустрии");
 
-            if (!isValidAddress)
-                return Results.NotFound(error);
+            if (db.Users.Any(u => u.Email == companyDto.Email &&
+            u.Address.FullAddress == companyDto.FullAddress && u.Id != id))
+                return Results.Conflict("Повтор уникальных данных");
 
-            var coords = await geocoding.GetCoordinatesAsync(companyDto.FullAddress);
+            var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
+            var cleanedAddress = await api.Clean<Dadata.Model.Address>(companyDto.FullAddress);
+
+            if (cleanedAddress.result == null)
+                return Results.NotFound("Адрес не найден");
 
             company.Name = companyDto.Name;
             company.Email = companyDto.Email;
@@ -339,9 +337,9 @@ namespace Backend.Mapping
             company.PhotoHeader = companyDto.PhotoHeader;
             company.Address = new ShortAddressDto()
             {
-                FullAddress = companyDto.FullAddress,
-                Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
-                Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
+                FullAddress = cleanedAddress.result,
+                Latitude = decimal.Parse(cleanedAddress.geo_lat, CultureInfo.InvariantCulture),
+                Longitude = decimal.Parse(cleanedAddress.geo_lon, CultureInfo.InvariantCulture)
             };
             company.Contacts.VirtualList = companyDto.Contacts.VirtualList.Select(i => i.Trim()).ToList();
             company.LeaderName = companyDto.LeaderName;

@@ -40,7 +40,7 @@ namespace DataBase.Models
         [JsonIgnore]
         public Guid UserId { get; set; }
         [JsonIgnore]
-        public User User { get; set; }
+        public User User { get; set; } = null!;
         [MaxLength(255)]
         public string FullAddress { get; set; } = null!;
         [Column(TypeName = "decimal(10, 7)")]

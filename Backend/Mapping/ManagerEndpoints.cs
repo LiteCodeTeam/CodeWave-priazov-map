@@ -9,6 +9,9 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Text;
 using Backend.Validation;
 using System.Globalization;
+using Dadata;
+using Microsoft.Extensions.Options;
+using Backend.Models;
 
 namespace Backend.Mapping
 {
@@ -30,7 +33,7 @@ namespace Backend.Mapping
         private static async Task<IResult> Create(
             [FromBody] ManagerCreateDto managerDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IGeocodingService geocoding)
+            [FromServices] IOptions<DadataSettings> dadata)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -57,24 +60,20 @@ namespace Backend.Mapping
             managerDto.Email = managerDto.Email.Trim();
             managerDto.Phone = managerDto.Phone.Trim();
 
-            if (Zxcvbn.Core.EvaluatePassword(managerDto.Password).Score < 3)
-                return Results.BadRequest("Слабый пароль");
+            //if (Zxcvbn.Core.EvaluatePassword(managerDto.Password).Score < 3)
+            //    return Results.BadRequest("Слабый пароль");
 
             using var db = await factory.CreateDbContextAsync();
-            var geocoderValidate = new NominatimGeocoder();
 
-
-
-            if (db.Users.Any(u => u.Email == managerDto.Email || u.Phone == managerDto.Phone ||
-            u.Name == managerDto.Name || u.Address.FullAddress == managerDto.FullAddress))
+            if (db.Users.Any(u => u.Email == managerDto.Email &&
+            u.Address.FullAddress == managerDto.FullAddress))
                 return Results.Conflict("Повтор уникальных данных");
 
-            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(managerDto.FullAddress);
+            var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
+            var cleanedAddress = await api.Clean<Dadata.Model.Address>(managerDto.FullAddress);
 
-            if (!isValidAddress)
-                return Results.NotFound(error);
-
-            var coords = await geocoding.GetCoordinatesAsync(managerDto.FullAddress);
+            if (cleanedAddress.result == null)
+                return Results.NotFound("Адрес не найден");
 
             var manager = new Manager()
             {
@@ -83,9 +82,9 @@ namespace Backend.Mapping
                 Phone = managerDto.Phone,
                 Address = new ShortAddressDto()
                 {
-                    FullAddress = managerDto.FullAddress,
-                    Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
-                    Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
+                    FullAddress = cleanedAddress.result,
+                    Latitude = decimal.Parse(cleanedAddress.geo_lat, CultureInfo.InvariantCulture),
+                    Longitude = decimal.Parse(cleanedAddress.geo_lon, CultureInfo.InvariantCulture),
                 }
             };
 
@@ -123,7 +122,7 @@ namespace Backend.Mapping
         public static async Task<IResult> Change([FromQuery] Guid? id,
             [FromBody] ManagerChangeDto managerDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IGeocodingService geocoding)
+            [FromServices] IOptions<DadataSettings> dadata)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -150,23 +149,21 @@ namespace Backend.Mapping
             managerDto.Phone = managerDto.Phone.Trim();
 
             using var db = await factory.CreateDbContextAsync();
-            var geocoderValidate = new NominatimGeocoder();
-
-            if (db.Users.Any(u => (u.Email == managerDto.Email || u.Phone == managerDto.Phone ||
-            u.Name == managerDto.Name || u.Address.FullAddress == managerDto.FullAddress) && u.Id != id))
-                return Results.Conflict("Повтор уникальных данных");
 
             var manager = db.Users.OfType<Manager>().FirstOrDefault(c => c.Id == id);
 
             if (manager == null)
                 return Results.NotFound();
 
-            var (isValidAddress, error) = await geocoderValidate.ValidateRussianAddressAsync(managerDto.FullAddress);
+            if (db.Users.Any(u => u.Email == managerDto.Email &&
+            u.Address.FullAddress == managerDto.FullAddress && u.Id != id))
+                return Results.Conflict("Повтор уникальных данных");
 
-            if (!isValidAddress)
-                return Results.NotFound(error);
+            var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
+            var cleanedAddress = await api.Clean<Dadata.Model.Address>(managerDto.FullAddress);
 
-            var coords = await geocoding.GetCoordinatesAsync(managerDto.FullAddress);
+            if (cleanedAddress.result == null)
+                return Results.NotFound("Адрес не найден");
 
             manager.Name = managerDto.Name;
             manager.Email = managerDto.Email;
@@ -174,9 +171,9 @@ namespace Backend.Mapping
             manager.PhotoIcon = managerDto.PhotoIcon;
             manager.Address = new ShortAddressDto()
             {
-                FullAddress = managerDto.FullAddress,
-                Latitude = decimal.Parse(coords.Latitude, CultureInfo.InvariantCulture),
-                Longitude = decimal.Parse(coords.Longitude, CultureInfo.InvariantCulture),
+                FullAddress = cleanedAddress.result,
+                Latitude = decimal.Parse(cleanedAddress.geo_lat, CultureInfo.InvariantCulture),
+                Longitude = decimal.Parse(cleanedAddress.geo_lon, CultureInfo.InvariantCulture),
             };
 
             await db.SaveChangesAsync();

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataBase.Migrations
 {
     /// <inheritdoc />
-    public partial class Migra : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,14 +37,10 @@ namespace DataBase.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Street = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Apartment = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    City = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Country = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    PostalCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FullAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Latitude = table.Column<decimal>(type: "numeric(10,7)", nullable: false),
-                    Longitude = table.Column<decimal>(type: "numeric(10,7)", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                    Longitude = table.Column<decimal>(type: "numeric(10,7)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,31 +135,11 @@ namespace DataBase.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "ShortAddressDto",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FullAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Latitude = table.Column<decimal>(type: "numeric(10,7)", nullable: false),
-                    Longitude = table.Column<decimal>(type: "numeric(10,7)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ShortAddressDto", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ShortAddressDto_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_UserId",
                 table: "Addresses",
-                column: "UserId");
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Password_UserId",
@@ -187,12 +163,6 @@ namespace DataBase.Migrations
                 table: "Sessions",
                 column: "UserId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ShortAddressDto_UserId",
-                table: "ShortAddressDto",
-                column: "UserId",
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -212,9 +182,6 @@ namespace DataBase.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sessions");
-
-            migrationBuilder.DropTable(
-                name: "ShortAddressDto");
 
             migrationBuilder.DropTable(
                 name: "Users");

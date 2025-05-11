@@ -22,51 +22,6 @@ namespace DataBase.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DataBase.Models.Address", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Apartment")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(10, 7)");
-
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(10, 7)");
-
-                    b.Property<string>("PostalCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Addresses");
-                });
-
             modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -145,7 +100,7 @@ namespace DataBase.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("ShortAddressDto");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("DataBase.Models.User", b =>
@@ -272,17 +227,6 @@ namespace DataBase.Migrations
                     b.HasBaseType("DataBase.Models.User");
 
                     b.HasDiscriminator().HasValue("Manager");
-                });
-
-            modelBuilder.Entity("DataBase.Models.Address", b =>
-                {
-                    b.HasOne("DataBase.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataBase.Models.PasswordResetToken", b =>
