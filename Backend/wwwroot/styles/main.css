@@ -63,10 +63,10 @@ body {
 }
 
 .menu-icon-bar {
-  margin-top: 2px;
-  width: 30px;
-  height: 3px;
-  background: var(--text-color);
+    margin-top: 2px;
+    width: 30px;
+    height: 3px;
+    background: var(--text-color);  
 }
 
 .logo {
