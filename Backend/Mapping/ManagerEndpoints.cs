@@ -13,6 +13,7 @@ using Dadata;
 using Microsoft.Extensions.Options;
 using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
+using Dadata.Model;
 
 namespace Backend.Mapping
 {
@@ -34,7 +35,8 @@ namespace Backend.Mapping
         private static async Task<IResult> Create(
             [FromBody] ManagerCreateDto managerDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IOptions<DadataSettings> dadata)
+            [FromServices] IOptions<DadataSettings> dadata,
+            [FromServices] EmailService email)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -94,6 +96,8 @@ namespace Backend.Mapping
 
             await db.Users.AddAsync(manager);
             await db.SaveChangesAsync();
+
+            await email.SendRegistrationEmail(manager);
 
             return Results.Ok(new ManagerResponseDto(manager));
         }

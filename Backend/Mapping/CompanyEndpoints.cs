@@ -68,7 +68,8 @@ namespace Backend.Mapping
 
         private static async Task<IResult> Create(CompanyCreateDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IOptions<DadataSettings> dadata)
+            [FromServices] IOptions<DadataSettings> dadata,
+            [FromServices] EmailService email)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -139,6 +140,8 @@ namespace Backend.Mapping
             };
             await db.Users.AddAsync(company);
             await db.SaveChangesAsync();
+
+            await email.SendRegistrationEmail(company);
 
             return Results.Ok(new CompanyResponseDto(company));
         }
