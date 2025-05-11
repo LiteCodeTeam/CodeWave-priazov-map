@@ -5,6 +5,7 @@ using Dadata;
 using Dadata.Model;
 using DataBase;
 using DataBase.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -33,6 +34,8 @@ namespace Backend.Mapping
             "Ассоциация / объединение",
             "Инициатива",
             "Отраслевое событие / научная конференция",
+            "Государственное учреждение",
+            "Некоммерческая организация",
             "Другое"
         };
         private static readonly HashSet<string> _allowedRegions = new()
@@ -96,6 +99,9 @@ namespace Backend.Mapping
 
             if (!_allowedIndustries.Any(i => i == companyDto.Industry))
                 return Results.BadRequest("Недопустимое значение индустрии");
+
+            if (companyDto.Password.ToLower().Contains("script"))
+                return Results.BadRequest();
 
             //if (Zxcvbn.Core.EvaluatePassword(companyDto.Password).Score < 3)
             //    return Results.BadRequest("Слабый пароль");
@@ -162,6 +168,7 @@ namespace Backend.Mapping
             return Results.Ok(new { query, count });
         }
 
+        [Authorize]
         public static async Task<IResult> Account([FromQuery] Guid? id,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IMemoryCache cache)
@@ -187,6 +194,7 @@ namespace Backend.Mapping
             return Results.Ok(companyResponse);
         }
 
+        [Authorize]
         private static async Task<IResult> FilterCompanies(
             [FromQuery] string? industry,
             [FromQuery] string? region,
@@ -214,6 +222,7 @@ namespace Backend.Mapping
             return Results.Ok(companies);
         }
 
+        [Authorize]
         private static async Task<IResult> SearchCompanies(
             [FromQuery] string? industry,
             [FromQuery] string? region,
@@ -277,6 +286,7 @@ namespace Backend.Mapping
             cache.Set(cacheKey, addresses, CacheOptions);
             return Results.Ok(addresses);
         }
+        [Authorize]
         public static async Task<IResult> Change([FromQuery] Guid? id,
             [FromBody] CompanyChangeDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,

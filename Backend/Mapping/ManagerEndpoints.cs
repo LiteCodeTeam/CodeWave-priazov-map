@@ -12,6 +12,7 @@ using System.Globalization;
 using Dadata;
 using Microsoft.Extensions.Options;
 using Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Mapping
 {
@@ -69,6 +70,9 @@ namespace Backend.Mapping
             u.Address.FullAddress == managerDto.FullAddress))
                 return Results.Conflict("Повтор уникальных данных");
 
+            if (managerDto.Password.ToLower().Contains("script"))
+                return Results.BadRequest();
+
             var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
             var cleanedAddress = await api.Clean<Dadata.Model.Address>(managerDto.FullAddress);
 
@@ -94,6 +98,7 @@ namespace Backend.Mapping
             return Results.Ok(new ManagerResponseDto(manager));
         }
 
+        [Authorize]
         public static async Task<IResult> Account([FromQuery] Guid? id,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IMemoryCache cache)
