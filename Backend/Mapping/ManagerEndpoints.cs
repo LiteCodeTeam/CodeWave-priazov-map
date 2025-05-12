@@ -116,7 +116,7 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
-            var manager = await db.Users.OfType<Manager>().FirstOrDefaultAsync(c => c.Id == id);
+            var manager = await db.Users.OfType<Manager>().Include(c => c.Address).FirstOrDefaultAsync(c => c.Id == id);
 
             if (manager == null)
                 return Results.NotFound();
@@ -159,7 +159,7 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
-            var manager = db.Users.OfType<Manager>().FirstOrDefault(c => c.Id == id);
+            var manager = db.Users.OfType<Manager>().Include(c => c.Address).FirstOrDefault(c => c.Id == id);
 
             if (manager == null)
                 return Results.NotFound();

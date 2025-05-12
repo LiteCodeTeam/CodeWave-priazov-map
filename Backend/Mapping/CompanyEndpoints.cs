@@ -161,6 +161,7 @@ namespace Backend.Mapping
                 .AsQueryable()
                 .OrderBy(c => c.Name)
                 .Take(5)
+                .Include(c => c.Address)
                 .Select(c => new CompanyResponseDto(c))
                 .ToListAsync();
 
@@ -185,7 +186,7 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
-            var company = await db.Users.OfType<Company>().FirstOrDefaultAsync(c => c.Id == id);
+            var company = await db.Users.OfType<Company>().Include(c => c.Address).FirstOrDefaultAsync(c => c.Id == id);
 
             if (company == null)
                 return Results.NotFound();
@@ -217,7 +218,7 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
-            var query = db.Users.OfType<Company>().AsQueryable().Where(c => c.Industry == industry);
+            var query = db.Users.OfType<Company>().AsQueryable().Include(c => c.Address).Where(c => c.Industry == industry);
 
             var companies = await query.OrderBy(c => c.Name).ToListAsync();
 
@@ -246,7 +247,7 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
-            var query = db.Users.OfType<Company>().AsQueryable().Where(c => c.Industry == industry);
+            var query = db.Users.OfType<Company>().AsQueryable().Include(c => c.Address).Where(c => c.Industry == industry);
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
                 query = query.Where(c => EF.Functions.ILike(c.Name, $"%{searchTerm}%"));
