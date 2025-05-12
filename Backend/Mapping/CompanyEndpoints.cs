@@ -220,7 +220,7 @@ namespace Backend.Mapping
 
             var query = db.Users.OfType<Company>().AsQueryable().Include(c => c.Address).Where(c => c.Industry == industry);
 
-            var companies = await query.OrderBy(c => c.Name).ToListAsync();
+            var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c)).ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
             return Results.Ok(companies);
@@ -252,7 +252,7 @@ namespace Backend.Mapping
             if (!string.IsNullOrWhiteSpace(searchTerm))
                 query = query.Where(c => EF.Functions.ILike(c.Name, $"%{searchTerm}%"));
 
-            var companies = await query.OrderBy(c => c.Name).ToListAsync();
+            var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c)).ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
 
