@@ -128,7 +128,7 @@ body {
     font-weight: 700;
     font-size: 48px;
     line-height: 1.2;
-    color: #000000;
+    color: #fff;
     text-shadow: none;
     margin: 0;
 }
@@ -266,7 +266,6 @@ body {
     display: flex;
     gap: 24px;
     margin-bottom: 40px;
-    
 }
 
 .map-container {
@@ -275,6 +274,7 @@ body {
     display: flex;
     border: 1px solid;
     border-color: gray;
+    min-height: 400px;
 }
 
 .filters-menu {
@@ -524,7 +524,7 @@ body {
 footer {
     display: flex;
     align-items: center;
-    width: 100%;
+    /* width: 100%; */
     font-size: 14px;
     color: var(--text-color);
     padding: 10px 180px;
@@ -543,6 +543,10 @@ footer {
     top: -1rem;
 }
 
+.contact-item a {
+    color: white;
+}
+
 .contact-icon {
     font-size: 20px;
     color: #FFFFFF;
@@ -553,6 +557,34 @@ footer {
     font-weight: 400;
     font-size: 16px;
     color: #FFFFFF;
+}
+
+/* Add media query for responsive layout */
+@media screen and (max-width: 768px) {
+    .map-filters-container {
+        flex-direction: column;
+    }
+
+    .map-container {
+        width: 100%;
+        margin-bottom: 24px;
+    }
+
+    .filters-menu {
+        width: 100%;
+    }
+
+    .contacts {
+        margin-left: 0;
+    }
+
+    footer {
+        padding: 10px 10px;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        display: block;
+    }
 }
 
 
