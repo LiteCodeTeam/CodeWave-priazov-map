@@ -40,7 +40,7 @@ body {
 
 .header {
     background: linear-gradient(#ffffff 98%,rgba(31, 111, 112, 0.01) 2%);
-    height: 3.125rem;
+    height: 3.5rem;
     display: flex;
     justify-content: left;
     align-items: center;
@@ -48,10 +48,7 @@ body {
     box-sizing: border-box;
     border-bottom: 1px solid var(--header-border);
     width: 100%;
-    box-shadow: 0px 48px 19px rgba(31, 111, 112, 0.01), 
-                0px 27px 16px rgba(31, 111, 112, 0.03), 
-                0px 12px 12px rgba(31, 111, 112, 0.04), 
-                0px 3px 7px rgba(31, 111, 112, 0.05);
+    box-shadow: 0px 48px 19px rgba(31, 111, 112, 0.01), 0px 27px 16px rgba(31, 111, 112, 0.03), 0px 12px 12px rgba(31, 111, 112, 0.04), 0px 3px 7px rgba(31, 111, 112, 0.05);
 }
   
 .header-container {
@@ -60,6 +57,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-left: 1rem;
 }
   
 .logo-group {
@@ -102,24 +100,22 @@ body {
 .main-container {
     flex: 1;
     width: 100%;
-    min-height: 100vh;
-    height: auto;
+    height: 1440px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px 20px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
     position: relative;
 }
 
 .registration-container {
-    width: 90%;
+    width: 100%;
     max-width: 700px;
-    height: auto;
-    min-height: 735px;
+    height: 735px;
     position: relative;
-    transform: none;
-    margin: 20px auto;
+    transform: translate(-15%, 10%);
+    margin: 0 auto;
+    justify-content: center;
     background: var(--secondary-color);
     border: 1px solid rgba(70, 70, 70, 0.8);
     border-radius: 30px;
@@ -168,30 +164,26 @@ body {
 .registration-title {
     position: relative;
     font-weight: 600;
-    font-size: clamp(20px, 5vw, 28px);
+    font-size: 28px;
     letter-spacing: 0.08em;
-    text-align: center;
-    margin: 20px 0;
+    left: 50%;
     text-transform: uppercase;
     color: var(--text-color);
-    transform: none;
-    left: 0;
+    transform: translate(-50%, 0);
 }
 
 .registration-form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    gap: 15px;
-    width: 100%;
+    padding: 0 70px 15px;
+    padding-top: 50px;
+    gap: 25px;
 }
 
 .form-field {
     width: 100%;
-    max-width: 500px;
     height: 40px;
-    margin: 0 auto;
     background: #FFFFFF;
     border: 1px solid var(--border-color);
     border-radius: 5px;
@@ -218,11 +210,8 @@ body {
 }
 
 .submit-btn {
-    width: 100%;
-    max-width: 500px;
-    height: 50px;
-    margin-top: 20px;
-    position: static;
+    width: 140%;
+    height: 70px;
     background: var(--primary-color);
     color: var(--light-text);
     border: none;
@@ -231,6 +220,8 @@ body {
     font-size: 18px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    position: relative;
+    top: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -242,105 +233,109 @@ body {
 
 footer {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
     font-size: 14px;
-    color: white;
-    padding: 20px;
+    color: var(--text-color);
+    padding: 10px 180px;
     background: #0E6466;
+    justify-content: left;
+    color: white;
     gap: 1rem;
+    position: relative;
 }
 
 .contacts {
     margin-left: 10rem;
 }
 
-.contacts a {
-    color: white;
-}
-
-
 .interm {
     height: 10rem;
 }
 
-/* Add responsive styles */
-@media screen and (max-width: 768px) {
-    .header {
-        padding: 0 1rem;
-        height: auto;
-        min-height: 3.125rem;
-    }
+/* Адрес (подсказки) */
 
-    .logo-group {
-        gap: 10px;
-    }
-
-    .tabs-container {
-        height: 60px;
-    }
-
-    .tab-text {
-        font-size: 16px;
-    }
-
-    .registration-form {
-        padding: 20px 15px;
-    }
-
-    .form-field input,
-    .form-field select {
-        font-size: 14px;
-    }
-
-    .submit-btn {
-        font-size: 16px;
-        height: 45px;
-    }
+.suggestions-wrapper {
+    position: relative;
 }
 
-@media screen and (max-width: 480px) {
-    .registration-container {
-        width: 95%;
-        border-radius: 20px;
-    }
-
-    .tab-text {
-        font-size: 14px;
-    }
-
-    .form-field {
-        height: 35px;
-    }
-
-    .form-field input,
-    .form-field select {
-        padding: 0 10px;
-        font-size: 14px;
-    }
-
-    footer {
-        text-align: center;
-        align-items: center;
-    }
-
-    .contacts {
-        margin-left: 0;
-    }
+.suggestions-suggestions {
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+    z-index: 1000;
 }
 
-/* Fix for mobile input fields */
-@media screen and (max-width: 768px) {
-    input[type="text"],
-    input[type="tel"],
-    input[type="email"],
-    input[type="password"],
-    select {
-        font-size: 16px !important; /* Prevents iOS zoom on focus */
+.suggestions-suggestion {
+    padding: 8px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+    .suggestions-suggestion:hover {
+        background-color: #f5f5f5;
     }
 
-    .contacts {
-        margin-left: 0;
-    }
+.suggestions-highlight {
+    color: #2a5885;
+    font-weight: bold;
+}
+
+/**/
+
+.catalog {
+    transition: background-color 0.5s ease;
+    background-color: white;
+    border: solid;
+    border-width: 1px;
+    color: black;
+    height: 3em;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) inset;
+}
+.login-btn {
+    background: var(--accent-light);
+    border-radius: 15px;
+    color: var(--primary-color);
+    font-weight: 500;
+    padding: 8px 20px;
+}
+.mb-2 {
+    margin-bottom: .5rem !important;
+}
+.w-100 {
+    width: 100% !important;
+}
+.btn {
+    --bs-btn-padding-x: 0.75rem;
+    --bs-btn-padding-y: 0.375rem;
+    --bs-btn-font-family:;
+    --bs-btn-font-size: 1rem;
+    --bs-btn-font-weight: 400;
+    --bs-btn-line-height: 1.5;
+    --bs-btn-color: var(--bs-body-color);
+    --bs-btn-bg: transparent;
+    --bs-btn-border-width: var(--bs-border-width);
+    --bs-btn-border-color: transparent;
+    --bs-btn-border-radius: var(--bs-border-radius);
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+    --bs-btn-disabled-opacity: 0.65;
+    --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-btn-focus-shadow-rgb), .5);
+    display: inline-block;
+    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+    font-family: var(--bs-btn-font-family);
+    font-size: var(--bs-btn-font-size);
+    font-weight: var(--bs-btn-font-weight);
+    line-height: var(--bs-btn-line-height);
+    color: var(--bs-btn-color);
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
+    border-radius: var(--bs-btn-border-radius);
+    background-color: var(--bs-btn-bg);
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
