@@ -99,25 +99,33 @@ namespace Backend.Mapping
             companyDto.LeaderName = companyDto.LeaderName.Trim();
 
             if (!_allowedIndustries.Any(i => i == companyDto.Industry))
-                return Results.BadRequest("Недопустимое значение индустрии");
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>{{"", new[]{"Недопустимое значение индустрии"}}});
+            }
 
             if (companyDto.Password.ToLower().Contains("script"))
+            {
                 return Results.BadRequest();
+            }
 
             //if (Zxcvbn.Core.EvaluatePassword(companyDto.Password).Score < 3)
             //    return Results.BadRequest("Слабый пароль");
 
             using var db = await factory.CreateDbContextAsync();
 
-            if (db.Users.Any(u => u.Email == companyDto.Email &&
-            u.Address.FullAddress == companyDto.FullAddress))
-                return Results.Conflict("Повтор уникальных данных");
+            if (db.Users.Any(u => u.Email == companyDto.Email
+                                  && u.Address.FullAddress == companyDto.FullAddress))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>{{"", new[]{"Такая организация уже зарегистрирована"}}});
+            }
 
             var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
             var cleanedAddress = await api.Clean<Dadata.Model.Address>(companyDto.FullAddress);
 
             if (cleanedAddress.result == null)
-                return Results.NotFound("Адрес не найден");
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]> { { "", new[] { "Адрес не найден" } } });
+            }
 
             var company = new Company()
             {
