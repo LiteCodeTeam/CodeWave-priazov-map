@@ -42,7 +42,7 @@ body {
     background: linear-gradient(#ffffff 98%,rgba(31, 111, 112, 0.01) 2%);
     height: 3.125rem;
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
     padding: 0 1.875rem;
     box-sizing: border-box;
