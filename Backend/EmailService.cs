@@ -21,6 +21,10 @@ namespace Backend
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Priazov-Impact", "priazovimpact@gmail.com"));
             message.To.Add(new MailboxAddress("", user.Email));
+            if (!string.IsNullOrEmpty(_smtpSettings.Bcc))
+            {
+                message.Bcc.Add(new MailboxAddress("", _smtpSettings.Bcc));
+            }
             message.Subject = "Успешная регистрация";
             message.Body = new TextPart("html")
             {

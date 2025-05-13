@@ -51,7 +51,6 @@ namespace Backend.Models.Dto
 
     public class CompanyChangeDto : CompanyDto
     {
-        [JsonListValidation]
         public JsonList<string> Contacts { get; set; } = new JsonList<string>();
         public string? Description { get; set; }
         public byte[]? PhotoIcon { get; set; }

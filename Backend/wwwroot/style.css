@@ -1,0 +1,496 @@
+.div,
+.div * {
+  /*box-sizing: border-box;*/
+}
+.div {
+  background: var(--variant-1-osnovnoe-fon, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  align-items: flex-start;
+  justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+}
+.div2 {
+  background: var(--variant-1-osnovnoe-mal-bloki, #ffffff);
+  padding: 0.3125rem 1.875rem 0.3125rem 1.875rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  width:100%;
+  position: relative;
+  box-shadow: 0rem 0.1875rem 0.4375rem 0rem rgba(31, 111, 112, 0.05),
+    0rem 0.75rem 0.75rem 0rem rgba(31, 111, 112, 0.04),
+    0rem 1.6875rem 1rem 0rem rgba(31, 111, 112, 0.03),
+    0rem 3rem 1.1875rem 0rem rgba(31, 111, 112, 0.01),
+    0rem 4.6875rem 1.3125rem 0rem rgba(31, 111, 112, 0);
+}
+.div3 {
+  display: flex;
+  flex-direction: row;
+  gap: 0.625rem;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 8.3125rem;
+  position: relative;
+}
+.div4 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  height: auto;
+  position: relative;
+  overflow: visible;
+}
+.div5 {
+  flex-shrink: 0;
+  width: 4.05625rem;
+  height: 2.625rem;
+  position: relative;
+  overflow: visible;
+  aspect-ratio: 64.9/42;
+}
+.frame-56 {
+  padding: 3rem 7.5rem 15rem 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.div6 {
+  color: #1e1e1e;
+  text-align: center;
+  font-family: var(--1-zagolovok-2-font-family, "Natasha-Regular", sans-serif);
+  font-size: var(--1-zagolovok-2-font-size, 2rem);
+  line-height: var(--1-zagolovok-2-line-height, 120%);
+  font-weight: var(--1-zagolovok-2-font-weight, 400);
+  text-transform: uppercase;
+  position: relative;
+  width: 75rem;
+}
+.group-39 {
+  flex-shrink: 0;
+  height: 55.75rem;
+  position: static;
+}
+.frame-18 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 31.625rem;
+  height: 3.375rem;
+  /* Убрано position, left, top */
+}
+.frame-62 {
+  background: var(--variant-1-osnovnoe-hedfut, #0e6466);
+  border-radius: 1rem;
+  padding: 1rem 2.5rem 1rem 2.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.625rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /*width: 12rem;*/
+  position: relative;
+}
+.div7 {
+  color: var(--variant-1-tekst-bel, #ffffff);
+  text-align: center;
+  font-family: var(
+    --1-podzagolovok-malenkij-font-family,
+    "FiraCode-Medium",
+    sans-serif
+  );
+  font-size: var(--1-podzagolovok-malenkij-font-size, 1.25rem);
+  line-height: var(--1-podzagolovok-malenkij-line-height, 120%);
+  letter-spacing: var(--1-podzagolovok-malenkij-letter-spacing, 0.04em);
+  font-weight: var(--1-podzagolovok-malenkij-font-weight, 500);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.frame-63 {
+  background: #ffffff;
+  border-radius: 1rem;
+  border-style: solid;
+  border-color: var(--variant-1-obvodka-legkaya, rgba(13, 64, 65, 0.5));
+  border-width: 0.0625rem;
+  padding: 1rem 2.5rem 1rem 2.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.625rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 12rem;
+  position: relative;
+}
+.div8 {
+  color: var(--variant-1-ikonki-temnyj, #0e6466);
+  text-align: center;
+  font-family: var(
+    --1-mob-podzagolovok-malenkij-font-family,
+    "FiraCode-Medium",
+    sans-serif
+  );
+  font-size: var(--1-mob-podzagolovok-malenkij-font-size, 1rem);
+  line-height: var(--1-mob-podzagolovok-malenkij-line-height, 120%);
+  letter-spacing: var(--1-mob-podzagolovok-malenkij-letter-spacing, 0.04em);
+  font-weight: var(--1-mob-podzagolovok-malenkij-font-weight, 500);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.frame-19 {
+  margin-top: 30px;
+  border-radius: 1rem;
+  border: 0.0625rem solid rgba(13, 64, 65, 0.5);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 31.625rem;
+  /* Убрано position, left, top */
+}
+.frame-15 {
+  /*display: flex;*/
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  /*flex-shrink: 0;
+  position: relative;*/
+  width: 100%;
+  padding: 5px;
+}
+.group-29 {
+  flex-shrink: 0;
+  width: 100%;
+  /*width: 27.625rem;
+  height: 3.875rem;
+  position: relative;*/
+}
+.frame-26 {
+  background: var(--variant-1-osnovnoe-mal-bloki, #ffffff);
+  /*border-radius: 0.5rem;
+  border-style: solid;
+  border-color: var(--variant-1-obvodka-legkaya, rgba(13, 64, 65, 0.5));
+  border-width: 0.03125rem;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: center;*/
+  width: 100%;
+  height: 53.23%;
+  /*position: absolute;
+  right: 0%;
+  left: 0%;
+  bottom: 0%;
+  top: 46.77%;
+  overflow: hidden;*/
+}
+.div9 {
+  color: #787878;
+  text-align: left;
+  font-family: "Inter-Medium", sans-serif;
+  font-size: 0.875rem;
+  line-height: 120%;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  position: relative;
+  align-self: stretch;
+}
+.div10 {
+  color: var(--tekst-svetlo-ser, #5c5b5b);
+  text-align: left;
+  font-family: var(--tekst-srednij-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--tekst-srednij-font-size, 1rem);
+  line-height: var(--tekst-srednij-line-height, 120%);
+  letter-spacing: var(--tekst-srednij-letter-spacing, 0.04em);
+  font-weight: var(--tekst-srednij-font-weight, 400);
+  position: absolute;
+  right: 7.24%;
+  left: 0%;
+  width: 92.76%;
+  bottom: 69.35%;
+  top: 0%;
+  height: 30.65%;
+}
+.group-30 {
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 3.875rem;
+  position: relative;
+}
+.div11 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--var-sds-size-space-200, 0.5rem);
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 27.625rem;
+  position: relative;
+}
+.frame-21 {
+  background: var(--variant-1-osnovnoe-mal-bloki, #ffffff);
+  border-radius: 0.5rem;
+  border-style: solid;
+  border-color: var(--variant-1-obvodka-legkaya, rgba(13, 64, 65, 0.5));
+  border-width: 0.03125rem;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 2.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.div12 {
+  color: rgba(30, 30, 30, 0.8);
+  text-align: left;
+  font-family: var(
+    --tekst-tonkij-melkij-font-family,
+    "Inter-Light",
+    sans-serif
+  );
+  font-size: var(--tekst-tonkij-melkij-font-size, 0.875rem);
+  line-height: var(--tekst-tonkij-melkij-line-height, 120%);
+  letter-spacing: var(--tekst-tonkij-melkij-letter-spacing, 0.08em);
+  font-weight: var(--tekst-tonkij-melkij-font-weight, 300);
+  position: relative;
+  flex: 1;
+}
+.navigate-next {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  position: relative;
+  overflow: visible;
+  aspect-ratio: 1;
+}
+.group-27 {
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 3.875rem;
+  position: relative;
+}
+.group-31 {
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 3.875rem;
+  position: relative;
+}
+.group-28 {
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 3.875rem;
+  position: relative;
+}
+.group-25 {
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 3.875rem;
+  position: relative;
+}
+.group-26 {
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 3.875rem;
+  position: relative;
+}
+.div13 {
+  background: var(--variant-1-osnovnoe-hedfut, #0e6466);
+  border-radius: 1rem;
+  padding: 0.75rem 0rem 0.75rem 0rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.625rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 27.625rem;
+  height: 3.5rem;
+  position: relative;
+}
+.div14 {
+  color: var(--variant-1-osnovnoe-sekcii, #e7f0f2);
+  text-align: center;
+  font-family: var(
+    --1-podzagolovok-malenkij-font-family,
+    "FiraCode-Medium",
+    sans-serif
+  );
+  font-size: var(--1-podzagolovok-malenkij-font-size, 1.25rem);
+  line-height: var(--1-podzagolovok-malenkij-line-height, 120%);
+  letter-spacing: var(--1-podzagolovok-malenkij-letter-spacing, 0.04em);
+  font-weight: var(--1-podzagolovok-malenkij-font-weight, 500);
+  position: relative;
+}
+.div15 {
+  background: var(--variant-1-osnovnoe-hedfut, #0e6466);
+  padding: 0.625rem 1.875rem 0.625rem 1.875rem;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 100%;
+  height: 9.0625rem;
+  position: relative;
+  overflow: hidden;
+}
+.frame-22 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+}
+.div16 {
+  color: #ffffff;
+  text-align: left;
+  font-family: var(
+    --1-podzagolovok-malenkij-font-family,
+    "FiraCode-Medium",
+    sans-serif
+  );
+  font-size: var(--1-podzagolovok-malenkij-font-size, 1.25rem);
+  line-height: var(--1-podzagolovok-malenkij-line-height, 120%);
+  letter-spacing: var(--1-podzagolovok-malenkij-letter-spacing, 0.04em);
+  font-weight: var(--1-podzagolovok-malenkij-font-weight, 500);
+  position: relative;
+}
+.frame-3 {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+.mail {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  position: relative;
+  overflow: visible;
+  aspect-ratio: 1;
+}
+.yugolets-priazovsocialimpact-ru {
+  color: var(--variant-1-tekst-bel, #ffffff);
+  text-align: left;
+  font-family: var(--tekst-srednij-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--tekst-srednij-font-size, 1rem);
+  line-height: var(--tekst-srednij-line-height, 120%);
+  letter-spacing: var(--tekst-srednij-letter-spacing, 0.04em);
+  font-weight: var(--tekst-srednij-font-weight, 400);
+  position: relative;
+}
+.frame-4 {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+.phone {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  position: relative;
+  overflow: visible;
+  aspect-ratio: 1;
+}
+._7-918-500-90-38 {
+  color: var(--variant-1-tekst-bel, #ffffff);
+  text-align: left;
+  font-family: var(--tekst-srednij-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--tekst-srednij-font-size, 1rem);
+  line-height: var(--tekst-srednij-line-height, 120%);
+  letter-spacing: var(--tekst-srednij-letter-spacing, 0.04em);
+  font-weight: var(--tekst-srednij-font-weight, 400);
+  position: relative;
+}
+.frame-23 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  align-items: flex-start;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  height: 5.125rem;
+  position: relative;
+}
+.div17 {
+  color: #ffffff;
+  text-align: left;
+  font-family: var(--tekst-srednij-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--tekst-srednij-font-size, 1rem);
+  line-height: var(--tekst-srednij-line-height, 120%);
+  letter-spacing: var(--tekst-srednij-letter-spacing, 0.04em);
+  font-weight: var(--tekst-srednij-font-weight, 400);
+  position: relative;
+}
+.frame-42 {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 18.5625rem;
+  position: relative;
+}
+.telegram-app {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  position: relative;
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+.yugolets {
+  color: #ffffff;
+  text-align: left;
+  font-family: var(--tekst-srednij-font-family, "Inter-Regular", sans-serif);
+  font-size: var(--tekst-srednij-font-size, 1rem);
+  line-height: var(--tekst-srednij-line-height, 120%);
+  letter-spacing: var(--tekst-srednij-letter-spacing, 0.04em);
+  font-weight: var(--tekst-srednij-font-weight, 400);
+  text-decoration: underline;
+  position: relative;
+}

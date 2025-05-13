@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+//using Microsoft.AspNetCore.Authentication.JwtBearer;
+//using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DataBase;
 using Microsoft.EntityFrameworkCore;
@@ -21,16 +21,16 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 
-builder.Services.AddHostedService<SessionsCleanupService>();
-builder.Services.AddHostedService<PasswordTokensCleanupService>();
+////builder.Services.AddHostedService<SessionsCleanupService>();
+////builder.Services.AddHostedService<PasswordTokensCleanupService>();
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SMTP"));
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+////builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.Configure<DadataSettings>(builder.Configuration.GetSection("Dadata"));
 
-builder.Services.AddScoped<TokenService>();
+////builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddScoped<EmailService>();
 
@@ -41,51 +41,51 @@ builder.Services.AddDbContextFactory<PriazovContext>(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var settings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+////builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+////    .AddJwtBearer(options =>
+////    {
+////        var settings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(settings.AccessTokenSecret)),
-            ValidateIssuer = true,
-            ValidIssuer = settings.Issuer,
-            ValidateAudience = true,
-            ValidAudience = settings.Audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
+////        options.TokenValidationParameters = new TokenValidationParameters
+////        {
+////            ValidateIssuerSigningKey = true,
+////            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(settings.AccessTokenSecret)),
+////            ValidateIssuer = true,
+////            ValidIssuer = settings.Issuer,
+////            ValidateAudience = true,
+////            ValidAudience = settings.Audience,
+////            ValidateLifetime = true,
+////            ClockSkew = TimeSpan.Zero
+////        };
+////    });
 
-builder.Services.AddSwaggerGen(opt =>
-{
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "API V1", Version = "v1" });
-    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        BearerFormat = "JWT",
-        Description = "JWT Authorization header using the Bearer scheme.",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer"
-    });
-    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Id = "Bearer",
-                    Type = ReferenceType.SecurityScheme
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
+////builder.Services.AddSwaggerGen(opt =>
+////{
+////    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "API V1", Version = "v1" });
+////    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+////    {
+////        BearerFormat = "JWT",
+////        Description = "JWT Authorization header using the Bearer scheme.",
+////        Name = "Authorization",
+////        In = ParameterLocation.Header,
+////        Type = SecuritySchemeType.Http,
+////        Scheme = "Bearer"
+////    });
+////    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+////    {
+////        {
+////            new OpenApiSecurityScheme
+////            {
+////                Reference = new OpenApiReference
+////                {
+////                    Id = "Bearer",
+////                    Type = ReferenceType.SecurityScheme
+////                }
+////            },
+////            Array.Empty<string>()
+////        }
+////    });
+////});
 
 var app = builder.Build();
 
@@ -96,11 +96,11 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseSwagger(opt =>
-    {
-        opt.RouteTemplate = "openapi/{documentName}.json";
-    });
-    app.UseSwaggerUI();
+    //app.UseSwagger(opt =>
+    //{
+    //    opt.RouteTemplate = "openapi/{documentName}.json";
+    //});
+    //app.UseSwaggerUI();
 }
 
 app.UseForwardedHeaders();
@@ -108,8 +108,8 @@ app.UseForwardedHeaders();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.UseAuthentication();
-app.UseAuthorization();
+////app.UseAuthentication();
+////app.UseAuthorization();
 
 app.MapScalarApiReference(opt =>
 {
@@ -119,8 +119,8 @@ app.MapScalarApiReference(opt =>
 });
 
 app.MapControllers();
-app.MapAuthEndpoints();
-app.MapPasswordEndpoints();
+//app.MapAuthEndpoints();
+//app.MapPasswordEndpoints();
 app.MapCompanyEndpoints();
 app.MapManagerEndpoints();
 
