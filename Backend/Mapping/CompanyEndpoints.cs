@@ -207,7 +207,7 @@ namespace Backend.Mapping
         {
             var cacheKey = $"companies_filter_{industry ?? "all"}_{region ?? "all"}";
 
-            if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
+            if (cache.TryGetValue(cacheKey, out List<CompanyResponseDto>? cachedCompanies))
                 return Results.Ok(cachedCompanies);
 
             if (industry != null && !_allowedIndustries.Contains(industry))
@@ -236,7 +236,7 @@ namespace Backend.Mapping
         {
             var cacheKey = $"companies_search_{industry ?? "all"}_{region ?? "all"}_{searchTerm}";
 
-            if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
+            if (cache.TryGetValue(cacheKey, out List<CompanyResponseDto>? cachedCompanies))
                 return Results.Ok(cachedCompanies);
 
             if (industry != null && !_allowedIndustries.Contains(industry))
@@ -265,7 +265,7 @@ namespace Backend.Mapping
         {
             var cacheKey = $"companies_filterMap_{industries ?? "all"}";
 
-            if (cache.TryGetValue(cacheKey, out List<Company>? cachedAddress))
+            if (cache.TryGetValue(cacheKey, out Dictionary<string, ShortAddressDto>? cachedAddress))
                 return Results.Ok(cachedAddress);
 
             List<string>? industryList = null;
