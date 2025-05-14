@@ -126,9 +126,10 @@ body {
     font-weight: 700;
     font-size: 48px;
     line-height: 1.2;
-    color: #000000;
+    color: white;
     text-shadow: none;
     margin: 0;
+    -webkit-text-stroke: 1.5px gray;
 }
 
 /* Плашка со скролляшейся информацией */
@@ -279,11 +280,12 @@ body {
     flex: 1;
     background: #FFFFFF;
     background-color: #E7F0F2;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     border: 1px solid;
     border-radius: 16px;
     border-color: gray;
+    gap: 10px;
 }
 
 .filter-item {
@@ -292,15 +294,14 @@ body {
     align-items: center;
 }
 
-.filter-checkbox {
-    margin-right: 10px;
-    width: 18px;
-    height: 18px;
+.filter-checkbox input[type=radio]{
+    width: 24px;
 }
 
 .filter-item label {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
+    margin-left: 10px;
     font-size: 16px;
     color: #012021;
     cursor: pointer;
@@ -525,24 +526,30 @@ footer {
     width: 100%;
     font-size: 14px;
     color: var(--text-color);
+    padding: 10px 180px;
     background: #0E6466;
     justify-content: left;
     color: white;
     gap: 1rem;
+    font-family: 'Inter', sans-serif;
     position: relative;
 }
 
+footer h3 {
+    font-size: 1.25rem;
+}
+
+footer a {
+  text-decoration: none;
+  color: white;
+}
+
 .contacts {
-    margin-left: 90px;
+    margin-bottom: 12px;
 }
 
 .interm {
     height: 10rem;
-}
-
-.contact-item {
-    position: relative;
-    top: -1rem;
 }
 
 
