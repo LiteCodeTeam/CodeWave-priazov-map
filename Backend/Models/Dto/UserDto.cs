@@ -11,8 +11,9 @@ namespace Backend.Models.Dto
         public string Name { get; set; } = null!;
 
         [Required]
+
         [StringLength(254, MinimumLength = 5, ErrorMessage = "Длина почты 5-254 символов")]
-        [RegularExpression(@"^\s*(?!\.)[\p{L}0-9_%+-]+(?<!\.)@(?!\.)[\p{L}.-]+\.[\p{L}]{2,4}\s*$", ErrorMessage = "Неверный формат почты")]
+        [RegularExpression(@"^\s*(?!\.)[\p{L}0-9_%+-\.]+(?<!\.)@(?!\.)[\p{L}.-]+\.[\p{L}]{2,4}\s*$", ErrorMessage = "Неверный формат почты")]
         public string Email { get; set; } = null!;
 
         [Required]

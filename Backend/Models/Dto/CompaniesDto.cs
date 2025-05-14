@@ -34,13 +34,13 @@ namespace Backend.Models.Dto
         public byte[]? PhotoHeader { get; set; }
         public JsonList<string> Contacts { get; set; } = new JsonList<string>();
         public CompanyResponseDto() { }
-        public CompanyResponseDto(Company company)
+        public CompanyResponseDto(Company company, string address)
         {
             Id = company.Id;
             Name = company.Name;
             Email = company.Email;
             Phone = company.Phone;
-            FullAddress = company.Address.FullAddress;
+            FullAddress = address;
             Industry = company.Industry;
             LeaderName = company.LeaderName;
             PhotoIcon = company.PhotoIcon;
