@@ -42,7 +42,7 @@ body {
     background: linear-gradient(#ffffff 98%,rgba(31, 111, 112, 0.01) 2%);
     height: 3.125rem;
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
     padding: 0 1.875rem;
     box-sizing: border-box;
@@ -102,22 +102,24 @@ body {
 .main-container {
     flex: 1;
     width: 100%;
-    height: 1440px;
+    min-height: 100vh;
+    height: auto;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     position: relative;
 }
 
 .registration-container {
-    width: 100%;
+    width: 90%;
     max-width: 700px;
-    height: 735px;
+    height: auto;
+    min-height: 735px;
     position: relative;
-    transform: translate(-15%, 10%);
-    margin: 0 auto;
-    justify-content: center;
+    transform: none;
+    margin: 20px auto;
     background: var(--secondary-color);
     border: 1px solid rgba(70, 70, 70, 0.8);
     border-radius: 30px;
@@ -166,26 +168,30 @@ body {
 .registration-title {
     position: relative;
     font-weight: 600;
-    font-size: 28px;
+    font-size: clamp(20px, 5vw, 28px);
     letter-spacing: 0.08em;
-    left: 50%;
+    text-align: center;
+    margin: 20px 0;
     text-transform: uppercase;
     color: var(--text-color);
-    transform: translate(-50%, 0);
+    transform: none;
+    left: 0;
 }
 
 .registration-form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 70px 15px;
-    padding-top: 50px;
-    gap: 25px;
+    padding: 20px;
+    gap: 15px;
+    width: 100%;
 }
 
 .form-field {
     width: 100%;
+    max-width: 500px;
     height: 40px;
+    margin: 0 auto;
     background: #FFFFFF;
     border: 1px solid var(--border-color);
     border-radius: 5px;
@@ -212,8 +218,11 @@ body {
 }
 
 .submit-btn {
-    width: 140%;
-    height: 70px;
+    width: 100%;
+    max-width: 500px;
+    height: 50px;
+    margin-top: 20px;
+    position: static;
     background: var(--primary-color);
     color: var(--light-text);
     border: none;
@@ -222,8 +231,6 @@ body {
     font-size: 18px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    position: relative;
-    top: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -235,22 +242,105 @@ body {
 
 footer {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     width: 100%;
     font-size: 14px;
-    color: var(--text-color);
-    padding: 10px 180px;
-    background: #0E6466;
-    justify-content: left 1rem;
     color: white;
+    padding: 20px;
+    background: #0E6466;
     gap: 1rem;
-    position: relative;
 }
 
 .contacts {
     margin-left: 10rem;
 }
 
+.contacts a {
+    color: white;
+}
+
+
 .interm {
     height: 10rem;
+}
+
+/* Add responsive styles */
+@media screen and (max-width: 768px) {
+    .header {
+        padding: 0 1rem;
+        height: auto;
+        min-height: 3.125rem;
+    }
+
+    .logo-group {
+        gap: 10px;
+    }
+
+    .tabs-container {
+        height: 60px;
+    }
+
+    .tab-text {
+        font-size: 16px;
+    }
+
+    .registration-form {
+        padding: 20px 15px;
+    }
+
+    .form-field input,
+    .form-field select {
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        font-size: 16px;
+        height: 45px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .registration-container {
+        width: 95%;
+        border-radius: 20px;
+    }
+
+    .tab-text {
+        font-size: 14px;
+    }
+
+    .form-field {
+        height: 35px;
+    }
+
+    .form-field input,
+    .form-field select {
+        padding: 0 10px;
+        font-size: 14px;
+    }
+
+    footer {
+        text-align: center;
+        align-items: center;
+    }
+
+    .contacts {
+        margin-left: 0;
+    }
+}
+
+/* Fix for mobile input fields */
+@media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+
+    .contacts {
+        margin-left: 0;
+    }
 }

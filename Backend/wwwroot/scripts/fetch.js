@@ -42,15 +42,20 @@
             if (!response.ok) {
                 // Начало обработки ошибок
                 const errors = result.errors || [];
-                const errorMessage = errors.length > 0 ? errors.join(', ') : 'Нет ошибок';
-                if (errors.length > 0) { throw new Error(`Ошибка: ${result.message}\n${errorMessage}\nОшибка сервера: ${response.status}`); }
+
+                const errorMessage = Object.entries(errors)
+                    .map(([key, value]) => `${value}`)
+                    .join(", ");
+
+                if (errorMessage.length > 0) {
+                    alert(errorMessage);
+                    return;
+                }
 
                 // Конец обработки ошибок
             }
 
             alert('Регистрация успешна!');
-
-
         } catch (error) {
             alert(error.message);
         }
