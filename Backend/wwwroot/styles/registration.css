@@ -102,7 +102,6 @@ body {
 .main-container {
     flex: 1;
     width: 100%;
-    min-height: 100vh;
     height: auto;
     margin: 0 auto;
     padding: 20px;
@@ -342,5 +341,13 @@ footer {
 
     .contacts {
         margin-left: 0;
+    }
+
+    footer {
+        padding: 10px 10px;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        display: block;
     }
 }
