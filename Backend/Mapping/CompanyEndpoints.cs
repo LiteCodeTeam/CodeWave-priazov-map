@@ -142,7 +142,7 @@ namespace Backend.Mapping
             await db.Users.AddAsync(company);
             await db.SaveChangesAsync();
 
-            //await email.SendRegistrationEmail(company);
+            await email.SendRegistrationEmail(company);
 
             return Results.Ok(new CompanyResponseDto(company, company.Address.FullAddress));
         }

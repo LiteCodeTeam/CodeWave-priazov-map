@@ -22,18 +22,19 @@ namespace Backend
             message.From.Add(new MailboxAddress("Priazov-Impact", "priazovimpact@gmail.com"));
             message.To.Add(new MailboxAddress("", user.Email));
             message.Subject = "Успешная регистрация";
+
+            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "RegisterEmail.html");
+            var htmlTemplate = await File.ReadAllTextAsync(templatePath);
+
+            var htmlBody = htmlTemplate
+                .Replace("[Имя пользователя]", user.Name)
+                .Replace("[Почта пользователя]", user.Email)
+                .Replace("[Телефон пользователя]", user.Phone);
+
+
             message.Body = new TextPart("html")
             {
-                Text = $"""
-                <div style ="
-                margin: 20px;
-                padding: 5px;
-                border: groove 2px black;"><p style = "font-size: 20px">Здравствуйте, уважаемый клиент!</p>
-                <p style = "font-size: 20px">Вы зарегистрировались на нашем сервисе Priazov Impact</p>
-                <p style = "font-size: 20px">Были введены следующие контакты контакты:</p>
-                <p style = "font-size: 20px">Почта - {user.Email}</p>
-                <p style = "font-size: 20px">Телефон - {user.Phone}</p></div>
-                """
+                Text = htmlBody
             };
 
             using var client = new SmtpClient();
