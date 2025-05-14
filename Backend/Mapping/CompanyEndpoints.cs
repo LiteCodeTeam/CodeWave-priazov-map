@@ -14,6 +14,7 @@ using Microsoft.Net.Http.Headers;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -141,9 +142,9 @@ namespace Backend.Mapping
             await db.Users.AddAsync(company);
             await db.SaveChangesAsync();
 
-            await email.SendRegistrationEmail(company);
+            //await email.SendRegistrationEmail(company);
 
-            return Results.Ok(new CompanyResponseDto(company));
+            return Results.Ok(new CompanyResponseDto(company, company.Address.FullAddress));
         }
 
         private static async Task<IResult> Review(
@@ -162,7 +163,7 @@ namespace Backend.Mapping
                 .OrderBy(c => c.Name)
                 .Take(5)
                 .Include(c => c.Address)
-                .Select(c => new CompanyResponseDto(c))
+                .Select(c => new CompanyResponseDto(c, c.Address.FullAddress))
                 .ToListAsync();
 
             var count = await db.Users.OfType<Company>().CountAsync() - query.Count;
@@ -191,7 +192,7 @@ namespace Backend.Mapping
             if (company == null)
                 return Results.NotFound();
 
-            var companyResponse = new CompanyResponseDto(company);
+            var companyResponse = new CompanyResponseDto(company, company.Address.FullAddress);
 
             cache.Set(cacheKey, companyResponse, CacheOptions);
 
@@ -220,7 +221,7 @@ namespace Backend.Mapping
 
             var query = db.Users.OfType<Company>().AsQueryable().Include(c => c.Address).Where(c => c.Industry == industry);
 
-            var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c)).ToListAsync();
+            var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c, c.Address.FullAddress)).ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
             return Results.Ok(companies);
@@ -252,7 +253,7 @@ namespace Backend.Mapping
             if (!string.IsNullOrWhiteSpace(searchTerm))
                 query = query.Where(c => EF.Functions.ILike(c.Name, $"%{searchTerm}%"));
 
-            var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c)).ToListAsync();
+            var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c, c.Address.FullAddress)).ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
 
@@ -265,7 +266,7 @@ namespace Backend.Mapping
         {
             var cacheKey = $"companies_filterMap_{industries ?? "all"}";
 
-            if (cache.TryGetValue(cacheKey, out Dictionary<string, ShortAddressDto>? cachedAddress))
+            if (cache.TryGetValue(cacheKey, out List<(ShortAddressDto Address, List<CompanyResponseDto> Companies)>? cachedAddress))
                 return Results.Ok(cachedAddress);
 
             List<string>? industryList = null;
@@ -280,12 +281,23 @@ namespace Backend.Mapping
 
             using var db = await factory.CreateDbContextAsync();
 
-            var query = db.Users.OfType<Company>().Include(c => c.Address).AsQueryable();
+            var query = db.Users.OfType<Company>().Select(user => new
+            {
+                Address = user.Address,
+                Company = new CompanyResponseDto(user, user.Address.FullAddress)
+            });
 
             if (industryList?.Count > 0)
-                query = query.Where(c => industryList.Contains(c.Industry));
+                query = query.Where(c => industryList.Contains(c.Company.Industry));
 
-            var addresses = await query.ToDictionaryAsync(c => c.Name, c=> c.Address);
+
+            var addresses = await query.GroupBy(x => x.Address.FullAddress)
+            .Select(g => new
+            {
+                Address = g.First().Address,
+                Users = g.Select(x => x.Company).ToList()
+            })
+            .ToListAsync();
 
             cache.Set(cacheKey, addresses, CacheOptions);
             return Results.Ok(addresses);
@@ -361,7 +373,7 @@ namespace Backend.Mapping
 
             await db.SaveChangesAsync();
 
-            return Results.Ok(new CompanyResponseDto(company));
+            return Results.Ok(new CompanyResponseDto(company, company.Address.FullAddress));
         }
     }
 }
