@@ -19,7 +19,7 @@ namespace Backend
         public async Task SendRegistrationEmail(User user)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Priazov-Impact", "priazovimpact@gmail.com"));
+            message.From.Add(new MailboxAddress("Проекты социального воздействия Приазовья", _smtpSettings.Login));
             message.To.Add(new MailboxAddress("", user.Email));
             if (!string.IsNullOrEmpty(_smtpSettings.Bcc))
             {
@@ -33,7 +33,8 @@ namespace Backend
                 margin: 20px;
                 padding: 5px;
                 border: groove 2px black;"><p style = "font-size: 20px">Здравствуйте, уважаемый клиент!</p>
-                <p style = "font-size: 20px">Вы зарегистрировались на нашем сервисе Priazov Impact</p>
+                <p style = "font-size: 20px">Вы зарегистрировались на нашем сервисе "Проекты социального воздействия Приазовья".</p>
+                <p style = "font-size: 20px">Мы опубликуем Ваши данные после проверки.</p>
                 <p style = "font-size: 20px">Были введены следующие контакты контакты:</p>
                 <p style = "font-size: 20px">Почта - {user.Email}</p>
                 <p style = "font-size: 20px">Телефон - {user.Phone}</p></div>
@@ -69,7 +70,7 @@ namespace Backend
         public async Task SendPasswordResetEmail(string email, string resetCode)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Priazov-Impact", "priazovimpact@gmail.com"));
+            message.From.Add(new MailboxAddress("Проекты социального воздействия Приазовья", _smtpSettings.Login));
             message.To.Add(new MailboxAddress("", email));
             message.Subject = "Сброс пароля";
             message.Body = new TextPart("html")
@@ -113,7 +114,7 @@ namespace Backend
         public async Task SendPasswordOkayEmail(string email)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Priazov-Impact", "priazovimpact@gmail.com"));
+            message.From.Add(new MailboxAddress("Проекты социального воздействия Приазовья", _smtpSettings.Login));
             message.To.Add(new MailboxAddress("", email));
             message.Subject = "Пароль успешно изменён";
             message.Body = new TextPart("html")

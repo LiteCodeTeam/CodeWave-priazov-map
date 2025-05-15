@@ -7,7 +7,6 @@ namespace Backend.Models.Dto
     {
         [Required]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Длина названия/имени 8-100 символов")]
-        [RegularExpression(@"^\s*[\p{L}\s-\""]+\s*$", ErrorMessage = "В названии/имени разрешены только буквы, кавычки и пробелы")]
         public string Name { get; set; } = null!;
 
         [Required]
