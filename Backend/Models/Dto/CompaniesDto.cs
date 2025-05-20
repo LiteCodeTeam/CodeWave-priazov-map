@@ -24,6 +24,8 @@ namespace Backend.Models.Dto
         //[RegularExpression(@"^\s*(?=.*[a-zа-яё])(?=.*[A-ZА-ЯЁ])(?=.*\d)(?=.*[^\da-zA-Zа-яА-ЯЁё]).{8,30}\s*$",
         //ErrorMessage = "Пароль слишком слабый")]
         public string Password { get; set; } = null!;
+        [Required]
+        public string Token { get; set; } = null!;
     }
     public class CompanyResponseDto : CompanyDto
     {

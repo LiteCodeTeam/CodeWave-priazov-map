@@ -61,16 +61,17 @@ namespace Backend.Mapping
             group.MapPost("/create", Create);
             group.MapGet("/review", Review);
             group.MapGet("account", Account);
-            group.MapGet("/filterCatalog", FilterCompanies);
             group.MapGet("/filterMap", FilterMap);
             group.MapGet("/search", SearchCompanies);
             group.MapPut("/change", Change);
         }
 
-        private static async Task<IResult> Create(CompanyCreateDto companyDto,
+        private static async Task<IResult> Create(
+            [FromBody] CompanyCreateDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IOptions<DadataSettings> dadata,
-            [FromServices] EmailService email)
+            [FromServices] EmailService email,
+            [FromServices] TurnstileService turnstile)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -90,6 +91,10 @@ namespace Backend.Mapping
                     );
                 return Results.ValidationProblem(errors);
             }
+
+            bool isHuman = await turnstile.VerifyTurnstileAsync(companyDto.Token);
+            if (!isHuman)
+                return Results.BadRequest("Проверка Cloudflare Turnstile не пройдена.");
 
             companyDto.Name = companyDto.Name.Trim();
             companyDto.Password = companyDto.Password.Trim();
@@ -197,34 +202,6 @@ namespace Backend.Mapping
             cache.Set(cacheKey, companyResponse, CacheOptions);
 
             return Results.Ok(companyResponse);
-        }
-
-        [Authorize]
-        private static async Task<IResult> FilterCompanies(
-            [FromQuery] string? industry,
-            [FromQuery] string? region,
-            [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IMemoryCache cache)
-        {
-            var cacheKey = $"companies_filter_{industry ?? "all"}_{region ?? "all"}";
-
-            if (cache.TryGetValue(cacheKey, out List<CompanyResponseDto>? cachedCompanies))
-                return Results.Ok(cachedCompanies);
-
-            if (industry != null && !_allowedIndustries.Contains(industry))
-                return Results.BadRequest("Недопустимые значения индустрии");
-
-            if (region != null && !_allowedRegions.Contains(region))
-                return Results.BadRequest("Недопустимые значения региона");
-
-            using var db = await factory.CreateDbContextAsync();
-
-            var query = db.Users.OfType<Company>().AsQueryable().Include(c => c.Address).Where(c => c.Industry == industry);
-
-            var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c, c.Address.FullAddress)).ToListAsync();
-
-            cache.Set(cacheKey, companies, CacheOptions);
-            return Results.Ok(companies);
         }
 
         [Authorize]

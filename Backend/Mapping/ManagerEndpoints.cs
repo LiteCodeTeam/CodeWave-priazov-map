@@ -36,7 +36,8 @@ namespace Backend.Mapping
             [FromBody] ManagerCreateDto managerDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IOptions<DadataSettings> dadata,
-            [FromServices] EmailService email)
+            [FromServices] EmailService email,
+            [FromServices] TurnstileService turnstile)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -56,6 +57,10 @@ namespace Backend.Mapping
                     );
                 return Results.ValidationProblem(errors);
             }
+
+            bool isHuman = await turnstile.VerifyTurnstileAsync(managerDto.Token);
+            if (!isHuman)
+                return Results.BadRequest("Проверка Cloudflare Turnstile не пройдена.");
 
             managerDto.Name = managerDto.Name.Trim();
             managerDto.Password = managerDto.Password.Trim();

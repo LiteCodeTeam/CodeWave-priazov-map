@@ -30,9 +30,13 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 
 builder.Services.Configure<DadataSettings>(builder.Configuration.GetSection("Dadata"));
 
+builder.Services.Configure<TurnstileSettings>(builder.Configuration.GetSection("Turnstile"));
+
 builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddScoped<EmailService>();
+
+builder.Services.AddScoped<TurnstileService>();
 
 builder.Services.AddMemoryCache();
 
