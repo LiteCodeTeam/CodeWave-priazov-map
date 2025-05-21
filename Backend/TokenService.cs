@@ -13,11 +13,13 @@ namespace Backend
     {
         private readonly JwtSettings _jwtSettings;
         private readonly IMemoryCache _cache;
+        private readonly ILogger<TokenService> _logger;
 
-        public TokenService(IOptions<JwtSettings> jwtSettings, IMemoryCache cache)
+        public TokenService(IOptions<JwtSettings> jwtSettings, ILogger<TokenService> logger, IMemoryCache cache)
         {
             _jwtSettings = jwtSettings.Value;
             _cache = cache;
+            _logger = logger;
         }
 
         // Валидация токена (для Access и Refresh)
@@ -52,14 +54,16 @@ namespace Backend
 
                 return principal;
             }
-            catch
+            catch(Exception ex)
             {
+                _logger.LogError(ex, "Не удалось провести валидацию токена");
                 return null;
             }
         }
 
         public string GenerateAccessToken(string userId, string email, string role)
         {
+            _logger.LogInformation($"Генерация токена для пользователя {userId}");
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.AccessTokenSecret);
 
@@ -86,6 +90,7 @@ namespace Backend
         // Генерация Refresh Token (обычно случайная строка, но может быть и JWT)
         public string GenerateRefreshToken(string userId)
         {
+            _logger.LogInformation($"Генерация токена для пользователя {userId}");
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.RefreshTokenSecret);
 
@@ -102,28 +107,6 @@ namespace Backend
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
-        }
-        public ClaimsPrincipal? ValidateExpiredToken(string token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            try
-            {
-                // Валидация без проверки срока действия
-                return tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.RefreshTokenSecret)),
-                    ValidateIssuer = true,
-                    ValidIssuer = _jwtSettings.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = _jwtSettings.Audience,
-                    ValidateLifetime = false
-                }, out _);
-            }
-            catch
-            {
-                return null;
-            }
         }
     }
 }

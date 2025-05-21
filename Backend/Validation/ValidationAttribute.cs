@@ -6,7 +6,7 @@ namespace Backend.Validation
 {
     public class JsonListValidationAttribute : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object value, ValidationContext context)
+        protected override ValidationResult IsValid(object? value, ValidationContext context)
         {       
             var Jsonlist = value as JsonList<string>;
             var regex = new Regex(@"^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$");

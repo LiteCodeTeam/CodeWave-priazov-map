@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
+using NLog.Web;
 using System.Text;
 using DataBase;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
+
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
 
 builder.Services.AddHostedService<SessionsCleanupService>();
 builder.Services.AddHostedService<PasswordTokensCleanupService>();

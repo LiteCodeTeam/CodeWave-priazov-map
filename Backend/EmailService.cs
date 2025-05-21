@@ -1,4 +1,5 @@
 ﻿using Backend.Models;
+using Dadata.Model;
 using DataBase.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -10,10 +11,12 @@ namespace Backend
     public class EmailService
     {
         private readonly SmtpSettings _smtpSettings;
+        private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IOptions<SmtpSettings> smtpSettings)
+        public EmailService(IOptions<SmtpSettings> smtpSettings, ILogger<EmailService> logger)
         {
             _smtpSettings = smtpSettings.Value;
+            _logger = logger;
         }
 
         public async Task SendRegistrationEmail(User user)
@@ -43,22 +46,27 @@ namespace Backend
                 await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(_smtpSettings.Login, _smtpSettings.Password);
                 await client.SendAsync(message);
+                _logger.LogInformation($"Письмо успешно отправлено на {user.Email} ");
             }
             catch (SmtpCommandException ex) when (ex.StatusCode == SmtpStatusCode.MailboxBusy)
             {
+                _logger.LogWarning(ex, "Почтовый ящик занят для пользователя {Email}. Повтор через 5 секунд...", user.Email);
                 await Task.Delay(5000);
                 await SendRegistrationEmail(user);
             }
             catch (SmtpCommandException ex)
             {
+                _logger.LogError(ex, "Ошибка SMTP при отправке письма пользователю {Email}: {Message}", user.Email, ex.Message);
                 throw new ApplicationException($"SMTP error: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Не удалось отправить письмо пользователю {Email}", user.Email);
                 throw new ApplicationException($"Failed to send email: {ex.Message}", ex);
             }
             finally
             {
+                _logger.LogInformation("Отключение от SMTP сервера после отправки письма пользователю {Email}", user.Email);
                 await client.DisconnectAsync(true);
             }
         }
@@ -87,22 +95,27 @@ namespace Backend
                 await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(_smtpSettings.Login, _smtpSettings.Password);
                 await client.SendAsync(message);
+                _logger.LogInformation($"Письмо успешно отправлено на {email} ");
             }
             catch (SmtpCommandException ex) when (ex.StatusCode == SmtpStatusCode.MailboxBusy)
             {
+                _logger.LogWarning(ex, "Почтовый ящик занят для пользователя {Email}. Повтор через 5 секунд...", email);
                 await Task.Delay(5000);
                 await SendPasswordResetEmail(email, resetCode);
             }
             catch (SmtpCommandException ex)
             {
+                _logger.LogError(ex, "Ошибка SMTP при отправке письма пользователю {Email}: {Message}", email, ex.Message);
                 throw new ApplicationException($"SMTP error: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Не удалось отправить письмо пользователю {Email}", email);
                 throw new ApplicationException($"Failed to send email: {ex.Message}", ex);
             }
             finally
             {
+                _logger.LogInformation("Отключение от SMTP сервера после отправки письма пользователю {Email}", email);
                 await client.DisconnectAsync(true);
             }
         }
@@ -129,22 +142,27 @@ namespace Backend
                 await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(_smtpSettings.Login, _smtpSettings.Password);
                 await client.SendAsync(message);
+                _logger.LogInformation($"Письмо успешно отправлено на {email} ");
             }
             catch (SmtpCommandException ex) when (ex.StatusCode == SmtpStatusCode.MailboxBusy)
             {
+                _logger.LogWarning(ex, "Почтовый ящик занят для пользователя {Email}. Повтор через 5 секунд...", email);
                 await Task.Delay(5000);
                 await SendPasswordOkayEmail(email);
             }
             catch (SmtpCommandException ex)
             {
+                _logger.LogError(ex, "Ошибка SMTP при отправке письма пользователю {Email}: {Message}", email, ex.Message);
                 throw new ApplicationException($"SMTP error: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Не удалось отправить письмо пользователю {Email}", email);
                 throw new ApplicationException($"Failed to send email: {ex.Message}", ex);
             }
             finally
             {
+                _logger.LogInformation("Отключение от SMTP сервера после отправки письма пользователю {Email}", email);
                 await client.DisconnectAsync(true);
             }
         }

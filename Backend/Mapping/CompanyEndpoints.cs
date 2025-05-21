@@ -71,7 +71,8 @@ namespace Backend.Mapping
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IOptions<DadataSettings> dadata,
             [FromServices] EmailService email,
-            [FromServices] TurnstileService turnstile)
+            [FromServices] TurnstileService turnstile,
+            [FromServices] ILogger<CompanyEndpointsLogger> logger)
         {
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
@@ -83,6 +84,7 @@ namespace Backend.Mapping
 
             if (!isValid)
             {
+                logger.LogWarning($"Ошибка валидации при создании компании: {validationResults}");
                 var errors = validationResults
                     .GroupBy(v => v.MemberNames.FirstOrDefault() ?? "")
                     .ToDictionary(
@@ -94,8 +96,11 @@ namespace Backend.Mapping
 
             bool isHuman = await turnstile.VerifyTurnstileAsync(companyDto.Token);
             if (!isHuman)
+            {
+                logger.LogWarning($"Cloudflare Turnstile не пройдён для email: {companyDto.Email}");
                 return Results.BadRequest("Проверка Cloudflare Turnstile не пройдена.");
-
+            }
+                
             companyDto.Name = companyDto.Name.Trim();
             companyDto.Password = companyDto.Password.Trim();
             companyDto.FullAddress = companyDto.FullAddress.Trim();
@@ -105,26 +110,35 @@ namespace Backend.Mapping
             companyDto.LeaderName = companyDto.LeaderName.Trim();
 
             if (!_allowedIndustries.Any(i => i == companyDto.Industry))
+            {
+                logger.LogWarning($"Индустрия не найдена в списке: {companyDto.Industry}");
                 return Results.BadRequest("Недопустимое значение индустрии");
-
+            }
+                
             if (companyDto.Password.ToLower().Contains("script"))
+            {
+                logger.LogWarning("Попытка зарегистрировать опасный контент");
                 return Results.BadRequest();
-
-            //if (Zxcvbn.Core.EvaluatePassword(companyDto.Password).Score < 3)
-            //    return Results.BadRequest("Слабый пароль");
+            }
 
             using var db = await factory.CreateDbContextAsync();
 
             if (db.Users.Any(u => u.Email == companyDto.Email &&
             u.Address.FullAddress == companyDto.FullAddress))
+            {
+                logger.LogWarning($"Пользователь с таким email и адресом уже существует: {companyDto.Email}, {companyDto.FullAddress}");
                 return Results.Conflict("Повтор уникальных данных");
-
+            }
+                
             var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
             var cleanedAddress = await api.Clean<Dadata.Model.Address>(companyDto.FullAddress);
 
             if (cleanedAddress.result == null)
+            {
+                logger.LogWarning($"Адрес не найден: {companyDto.FullAddress}");
                 return Results.NotFound("Адрес не найден");
-
+            }
+                
             var company = new Company()
             {
                 Name = companyDto.Name,
@@ -148,18 +162,27 @@ namespace Backend.Mapping
             await db.SaveChangesAsync();
 
             await email.SendRegistrationEmail(company);
+            logger.LogInformation($"Компания зарегистрирована: {companyDto.Email}");
 
             return Results.Ok(new CompanyResponseDto(company, company.Address.FullAddress));
         }
 
         private static async Task<IResult> Review(
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IMemoryCache cache)
+            [FromServices] IMemoryCache cache,
+            [FromServices] ILogger<CompanyEndpointsLogger> logger)
         {
             var cacheKey = $"companies_review";
 
             if (cache.TryGetValue(cacheKey, out List<Company>? cachedCompanies))
+            {
+                logger.LogInformation($"Ответ взят из кэша: {cacheKey}");
                 return Results.Ok(cachedCompanies);
+            }
+            else
+            {
+                logger.LogInformation($"Кэш промах. Запрос к БД: {cacheKey}");
+            }
 
             using var db = await factory.CreateDbContextAsync();
             
@@ -174,6 +197,7 @@ namespace Backend.Mapping
             var count = await db.Users.OfType<Company>().CountAsync() - query.Count;
 
             cache.Set(cacheKey, query, CacheOptions);
+            logger.LogInformation("Краткий просмотр компаний выполнен");
 
             return Results.Ok(new { query, count });
         }
@@ -181,25 +205,40 @@ namespace Backend.Mapping
         [Authorize]
         public static async Task<IResult> Account([FromQuery] Guid? id,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IMemoryCache cache)
+            [FromServices] IMemoryCache cache,
+            [FromServices] ILogger<CompanyEndpointsLogger> logger)
         {
             if (id == null)
+            {
+                logger.LogWarning("Id компании отсутствует");
                 return Results.BadRequest("Id пуст");
+            }             
 
             var cacheKey = $"companies_{id}";
             if (cache.TryGetValue(cacheKey, out CompanyResponseDto? cachedCompany))
+            {
+                logger.LogInformation($"Ответ взят из кэша: {cacheKey}");
                 return Results.Ok(cachedCompany);
+            }
+            else
+            {
+                logger.LogInformation($"Кэш промах. Запрос к БД: {cacheKey}");
+            }
 
             using var db = await factory.CreateDbContextAsync();
 
             var company = await db.Users.OfType<Company>().Include(c => c.Address).FirstOrDefaultAsync(c => c.Id == id);
 
             if (company == null)
+            {
+                logger.LogWarning($"Компания не найдена по Id: {id}");
                 return Results.NotFound();
-
+            }
+                
             var companyResponse = new CompanyResponseDto(company, company.Address.FullAddress);
 
             cache.Set(cacheKey, companyResponse, CacheOptions);
+            logger.LogInformation($"Компания успешно найдена Id: {id}");
 
             return Results.Ok(companyResponse);
         }
@@ -208,20 +247,35 @@ namespace Backend.Mapping
         private static async Task<IResult> SearchCompanies(
             [FromQuery] string? industry,
             [FromQuery] string? region,
+            [FromQuery] string? searchTerm,
             [FromServices] IDbContextFactory<PriazovContext> factory,
             [FromServices] IMemoryCache cache,
-            [FromQuery] string searchTerm = "")
+            [FromServices] ILogger<CompanyEndpointsLogger> logger)
         {
-            var cacheKey = $"companies_search_{industry ?? "all"}_{region ?? "all"}_{searchTerm}";
+            var cacheKey = $"companies_search_{industry ?? "all"}_{region ?? "all"}_{searchTerm ?? "all"}";
 
             if (cache.TryGetValue(cacheKey, out List<CompanyResponseDto>? cachedCompanies))
+            {
+                logger.LogInformation($"Ответ взят из кэша: {cacheKey}");
                 return Results.Ok(cachedCompanies);
+            }
+            else
+            {
+                logger.LogInformation($"Кэш промах. Запрос к БД: {cacheKey}");
+            }
 
             if (industry != null && !_allowedIndustries.Contains(industry))
-                return Results.BadRequest("Недопустимые значения индустрии");
+            {
+                logger.LogInformation($"Недопустимое значение индустрии: {industry}");
+                return Results.BadRequest("Недопустимое значение индустрии");
+            }
+                
 
             if (region != null && !_allowedRegions.Contains(region))
+            {
+                logger.LogInformation($"Недопустимое значение региона: {region}");
                 return Results.BadRequest("Недопустимые значения региона");
+            }       
 
             using var db = await factory.CreateDbContextAsync();
 
@@ -233,18 +287,27 @@ namespace Backend.Mapping
             var companies = await query.OrderBy(c => c.Name).Select(c => new CompanyResponseDto(c, c.Address.FullAddress)).ToListAsync();
 
             cache.Set(cacheKey, companies, CacheOptions);
+            logger.LogInformation("Поиск и фильтрация компаний завершились успешно");
 
             return Results.Ok(companies);
         }
         public static async Task<IResult> FilterMap(
                     [FromQuery] string? industries,
                     [FromServices] IDbContextFactory<PriazovContext> factory,
-                    [FromServices] IMemoryCache cache)
+                    [FromServices] IMemoryCache cache,
+                    [FromServices] ILogger<CompanyEndpointsLogger> logger)
         {
             var cacheKey = $"companies_filterMap_{industries ?? "all"}";
 
             if (cache.TryGetValue(cacheKey, out List<(ShortAddressDto Address, List<CompanyResponseDto> Companies)>? cachedAddress))
+            {
+                logger.LogInformation($"Ответ взят из кэша: {cacheKey}");
                 return Results.Ok(cachedAddress);
+            }
+            else
+            {
+                logger.LogInformation($"Кэш промах. Запрос к БД: {cacheKey}");
+            }
 
             List<string>? industryList = null;
             if (!string.IsNullOrEmpty(industries))
@@ -253,7 +316,11 @@ namespace Backend.Mapping
                                         .ToList();
 
             if (industryList?.Count > 0 && industryList.Any(i => !_allowedIndustries.Contains(i)))
+            {
+                logger.LogInformation($"Недопустимые значения индустрий: {industryList}");
                 return Results.BadRequest("Недопустимые значения индустрий.");
+            }
+                
 
 
             using var db = await factory.CreateDbContextAsync();
@@ -277,14 +344,24 @@ namespace Backend.Mapping
             .ToListAsync();
 
             cache.Set(cacheKey, addresses, CacheOptions);
+            logger.LogInformation("Фильтрация адресов завершилась успешно");
+
             return Results.Ok(addresses);
         }
         [Authorize]
         public static async Task<IResult> Change([FromQuery] Guid? id,
             [FromBody] CompanyChangeDto companyDto,
             [FromServices] IDbContextFactory<PriazovContext> factory,
-            [FromServices] IOptions<DadataSettings> dadata)
+            [FromServices] IOptions<DadataSettings> dadata,
+            [FromServices] ILogger<CompanyEndpointsLogger> logger)
         {
+
+            if (id == null)
+            {
+                logger.LogWarning("Id компании отсутствует");
+                return Results.BadRequest("Id пуст");
+            }
+
             var validationResults = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(
                 companyDto,
@@ -295,6 +372,7 @@ namespace Backend.Mapping
 
             if (!isValid)
             {
+                logger.LogWarning($"Ошибка валидации при создании компании: {validationResults}");
                 var errors = validationResults
                     .GroupBy(v => v.MemberNames.FirstOrDefault() ?? "")
                     .ToDictionary(
@@ -317,21 +395,35 @@ namespace Backend.Mapping
             var company = db.Users.OfType<Company>().Include(c => c.Address).FirstOrDefault(c => c.Id == id);
 
             if (company == null)
+            {
+                logger.LogWarning($"Компания не найдена по Id: {id}");
                 return Results.NotFound();
-
+            }
+                
             if (!_allowedIndustries.Any(i => i == companyDto.Industry))
+            {
+                logger.LogWarning($"Индустрия не найдена в списке: {companyDto.Industry}");
                 return Results.BadRequest("Недопустимое значение индустрии");
+            }
+                
 
             if (db.Users.Any(u => u.Email == companyDto.Email &&
             u.Address.FullAddress == companyDto.FullAddress && u.Id != id))
+            {
+                logger.LogWarning($"Пользователь с таким email и адресом уже существует: {companyDto.Email}, {companyDto.FullAddress}");
                 return Results.Conflict("Повтор уникальных данных");
+            }
+                
 
             var api = new CleanClientAsync(dadata.Value.ApiKey, dadata.Value.SecretKey);
             var cleanedAddress = await api.Clean<Dadata.Model.Address>(companyDto.FullAddress);
 
             if (cleanedAddress.result == null)
+            {
+                logger.LogWarning($"Адрес не найден: {companyDto.FullAddress}");
                 return Results.NotFound("Адрес не найден");
-
+            }
+                
             company.Name = companyDto.Name;
             company.Email = companyDto.Email;
             company.Phone = companyDto.Phone;
@@ -349,6 +441,7 @@ namespace Backend.Mapping
             company.Description = companyDto.Description;
 
             await db.SaveChangesAsync();
+            logger.LogInformation($"Компания успешно изменена: {id}");
 
             return Results.Ok(new CompanyResponseDto(company, company.Address.FullAddress));
         }
